@@ -15,6 +15,7 @@ import {
   PulsarVisualization,
   QuasarVisualization,
   ProtoplanetaryDiskVisualization,
+  IsoclinesVisualization,
 } from "@/components/visualizations/lazy"
 
 interface CosmosSectionProps {
@@ -118,6 +119,15 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
         isDark={isDark}
       >
         <ProtoplanetaryDiskVisualization isDark={isDark} />
+      </VisualizationCard>
+
+      <VisualizationCard
+        title="Кольца Сатурна: Изоклины"
+        description="Визуализация дифференциальных уравнений через метод изоклин на примере колец Сатурна"
+        color="indigo"
+        isDark={isDark}
+      >
+        <IsoclinesVisualization />
       </VisualizationCard>
     </>
   )

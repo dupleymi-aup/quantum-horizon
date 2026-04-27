@@ -372,6 +372,17 @@ export const ProtoplanetaryDiskVisualization = dynamic(
   }
 )
 
+export const IsoclinesVisualization = dynamic(
+  () =>
+    import("@/components/visualizations/cosmos/isoclines").then((mod) => ({
+      default: mod.IsoclinesVisualization,
+    })),
+  {
+    loading: () => <VisualizationCardSkeleton />,
+    ssr: false,
+  }
+)
+
 // Thermodynamics visualizations
 export const ThermalRadiationVisualization = dynamic(
   () =>
