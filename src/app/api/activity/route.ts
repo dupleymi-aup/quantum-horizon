@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
+import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:activity")
@@ -22,30 +24,38 @@ async function getUserId(): Promise<string | null> {
 /**
  * GET /api/activity
  * Получить историю активности пользователя
+ * Query params: limit (default 50, max 100), offset (default 0)
  */
-export async function GET() {
+async function GETHandler(request: NextRequest) {
   try {
     const userId = await getUserId()
-
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const activities = await db.userActivity.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      select: {
-        id: true,
-        action: true,
-        topic: true,
-        xpGained: true,
-        createdAt: true,
-      },
-    })
+    const { searchParams } = new URL(request.url)
+    const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 50, 1), 100)
+    const offset = Math.max(Number(searchParams.get("offset")) || 0, 0)
+
+    const [activities, total] = await Promise.all([
+      db.userActivity.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: offset,
+        select: {
+          id: true,
+          action: true,
+          topic: true,
+          xpGained: true,
+          createdAt: true,
+        },
+      }),
+      db.userActivity.count({ where: { userId } }),
+    ])
 
     return NextResponse.json(
-      { success: true, data: activities },
+      { success: true, data: activities, total, limit, offset },
       { headers: { "Cache-Control": "private, no-store" } }
     )
   } catch (error) {
@@ -61,15 +71,15 @@ export async function GET() {
  * POST /api/activity
  * Записать новое действие
  */
-export async function POST(request: NextRequest) {
+async function POSTHandler(request: NextRequest) {
   try {
     const userId = await getUserId()
-
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = (await request.json()) as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const body = await request.json()
 
     // Валидация входных данных
     const validationResult = activitySchema.safeParse(body)
@@ -83,12 +93,7 @@ export async function POST(request: NextRequest) {
     const { action, topic, xpGained } = validationResult.data
 
     const activity = await db.userActivity.create({
-      data: {
-        userId,
-        action,
-        topic,
-        xpGained,
-      },
+      data: { userId, action, topic, xpGained },
       select: {
         id: true,
         action: true,
@@ -110,3 +115,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to log activity" }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(GETHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))

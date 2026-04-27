@@ -14,13 +14,22 @@ export default defineConfig({
       },
     },
     coverage: {
-      reporter: ["text", "json", "html"],
+      reporter: ["text", "json", "html", "lcov"],
       exclude: [
         "node_modules/",
         "src/test/",
         "**/*.stories.*",
         "**/*.config.*",
+        "src/types/**",
+        "src/i18n/messages/**",
+        "src/i18n/types.ts",
       ],
+      thresholds: {
+        branches: 50,
+        functions: 50,
+        lines: 50,
+        statements: 50,
+      },
     },
   },
   resolve: {

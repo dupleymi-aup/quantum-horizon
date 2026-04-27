@@ -11,10 +11,13 @@ import {
   SolarSystemVisualization,
   CMBVisualization,
   DarkEnergyVisualization,
+  DarkMatterVisualization,
   WormholeVisualization,
   PulsarVisualization,
   QuasarVisualization,
   ProtoplanetaryDiskVisualization,
+  BigBangVisualization,
+  StandardModelVisualization,
   IsoclinesVisualization,
 } from "@/components/visualizations/lazy"
 
@@ -28,23 +31,13 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
   return (
     <>
       <VisualizationCard
-        title={t("hrDiagram")}
-        description={t("hrDiagramDesc")}
-        color="blue"
+        title={t("bigBang")}
+        description={t("bigBangDesc")}
+        color="orange"
         isDark={isDark}
       >
-        <HRDiagramVisualization isDark={isDark} />
+        <BigBangVisualization isDark={isDark} />
       </VisualizationCard>
-
-      <VisualizationCard
-        title={t("neutronStar")}
-        description={t("neutronStarDesc")}
-        color="cyan"
-        isDark={isDark}
-      >
-        <NeutronStarVisualization isDark={isDark} />
-      </VisualizationCard>
-
       <VisualizationCard
         title={t("blackHole")}
         description={t("blackHoleDesc")}
@@ -53,7 +46,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <BlackHoleVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("whiteHole")}
         description={t("whiteHoleDesc")}
@@ -62,29 +54,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <WhiteHoleVisualization isDark={isDark} />
       </VisualizationCard>
-
-      <VisualizationCard
-        title={t("solarSystem")}
-        description={t("solarSystemDesc")}
-        color="yellow"
-        isDark={isDark}
-      >
-        <SolarSystemVisualization isDark={isDark} />
-      </VisualizationCard>
-
-      <VisualizationCard title={t("cmb")} description={t("cmbDesc")} color="blue" isDark={isDark}>
-        <CMBVisualization isDark={isDark} />
-      </VisualizationCard>
-
-      <VisualizationCard
-        title={t("darkEnergy")}
-        description={t("darkEnergyDesc")}
-        color="purple"
-        isDark={isDark}
-      >
-        <DarkEnergyVisualization isDark={isDark} />
-      </VisualizationCard>
-
       <VisualizationCard
         title={t("wormhole")}
         description={t("wormholeDesc")}
@@ -93,7 +62,22 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <WormholeVisualization isDark={isDark} />
       </VisualizationCard>
-
+      <VisualizationCard
+        title={t("solarSystem")}
+        description={t("solarSystemDesc")}
+        color="yellow"
+        isDark={isDark}
+      >
+        <SolarSystemVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("neutronStar")}
+        description={t("neutronStarDesc")}
+        color="cyan"
+        isDark={isDark}
+      >
+        <NeutronStarVisualization isDark={isDark} />
+      </VisualizationCard>
       <VisualizationCard
         title={t("pulsar")}
         description={t("pulsarDesc")}
@@ -102,7 +86,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <PulsarVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("quasar")}
         description={t("quasarDesc")}
@@ -111,7 +94,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <QuasarVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("protoplanetaryDisk")}
         description={t("protoplanetaryDiskDesc")}
@@ -120,12 +102,42 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <ProtoplanetaryDiskVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
-        title="Кольца Сатурна: Изоклины"
-        description="Визуализация дифференциальных уравнений через метод изоклин на примере колец Сатурна"
-        color="indigo"
+        title={t("hrDiagram")}
+        description={t("hrDiagramDesc")}
+        color="blue"
         isDark={isDark}
+      >
+        <HRDiagramVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard title={t("cmb")} description={t("cmbDesc")} color="blue" isDark={isDark}>
+        <CMBVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("darkMatter")}
+        description={t("darkMatterDesc")}
+        color="purple"
+        isDark={isDark}
+      >
+        <DarkMatterVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("darkEnergy")}
+        description={t("darkEnergyDesc")}
+        color="purple"
+        isDark={isDark}
+      >
+        <DarkEnergyVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("standardModel")}
+        description={t("standardModelDesc")}
+        color="yellow"
+        isDark={isDark}
+      >
+        <StandardModelVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard title="Кольца Сатурна: Изоклины" description="Визуализация дифференциальных уравнений через метод изоклин на примере колец Сатурна" color="indigo" isDark={isDark}
       >
         <IsoclinesVisualization />
       </VisualizationCard>

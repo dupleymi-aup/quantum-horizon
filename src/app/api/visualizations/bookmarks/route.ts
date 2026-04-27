@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
+import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:bookmarks")
@@ -20,7 +22,7 @@ async function getUserId(): Promise<string | null> {
 /**
  * GET /api/visualizations/bookmarks
  */
-export async function GET() {
+async function GETHandler() {
   try {
     const userId = await getUserId()
     if (!userId) {
@@ -38,7 +40,10 @@ export async function GET() {
       { headers: { "Cache-Control": "private, no-store" } }
     )
   } catch (error) {
-    logger.error("Error fetching bookmarks:", error instanceof Error ? error.message : "Unknown error")
+    logger.error(
+      "Error fetching bookmarks:",
+      error instanceof Error ? error.message : "Unknown error"
+    )
     return NextResponse.json({ error: "Failed to fetch bookmarks" }, { status: 500 })
   }
 }
@@ -46,7 +51,7 @@ export async function GET() {
 /**
  * POST /api/visualizations/bookmarks
  */
-export async function POST(request: NextRequest) {
+async function POSTHandler(request: NextRequest) {
   try {
     const userId = await getUserId()
     if (!userId) {
@@ -65,7 +70,10 @@ export async function POST(request: NextRequest) {
 
     const { topic, title } = validationResult.data
 
-    const existing = await db.bookmark.findFirst({ where: { userId, topic } })
+    const existing = await db.bookmark.findFirst({
+      where: { userId, topic },
+    })
+
     if (existing) {
       return NextResponse.json({ error: "Bookmark already exists" }, { status: 409 })
     }
@@ -80,7 +88,10 @@ export async function POST(request: NextRequest) {
       { headers: { "Cache-Control": "private, no-store" } }
     )
   } catch (error) {
-    logger.error("Error creating bookmark:", error instanceof Error ? error.message : "Unknown error")
+    logger.error(
+      "Error creating bookmark:",
+      error instanceof Error ? error.message : "Unknown error"
+    )
     return NextResponse.json({ error: "Failed to create bookmark" }, { status: 500 })
   }
 }
@@ -88,7 +99,7 @@ export async function POST(request: NextRequest) {
 /**
  * DELETE /api/visualizations/bookmarks
  */
-export async function DELETE(request: NextRequest) {
+async function DELETEHandler(request: NextRequest) {
   try {
     const userId = await getUserId()
     if (!userId) {
@@ -97,18 +108,28 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const topic = searchParams.get("topic")
+
     if (!topic) {
       return NextResponse.json({ error: "Topic is required" }, { status: 400 })
     }
 
-    await db.bookmark.deleteMany({ where: { topic, userId } })
+    await db.bookmark.deleteMany({
+      where: { topic, userId },
+    })
 
     return NextResponse.json(
       { success: true, message: "Bookmark deleted" },
       { headers: { "Cache-Control": "private, no-store" } }
     )
   } catch (error) {
-    logger.error("Error deleting bookmark:", error instanceof Error ? error.message : "Unknown error")
+    logger.error(
+      "Error deleting bookmark:",
+      error instanceof Error ? error.message : "Unknown error"
+    )
     return NextResponse.json({ error: "Failed to delete bookmark" }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(GETHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))
+export const DELETE = withCsrf(withRateLimit(DELETEHandler))

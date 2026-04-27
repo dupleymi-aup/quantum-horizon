@@ -9,11 +9,15 @@ const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
 })
 
+// Логирование запросов только в development; в production — только ошибки
+const logConfig: Array<"query" | "error" | "warn"> =
+  process.env.NODE_ENV === "production" ? ["error"] : ["query", "error", "warn"]
+
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: ["query"],
+    log: logConfig,
   })
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db

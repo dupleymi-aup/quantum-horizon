@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
+import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:progress")
@@ -21,10 +23,9 @@ async function getUserId(): Promise<string | null> {
  * GET /api/visualizations/progress
  * Получить прогресс пользователя для визуализаций
  */
-export async function GET() {
+async function GETHandler() {
   try {
     const userId = await getUserId()
-
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -41,15 +42,8 @@ export async function GET() {
     })
 
     return NextResponse.json(
-      {
-        success: true,
-        data: progress,
-      },
-      {
-        headers: {
-          "Cache-Control": "private, no-store",
-        },
-      }
+      { success: true, data: progress },
+      { headers: { "Cache-Control": "private, no-store" } }
     )
   } catch (error) {
     logger.error(
@@ -64,15 +58,16 @@ export async function GET() {
  * POST /api/visualizations/progress
  * Обновить или создать прогресс для визуализации
  */
-export async function POST(request: NextRequest) {
+async function POSTHandler(request: NextRequest) {
   try {
     const userId = await getUserId()
-
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = (await request.json()) as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const body = await request.json()
+
     const validationResult = progressSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
@@ -85,10 +80,7 @@ export async function POST(request: NextRequest) {
 
     const progress = await db.userProgress.upsert({
       where: {
-        userId_topic: {
-          userId,
-          topic,
-        },
+        userId_topic: { userId, topic },
       },
       update: {
         completedCount: { increment: completedCount },
@@ -101,12 +93,12 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({
-      success: true,
-      data: progress,
-    })
+    return NextResponse.json({ success: true, data: progress })
   } catch {
     logger.error("Error updating progress:")
     return NextResponse.json({ error: "Failed to update progress" }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(GETHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))

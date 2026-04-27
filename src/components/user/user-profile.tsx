@@ -1,25 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 "use client"
 
-import { useState } from "react"
 import { User, Award, BookOpen, Clock, TrendingUp, Star, Trophy, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUserProgress } from "@/hooks/api/use-user-progress"
-
-interface UserProgress {
-  userId: string
-  username: string
-  level: number
-  xp: number
-  xpToNextLevel: number
-  coursesCompleted: number
-  totalStudyTime: number // minutes
-  streak: number
-  achievements: Achievement[]
-  currentCourses: CourseProgress[]
-  recentActivity: Activity[]
-}
+import { useAchievements } from "@/hooks/api/use-achievements"
+import { useActivity } from "@/hooks/api/use-activity"
 
 interface Achievement {
   id: string
@@ -38,12 +23,31 @@ interface CourseProgress {
   nextLesson: string
 }
 
-interface Activity {
+interface ActivityItem {
   id: string
-  type: "lesson_completed" | "quiz_passed" | "achievement_unlocked" | "study_session"
+  type:
+    | "lesson_completed"
+    | "quiz_passed"
+    | "achievement_unlocked"
+    | "study_session"
+    | "visualization_viewed"
   description: string
   timestamp: Date
   xpEarned: number
+}
+
+interface UserProgressData {
+  userId: string
+  username: string
+  level: number
+  xp: number
+  xpToNextLevel: number
+  coursesCompleted: number
+  totalStudyTime: number
+  streak: number
+  achievements: Achievement[]
+  currentCourses: CourseProgress[]
+  recentActivity: ActivityItem[]
 }
 
 interface UserProfileProps {
@@ -51,11 +55,14 @@ interface UserProfileProps {
 }
 
 export function UserProfile({ className }: UserProfileProps) {
-  // Get real data from API
   const { stats, progress, loading: progressLoading } = useUserProgress()
+  const { achievements: apiAchievements, loading: achievementsLoading } = useAchievements()
+  const { activities: apiActivities, loading: activitiesLoading } = useActivity()
 
-  // Mock data as fallback (in production, fetch from database)
-  const mockUserProgress: UserProgress = {
+  const _loading = progressLoading || achievementsLoading || activitiesLoading
+
+  // Fallback mock data for non-authenticated users
+  const mockUserProgress: UserProgressData = {
     userId: "user_001",
     username: "SpaceExplorer",
     level: 12,
@@ -153,8 +160,62 @@ export function UserProfile({ className }: UserProfileProps) {
     ],
   }
 
-  // Use API stats if available, otherwise use mock data
-  const userProgress: UserProgress = stats
+  // Map API achievements to component format
+  const mappedAchievements: Achievement[] =
+    apiAchievements.length > 0
+      ? apiAchievements
+          .filter((a) => a.progress >= a.target)
+          .map((a) => ({
+            id: a.id,
+            name: a.achievementId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+            description: `Achievement: ${a.achievementId}`,
+            icon: "🏆",
+            unlockedAt: a.unlockedAt ? new Date(a.unlockedAt) : new Date(),
+            rarity:
+              a.target >= 10
+                ? "legendary"
+                : a.target >= 5
+                  ? "epic"
+                  : a.target >= 2
+                    ? "rare"
+                    : "common",
+          }))
+      : mockUserProgress.achievements
+
+  // Map API activities to component format
+  const mappedActivities: ActivityItem[] =
+    apiActivities.length > 0
+      ? apiActivities.slice(0, 10).map((a) => ({
+          id: a.id,
+          type: a.action.includes("quiz")
+            ? "quiz_passed"
+            : a.action.includes("achievement")
+              ? "achievement_unlocked"
+              : a.action.includes("lesson")
+                ? "lesson_completed"
+                : a.action.includes("visualization")
+                  ? "visualization_viewed"
+                  : "study_session",
+          description: a.action,
+          timestamp: new Date(a.createdAt),
+          xpEarned: a.xpGained,
+        }))
+      : mockUserProgress.recentActivity
+
+  // Map progress data to courses
+  const mappedCourses: CourseProgress[] =
+    progress.length > 0
+      ? progress.slice(0, 5).map((p) => ({
+          courseId: p.id,
+          courseName: p.topic.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          progress: Math.min(p.completedCount * 20, 100),
+          lastAccessed: new Date(p.lastCompleted),
+          nextLesson: "Continue exploring",
+        }))
+      : mockUserProgress.currentCourses
+
+  // Build user progress from API data or fallback to mock
+  const userProgress: UserProgressData = stats
     ? {
         userId: "user_001",
         username: "SpaceExplorer",
@@ -164,11 +225,11 @@ export function UserProfile({ className }: UserProfileProps) {
         coursesCompleted: stats.completedCourses,
         totalStudyTime: stats.totalTimeSpent,
         streak: stats.currentStreak,
-        achievements: [], // Will be populated from achievements API
-        currentCourses: [],
-        recentActivity: [],
+        achievements: mappedAchievements,
+        currentCourses: mappedCourses,
+        recentActivity: mappedActivities,
       }
-    : mockUserProgress
+    : { ...mockUserProgress, achievements: mappedAchievements, recentActivity: mappedActivities }
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -193,6 +254,8 @@ export function UserProfile({ className }: UserProfileProps) {
         return <Award className="size-4 text-blue-500" />
       case "achievement_unlocked":
         return <Trophy className="size-4 text-yellow-500" />
+      case "visualization_viewed":
+        return <Star className="size-4 text-cyan-500" />
       case "study_session":
         return <Clock className="size-4 text-purple-500" />
       default:
@@ -215,7 +278,6 @@ export function UserProfile({ className }: UserProfileProps) {
             <div className="rounded-full bg-gradient-to-br from-purple-500 to-blue-500 p-4">
               <User className="size-8 text-white" />
             </div>
-
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <h3 className="text-2xl font-bold">{userProgress.username}</h3>
@@ -223,7 +285,6 @@ export function UserProfile({ className }: UserProfileProps) {
                   Level {userProgress.level}
                 </span>
               </div>
-
               {/* XP Progress Bar */}
               <div className="w-[300px] space-y-1">
                 <div className="flex justify-between text-xs">
@@ -241,7 +302,6 @@ export function UserProfile({ className }: UserProfileProps) {
                   />
                 </div>
               </div>
-
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-1 text-orange-500">
                   <TrendingUp className="size-4" />
@@ -254,7 +314,6 @@ export function UserProfile({ className }: UserProfileProps) {
               </div>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-background rounded-lg border p-3 text-center">
               <div className="text-2xl font-bold text-purple-500">
@@ -280,7 +339,6 @@ export function UserProfile({ className }: UserProfileProps) {
             <Target className="size-5 text-purple-500" />
             <h4 className="text-lg font-semibold">Current Courses</h4>
           </div>
-
           <div className="space-y-3">
             {userProgress.currentCourses.map((course) => (
               <div key={course.courseId} className="rounded-lg border p-4">
@@ -293,7 +351,6 @@ export function UserProfile({ className }: UserProfileProps) {
                     <div className="text-2xl font-bold text-purple-500">{course.progress}%</div>
                   </div>
                 </div>
-
                 {/* Progress Bar */}
                 <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                   <div
@@ -301,12 +358,13 @@ export function UserProfile({ className }: UserProfileProps) {
                     style={{ width: `${course.progress.toFixed(1)}%` }}
                   />
                 </div>
-
-                <button className="mt-3 w-full rounded-md bg-purple-600 py-2 text-sm text-white transition-colors hover:bg-purple-700">
-                  Continue Learning
-                </button>
               </div>
             ))}
+            {userProgress.currentCourses.length === 0 && (
+              <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+                No courses in progress yet. Start exploring visualizations!
+              </div>
+            )}
           </div>
         </div>
 
@@ -316,7 +374,6 @@ export function UserProfile({ className }: UserProfileProps) {
             <Trophy className="size-5 text-yellow-500" />
             <h4 className="text-lg font-semibold">Achievements</h4>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             {userProgress.achievements.map((achievement) => (
               <div
@@ -335,10 +392,11 @@ export function UserProfile({ className }: UserProfileProps) {
               </div>
             ))}
           </div>
-
-          <button className="text-muted-foreground hover:bg-accent w-full rounded-md border border-dashed py-2 text-sm">
-            View All Achievements →
-          </button>
+          {userProgress.achievements.length === 0 && (
+            <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+              No achievements unlocked yet. Keep exploring!
+            </div>
+          )}
         </div>
       </div>
 
@@ -348,7 +406,6 @@ export function UserProfile({ className }: UserProfileProps) {
           <Clock className="size-5 text-blue-500" />
           <h4 className="text-lg font-semibold">Recent Activity</h4>
         </div>
-
         <div className="mt-4 space-y-3">
           {userProgress.recentActivity.map((activity) => (
             <div
@@ -371,6 +428,11 @@ export function UserProfile({ className }: UserProfileProps) {
               </div>
             </div>
           ))}
+          {userProgress.recentActivity.length === 0 && (
+            <div className="text-muted-foreground text-center text-sm">
+              No recent activity. Start exploring to track your progress!
+            </div>
+          )}
         </div>
       </div>
 

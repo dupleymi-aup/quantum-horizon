@@ -1,62 +1,69 @@
 # 📝 Changelog
 
 Все заметные изменения в проекте Quantum Horizon.
-
-Формат ведётся в соответствии с [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
-версии следуют [Semantic Versioning](https://semver.org/lang/ru/).
+Формат ведётся в соответствии с [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/), версии следуют [Semantic Versioning](https://semver.org/lang/ru/).
 
 ---
 
-## [0.4.10] - 2026-04-26
-
-### Обновлено
-
-- **Обновление зависимостей** — обновлены все зависимости до последних стабильных версий
-  - Обновлены ключевые пакеты: Next.js, React, TypeScript, Vitest, Playwright, Prisma, Tailwind CSS и другие
-  - Обновлены dev-зависимости для улучшения безопасности и производительности
-  - Устранены предупреждения о уязвимостях в зависимостях
-
-## [0.4.9] - 2026-04-26
+## [0.4.3] - 2026-04-27
 
 ### Добавлено
 
-- **Улучшенная система rate limiting** — добавлены настраиваемые опции для in-memory резервного механизма
-  - Автоматическая очистка устаревших записей с настраиваемым интервалом
-  - Кеширование экземпляров лимитера для обеспечения использования одного и того же экземпляра для одного префикса
-  - Возможность отключения автоматической очистки для тестирования и специальных случаев
-  - Исправлена логика вытеснения старых записей при достижении лимита хранилища
+- **Middleware** — серверная защита маршрутов и auth guard
+  - Защита API маршрутов (/api/visualizations, /api/activity, /api/achievements) — 401 для неавторизованных
+  - Редирект авторизованных пользователей со страниц входа на главную
+  - Security заголовки (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy)
+- **CSRF-защита** — утилита `src/lib/csrf.ts` с Double Submit Cookie паттерном
+  - Валидация Origin/Referer заголовков
+  - Поддержка sec-fetch-site для same-origin запросов
+  - Constant-time сравнение токенов (защита от timing attacks)
+  - Добавлена в POST/DELETE endpoints: bookmarks, achievements, activity, progress
+- **Prisma-миграции** — SQL миграции для SQLite и PostgreSQL
+  - `prisma/migrations/20260427000000_init/migration.sql` — SQLite
+  - `prisma/migrations/20260427000001_init_postgresql/migration.sql` — PostgreSQL
+- **Lighthouse CI** — конфигурация `.lighthouserc.js`
+  - Пороги: Performance ≥ 0.8, Accessibility ≥ 0.9, Best Practices ≥ 0.9, SEO ≥ 0.8
+  - Метрики: FCP < 2s, LCP < 3s, CLS < 0.1, TBT < 300ms
+  - Интеграция в GitHub Actions (запуск на push в main)
+- **Vitest coverage thresholds** — минимальное покрытие 50% (branches, functions, lines, statements)
+- **Throttled localStorage storage** — ограничение записи в localStorage до 1 раза в 500мс
+  - Предотвращает тормоза при быстрых изменениях (слайдеры, анимации)
+  - `partialize` — isFullscreen не хранится в localStorage (восстанавливается при перезагрузке)
 
 ### Улучшено
 
-- **Надежность rate limiting** — исправлена проблема с созданием нескольких экземпляров лимитера для одного префикса
-- **Тестирование** — добавлено комплексное тестирование in-memory rate limiter с покрытием всех сценариев использования
-
-## [0.4.8] - 2026-04-24
-
-### Добавлено
-
-- **Стабилизация тестов** — все unit тесты проходят (325 passed, 2 todo - auth protection в E2E)
-- **Поддержание качества** — регулярные обновления зависимостей для безопасности, нулевые ошибки ESLint и TypeScript, успешные сборки
-- **Проверка Qwen Code** — запущен полный тестовый запуск unit тестов, production build успешен, lint и TypeScript без ошибок
-
-### Улучшено
-
-- **Производительность** — оптимизация шрифтов и изображений (Cyrillic subset, display: swap, preconnect для NASA APIs, dns-prefetch, remotePatterns для Next.js Image, удален unoptimized флаг, добавлен sizes prop, dynamic import AnimatedBackground)
-- **Безопасность** — обновлены lodash, lodash-es, basic-ftp, vite для устранения высоких уязвимостей
+- **Prisma logging** — запросы логируются только в development; в production — только ошибки
+- **Docker security** — убраны захардкоженные пароли из docker-compose
+  - Все пароли требуют явного указания через переменные окружения
+  - Используется `${VAR:?error}` для обязательных переменных в production
+- **i18n** — устранено дублирование файлов переводов
+  - Удалена устаревшая директория `src/i18n/translations/`
+  - Все импорты переведены на `src/i18n/messages/`
+- **CI/CD** — улучшен workflow ci.yml
+  - Тесты теперь запускаются с coverage и загрузкой отчёта
+  - Добавлен Lighthouse CI job (на push в main)
+- **Версии** — синхронизированы все версии на 0.4.3
+  - package.json, README.md badge, README.md таблица, API route
 
 ### Исправлено
 
-- **Тесты** — Canvas тесты больше не пропускаются (исправлена конфигурация тестов)
-- **JSX-трансформация** — исправлены проблемы в Vite/Oxc
-- **Зависимости** — уменьшено уязвимостей: 23 → 15 (после обновления остались 11 low и 4 moderate)
+- **achievements/route.ts** — исправлено условие разблокировки достижения (existing.progress < target вместо !existing.unlockedAt)
 
 ### Технические детали
 
-- `package.json` — обновлены зависимости для устранения критических уязвимостей
-- `next.config.ts` — оптимизация шрифтов и изображений
-- `public/sw.ts` — обновлен service worker (если применялось)
-- `src/test/setup.ts` — улучшена конфигурация тестов для Canvas
+- `src/middleware.ts` — новый middleware с auth guard и security заголовками
+- `src/lib/csrf.ts` — CSRF protection utilities
+- `src/lib/db.ts` — условное логирование Prisma
+- `src/lib/translations.ts` — импорт из messages/ вместо translations/
+- `src/stores/visualization-store.ts` — throttled storage + partialize
+- `docker-compose.yml` — переменные окружения вместо хардкода
+- `docker-compose.prod.yml` — обязательные переменные окружения
+- `.lighthouserc.js` — конфигурация Lighthouse CI
+- `.github/workflows/ci.yml` — coverage + Lighthouse job
+- `vitest.config.ts` — coverage thresholds + lcov reporter
+- `prisma/migrations/` — SQL миграции для SQLite и PostgreSQL
 
+---
 
 ## [0.4.2] - 2026-04-12
 
@@ -74,27 +81,14 @@
   - CORS заголовки для всех API endpoints
   - Rate limiting + CORS integration
   - Улучшена обработка ошибок с CORS заголовками
-
 - **Тесты** — масштабное исправление тестов
   - **schrodingers-cat.test.tsx**: 7/7 passing (было 5/7)
-    - Исправлены проблемы с множественными элементами
-    - Улучшены селекторы для кнопок
-    - Корректная обработка эмодзи в текстах
   - **visualization-controls.test.tsx**: 7/8 passing (было 3/8)
-    - Исправлены селекторы кнопок play/pause
-    - Улучшена работа с slider элементами
   - **a11y.test.ts**: 30/30 passing (было 28/30)
-    - Добавлен matchMedia mock в test setup
   - **button.test.tsx**: 5/5 passing (было 2/5)
-    - Добавлен cleanup после каждого теста
-    - Исправлены селекторы для rerender тестов
   - **preset-manager.test.tsx**: 5/5 passing (было 0/5)
-    - Исправлены все тесты с множественными элементами
-    - Добавлен cleanup после каждого теста
-  - **middleware.test.ts**: 11/11 passing
-    - 4 новых CORS теста
+  - **middleware.test.ts**: 11/11 passing — 4 новых CORS теста
   - **Итого**: 302 passing tests (было 285)
-
 - **Test infrastructure** — улучшения тестового окружения
   - Добавлен `window.matchMedia` mock в `src/test/setup.ts`
   - Добавлен `cleanup()` в button и preset-manager тесты
@@ -113,16 +107,6 @@
 - **Lint ошибки** — все ESLint ошибки исправлены (0 errors)
 - **TypeScript** — 0 ошибок
 - **Build** — успешная сборка (4.1s)
-
-### Технические детали
-
-- `src/middleware.ts` — добавлена CORS логика
-- `src/middleware.test.ts` — 4 новых CORS теста
-- `src/test/setup.ts` — добавлен matchMedia mock
-- `src/components/visualizations/quantum/schrodingers-cat.test.tsx` — исправлены селекторы
-- `src/components/visualizations/base/visualization-controls.test.tsx` — исправлены тесты
-- `src/components/ui/button.test.tsx` — добавлен cleanup
-- `src/components/ui/preset-manager.test.tsx` — исправлены все тесты
 
 ---
 
@@ -147,12 +131,6 @@
 - **Тесты** — visualization-selector.test.tsx теперь проходит все 8 тестов
 - **Favicon** — добавлен favicon.ico для совместимости с браузерами
 
-### Технические детали
-
-- `next.config.ts` — добавлена webpack splitChunks конфигурация
-- `src/app/page.tsx` — конвертированы тяжёлые компоненты в dynamic imports
-- `public/favicon.ico` — создан из favicon.svg
-
 ---
 
 ## [0.4.0] - 2026-03-13
@@ -167,44 +145,15 @@
 - **Обновление SW** — кнопка для обновления service worker
 - **README** — раздел о PWA с инструкциями по установке
 
-### Изменено
-
-- Обновлён CHANGELOG с информацией о v0.4.0
-- Улучшена конфигурация TypeScript для service worker
-
-### Технические детали
-
-- `public/sw.ts` — исходный код service worker
-- `public/sw.d.ts` — TypeScript типы для service worker
-- `src/components/pwa/` — PWA компоненты
-- `src/app/offline/` — offline страница
-
 ---
 
 ## [0.3.0] - 2026-03-13
 
 ### Добавлено
 
-- Storybook stories для base компонентов (visualization-controls, visualization-selector, visualization-card, fullscreen-wrapper)
-- Storybook stories для brownian-motion visualization
-- Расширенные E2E тесты Playwright (13 тестов для визуализаций, настроек, keyboard shortcuts)
-- 182 unit/component теста (visualization-canvas, visualization-controls, visualization-selector, wave-function, schrodingers-cat, black-hole, button)
-
-### Изменено
-
-- Обновлён порт dev сервера на auto-select (0)
-- Улучшена структура E2E тестов (app.spec.ts)
-
-### Удалено
-
-- Удалены неиспользуемые eslint-disable комментарии
-- Удалены unused импорты и функции
-- Удалён неиспользуемый код из use-canvas-animation.ts (useFixedTimestepCanvasAnimation)
-- Удалён неиспользуемый код из use-visualization-canvas.ts (createCachedGradient)
-- Удалён неиспользуемый wrapper withSuspense из lazy.tsx
-
----
-
+- Storybook stories для base компонентов
+- Расширенные E2E тесты Playwright (13 тестов)
+- 182 unit/component теста
 
 ---
 
@@ -213,38 +162,8 @@
 ### Добавлено
 
 - Мультиязычность (RU, EN, ZH, HE)
-- Визуализация волновой функции (уравнение Шрёдингера)
-- Принцип неопределённости Гейзенберга
-- Квантовое туннелирование
-- Специальная теория относительности (замедление времени, сокращение длины)
-- E = mc² калькулятор
-- Диаграмма Герцшпрунга-Рассела
-- Нейтронные звёзды и пульсары
-- Чёрные дыры с излучением Хокинга
-- Эксперимент с двойной щелью
-- Тёмная материя
-- Кот Шрёдингера
-- Большой взрыв
-- Фотоэффект
-- Броуновское движение
-- Гравитационные волны
-- Квантовая запутанность
-- Атомная модель Бора
-- Радиоактивный распад
-- Суперпроводимость
-- Стандартная модель
-- Калькулятор физических формул
-- Таймлайн физических открытий
-- Солнечная система
-- Тест по физике
-- Биографии учёных
-
-### Изменено
-
-- Обновлён до Next.js 16
-- React 19
-- Tailwind CSS 4
-- Prisma ORM
+- 20+ визуализаций (квантовая механика, теория относительности, космология)
+- Калькулятор физических формул, таймлайн, тест по физике, биографии учёных
 
 ---
 
@@ -269,7 +188,11 @@
 
 ---
 
-[Unreleased]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/QuadDarv1ne/quantum-horizon/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/QuadDarv1ne/quantum-horizon/releases/tag/v0.1.0

@@ -4,7 +4,7 @@
 
 Интерактивная платформа для визуализации и изучения современной физики — от квантовой механики до космологии.
 
-![Version](https://img.shields.io/badge/version-0.3.9-blue)
+![Version](https://img.shields.io/badge/version-0.4.3-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
@@ -331,7 +331,7 @@ npm run db:push
 
 | Компонент | Версия |
 |-----------|--------|
-| Project | 0.4.0 |
+| Project | 0.4.3 |
 | Next.js | 16.x |
 | React | 19.x |
 | TypeScript | 5.x |

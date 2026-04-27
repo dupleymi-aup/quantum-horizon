@@ -1,61 +1,68 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { setupCanvas } from "@/hooks/use-canvas-animation"
+import { useRef, useState, useCallback, useMemo } from "react"
+import { VisualizationCanvas } from "../base/visualization-canvas"
+import { VisualizationControls } from "../base/visualization-controls"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { useVisualizationStore } from "@/stores/visualization-store"
+
+/** Deterministic seeded PRNG (mulberry32) — avoids Math.random() in render */
+function seededRandom(seed: number) {
+  let s = seed | 0
+  return () => {
+    s = (s + 0x6d2b79f5) | 0
+    let t = Math.imul(s ^ (s >>> 15), 1 | s)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
 
 interface DarkEnergyVisualizationProps {
   isDark: boolean
 }
 
 export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [expansionRate, setExpansionRate] = useState(0.7) // Hubble parameter visualization
-  const [darkEnergyFraction, setDarkEnergyFraction] = useState(68) // % of universe
+  const [expansionRate, setExpansionRate] = useState(0.7)
+  const [darkEnergyFraction, setDarkEnergyFraction] = useState(68)
   const [showMatter, setShowMatter] = useState(true)
+  const timeRef = useRef(0)
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+  const isPlaying = useVisualizationStore((state) => state.isPlaying)
+  const animationSpeed = useVisualizationStore((state) => state.animationSpeed)
+  const { togglePlaying, setAnimationSpeed } = useVisualizationStore()
 
-    let animationFrameId: number
+  // Generate galaxy positions once using deterministic seeded PRNG
+  const galaxies = useMemo(() => {
+    const rand = seededRandom(42)
+    return Array.from({ length: 50 }, () => ({
+      angle: rand() * Math.PI * 2,
+      distance: 20 + rand() * 100,
+      size: 1 + rand() * 2,
+      color: `hsl(${String(200 + rand() * 60)}, 70%, ${String(60 + rand() * 30)}%)`,
+    }))
+  }, [])
 
-    const resize = () => {
-      setupCanvas(canvas, ctx)
-    }
-    resize()
-    window.addEventListener("resize", resize)
-
-    const width = canvas.offsetWidth
-    const height = canvas.offsetHeight
-    const centerX = width / 2
-    const centerY = height / 2
-
-    // Galaxy positions
-    const galaxies: Array<{ angle: number; distance: number; size: number; color: string }> = []
-    for (let i = 0; i < 50; i++) {
-      galaxies.push({
-        angle: Math.random() * Math.PI * 2,
-        distance: 20 + Math.random() * 100,
-        size: 1 + Math.random() * 2,
-        color: `hsl(${String(200 + Math.random() * 60)}, 70%, ${String(60 + Math.random() * 30)}%)`,
-      })
-    }
-
-    let time = 0
-
-    const animate = () => {
-      time += 0.016 * expansionRate
-      ctx.clearRect(0, 0, width, height)
+  const draw = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      width: number,
+      height: number,
+      _isDark: boolean,
+      delta: number
+    ) => {
+      if (isPlaying) {
+        timeRef.current += (delta / 1000) * animationSpeed * expansionRate
+      }
+      const time = timeRef.current
+      const centerX = width / 2
+      const centerY = height / 2
 
       // Background - expanding space gradient
       const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, width / 2)
-      bgGradient.addColorStop(0, isDark ? "#0a0020" : "#1a0030")
-      bgGradient.addColorStop(0.5, isDark ? "#050015" : "#0f0020")
-      bgGradient.addColorStop(1, isDark ? "#000005" : "#050010")
+      bgGradient.addColorStop(0, _isDark ? "#0a0020" : "#1a0030")
+      bgGradient.addColorStop(0.5, _isDark ? "#050015" : "#0f0020")
+      bgGradient.addColorStop(1, _isDark ? "#000005" : "#050010")
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, width, height)
 
@@ -74,7 +81,6 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
 
       // Draw galaxies accelerating outward
       galaxies.forEach((galaxy) => {
-        // Accelerating expansion - distance grows faster over time
         const acceleratedDistance = galaxy.distance * (1 + time * 0.1 * (darkEnergyFraction / 50))
         const x = centerX + Math.cos(galaxy.angle) * acceleratedDistance
         const y = centerY + Math.sin(galaxy.angle) * acceleratedDistance
@@ -95,9 +101,9 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
         ctx.fill()
       })
 
-      // Matter density visualization (if enabled)
+      // Matter density visualization
       if (showMatter) {
-        ctx.fillStyle = isDark ? "rgba(255, 200, 100, 0.1)" : "rgba(255, 200, 100, 0.15)"
+        ctx.fillStyle = _isDark ? "rgba(255, 200, 100, 0.1)" : "rgba(255, 200, 100, 0.15)"
         for (let i = 0; i < 10; i++) {
           const x = centerX + Math.cos(time * 0.5 + i) * (30 + i * 10)
           const y = centerY + Math.sin(time * 0.5 + i * 1.3) * (30 + i * 10)
@@ -108,7 +114,7 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
       }
 
       // Central marker (observer)
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)"
+      ctx.strokeStyle = _isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)"
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.moveTo(centerX - 5, centerY)
@@ -117,12 +123,12 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
       ctx.lineTo(centerX, centerY + 5)
       ctx.stroke()
 
-      ctx.fillStyle = isDark ? "#FFFFFF" : "#333333"
+      ctx.fillStyle = _isDark ? "#FFFFFF" : "#333333"
       ctx.font = "8px sans-serif"
       ctx.textAlign = "center"
       ctx.fillText("Наблюдатель", centerX, centerY + 20)
 
-      // Universe composition pie chart (mini)
+      // Universe composition pie chart
       const pieX = 60
       const pieY = 50
       const pieR = 30
@@ -163,7 +169,7 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
       ctx.closePath()
       ctx.fill()
 
-      ctx.fillStyle = isDark ? "#FFF" : "#333"
+      ctx.fillStyle = _isDark ? "#FFF" : "#333"
       ctx.font = "7px sans-serif"
       ctx.textAlign = "left"
       ctx.fillText(`Ω_Λ = ${String(darkEnergyFraction)}%`, 95, 40)
@@ -171,9 +177,9 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
       ctx.fillText("Ω_m = 5%", 95, 64)
 
       // Info panel
-      ctx.fillStyle = isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(255, 255, 255, 0.85)"
+      ctx.fillStyle = _isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(255, 255, 255, 0.85)"
       ctx.fillRect(width - 130, height - 45, 125, 40)
-      ctx.fillStyle = isDark ? "#AAAAAA" : "#555555"
+      ctx.fillStyle = _isDark ? "#AAAAAA" : "#555555"
       ctx.font = "8px sans-serif"
       ctx.textAlign = "left"
       ctx.fillText(`H₀ ≈ 70 км/с/Мпк`, width - 125, height - 30)
@@ -182,29 +188,25 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
         width - 125,
         height - 18
       )
-
-      animationFrameId = requestAnimationFrame(animate)
-    }
-
-    animate()
-
-    return () => {
-      window.removeEventListener("resize", resize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [expansionRate, darkEnergyFraction, showMatter, isDark])
+    },
+    [isPlaying, animationSpeed, expansionRate, darkEnergyFraction, showMatter, galaxies]
+  )
 
   return (
     <div className="space-y-3">
-      <canvas
-        ref={canvasRef}
+      <VisualizationCanvas
+        draw={draw}
+        isDark={isDark}
         className="h-56 w-full rounded-lg"
-        aria-label="Сокращение длины: лоренцево сокращение движущегося объекта"
-        role="img"
-        aria-live="polite"
-        aria-atomic="true"
+        ariaLabel="Тёмная энергия: ускоренное расширение Вселенной"
       />
-
+      <VisualizationControls
+        isPlaying={isPlaying}
+        animationSpeed={animationSpeed}
+        onTogglePlay={togglePlaying}
+        onSpeedChange={setAnimationSpeed}
+        isDark={isDark}
+      />
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <div className="flex justify-between text-xs">
@@ -241,7 +243,6 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
           />
         </div>
       </div>
-
       <div className="flex gap-2">
         <Button
           onClick={() => {
@@ -254,7 +255,6 @@ export function DarkEnergyVisualization({ isDark }: DarkEnergyVisualizationProps
           🌟 Материя
         </Button>
       </div>
-
       <div className="rounded-lg border border-purple-500/20 bg-purple-900/20 p-3 text-xs">
         <div className="mb-1 font-semibold text-purple-300">💫 Тёмная энергия</div>
         <p className={isDark ? "text-gray-400" : "text-gray-600"}>
