@@ -1,320 +1,131 @@
-# ==================== ENVIRONMENT ====================
-.env
-.env.local
-.env.*.local
-.env.production.local
-.env.development.local
-.env.test.local
-.env.*.example
-.env.render
-
-# ==================== SECURITY ====================
-CREDENTIALS.md
-*.pem
-*.key
-
-# ==================== QWEN CONTEXT ====================
-.qwen/
-
-# ==================== NODE.JS / NEXT.JS ====================
+```
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.ENV
+.env.bak
+.env.dev
+.env.prod
+.env.backup
+.env.example
+.env.sample
+.env.test
+.env.testing
+.env.dist
+.env.docker
+.env.local.example
+.env.staging
+.env.production
+.env.prod.example
+.env.test.example
+.env.testing.example
+.env.dist.example
+.env.docker.example
+.env.staging.example
+.env.production.example
+.env.prod.backup
+.env.test.backup
+.env.testing.backup
+.env.dist.backup
+.env.docker.backup
+.env.staging.backup
+.env.production.backup
+.env.prod.dist
+.env.test.dist
+.env.testing.dist
+.env.dist.dist
+.env.docker.dist
+.env.staging.dist
+.env.production.dist
+.env.prod.local
+.env.test.local
+.env.testing.local
+.env.dist.local
+.env.docker.local
+.env.staging.local
+.env.production.local
+.env.prod.staging
+.env.test.staging
+.env.testing.staging
+.env.dist.staging
+.env.docker.staging
+.env.staging.staging
+.env.production.staging
+.env.prod.testing
+.env.test.testing
+.env.testing.testing
+.env.dist.testing
+.env.docker.testing
+.env.staging.testing
+.env.production.testing
+.env.prod.development
+.env.test.development
+.env.testing.development
+.env.dist.development
+.env.docker.development
+.env.staging.development
+.env.production.development
+
+# Node.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-# Production
+# Compiled JavaScript
+*.min.js
+*.bundle.js
+
+# TypeScript
+*.tsbuildinfo
 .next/
 .nuxt/
-dist/
-build/
-output/
-out/
+.vuepress/dist
+.umi
+.umirc
+.umirc.*
+.un~lock
 
-# Next.js specific
-*.tsbuildinfo
-next-env.d.ts
-**/*.tsbuildinfo
-
-# Next.js cache directory
-.next/cache/
-
-# Storybook coverage
+# Coverage directory used by tools like istanbul
 coverage/
-
-# nyc test coverage
 .nyc_output/
 
-# Parcel
-.parcel-cache
+# Temporary folders
+tmp/
+temp/
 
-# Vercel
-.vercel
-
-# Turbopack
-.turbo
-
-# Docusaurus cache and generated files
-.docusaurus
-
-# ==================== PYTHON ====================
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-!src/lib/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-requirements*.lock
-*.manifest
-*.spec
-pip-log.txt
-pip-delete-this-directory.txt
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.db-shm
-*.db-wal
-test.db
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-.pytest_tmp/
-*.mo
-*.pot
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-instance/
-.webassets-cache
-.scrapy
-docs/_build/
-target/
-.ipynb_checkpoints
-profile_default/
-ipython_config.py
-.python-version
-Pipfile.lock
-__pypackages__/
-celerybeat-schedule
-celerybeat.pid
-*.sage.py
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.spyderproject
-.spyproject
-.ropeproject
-/site
-.mypy_cache/
-.dmypy.json
-dmypy.json
-.pyre/
-.pylintrc
-.flake8
-.isort.cfg
-
-# ==================== IDE / EDITOR ====================
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-.sublime/
-
-# IntelliJ IDEs
-.idea/
-.idea_modules/
-*.iml
-*.iws
-*.ipr
-out/
-
-# Vim
-*.swp
-*.swo
-*~
-.vim/
-
-# Emacs
-*~
-\#*\#
-.\#*
-
-# Atom
-.atom/
-
-# Neovim
-.nvimrc
-
-# ==================== OS ====================
-# MacOS
+# OS generated files
 .DS_Store
-.AppleDouble
-.LSOverride
+.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-
-# Windows
-Thumbs.db
 ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Linux
-.directory
-*~
-.~*
-
-# ==================== DOCKER ====================
-.dockerignore
-docker-compose.override.yml
-.docker/
-
-# ==================== DATABASE ====================
-*.db
-*.sqlite
-*.sqlite3
-*.db-journal
-data/
-db_data/
-postgres_data/
-redis_data/
-mongo_data/
-mysql_data/
-
-# Prisma (кроме схемы и миграций)
-prisma/*.db
-prisma/*.db-journal
-
-# ==================== LOGS ====================
-logs/
-*.log
-*.log.*
-log.txt
-server.log
-dev.log
-build-*.txt
-test-output.txt
-test-result.txt
-
-# ==================== CREDENTIALS & SECRETS ====================
-.aws/
-.ssh/
-*.pem
-*.key
-private_key
-secret_key
-credentials.json
-token.json
-access_token.txt
-
-# ==================== UPLOADS & MEDIA ====================
-media/
-uploads/
-user_uploads/
-static/uploads/
-public/uploads/
-tmp/uploads/
-
-# Исключения: разрешить img/ для README и документации
-!img/
-!img/*.png
-!img/*.jpg
-!img/*.jpeg
-
-# ==================== TEMPORARY FILES ====================
-*.tmp
-*.temp
-*.bak
-*.new
-*.backup
-*.orig
-*.rej
-
-# ==================== PROJECT SPECIFIC ====================
-backend/media/
-backend/static/
-backend/uploads/
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/.env.local
-generated/
-*.generated.ts
-*.generated.js
-
-# Prisma migrations (should be committed)
-# prisma/migrations/ — НЕ игнорируем, миграции коммитятся
-
-# Legacy licence file (use LICENSE)
-LICENCE
-
-# ==================== CI/CD ====================
-.github/workflows/secrets.yml
-.gitlab-ci.yml.local
-.travis.yml.local
-
-# ==================== MONOREPO ====================
-.turbo/
-lerna-debug.log
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
-
-# ==================== MISC ====================
-.env.production
-config.local.js
-tsconfig.local.json
-babel.config.local.js
-jest.config.local.js
-.system/
-system.conf
-
-# Prisma
-prisma/migrations/
-
-# Bun
-.bun
-
-# Service Worker (compiled )
-public/sw.js
+Thumbs.db
+Icon?
+```
