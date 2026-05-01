@@ -7,6 +7,22 @@
 
 ---
 
+## [Unreleased]
+
+## [0.4.10] - 2026-05-01
+
+### Исправлено
+- **Исправление lint ошибок** — устранены 13 ошибок ESLint в коде и тестах
+  - Удалены лишние type assertions в wave-function.tsx и presets.test.ts
+  - Удалён неиспользуемый импорт cleanupExpiredEntries из in-memory-rate-limiter.test.ts
+  - Исправлены bracket notation на dot notation для внутренних свойств
+- **Тесты** — все unit тесты проходят (339 passed, 2 todo)
+
+### Изменено
+- **Качество кода** — поддержание нулевых ошибок ESLint и TypeScript
+
+---
+
 ## [0.4.10] - 2026-04-26
 
 ### Обновлено
