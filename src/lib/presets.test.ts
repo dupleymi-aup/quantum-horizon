@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+ 
+ 
 
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import {
@@ -54,7 +54,7 @@ describe("presets", () => {
         showProbability: true,
         showWaveFunction: true,
       },
-    } as any)
+    })
 
     expect(preset.id).toMatch(/^custom-\d+$/)
     expect(preset.name).toBe("Тестовый пресет")
@@ -117,12 +117,12 @@ describe("presets", () => {
   })
 
   it("возвращает пустой массив для неизвестной визуализации", () => {
-    const presets = getAllPresets("unknown" as any)
+    const presets = getAllPresets("unknown")
     expect(presets).toEqual([])
   })
 
   it("создаёт пресет с корректным ID", () => {
-    const preset = createCustomPreset("Test", "Desc", "waveFunction", {} as any)
+    const preset = createCustomPreset("Test", "Desc", "waveFunction", {})
     expect(typeof preset.id).toBe("string")
     expect(preset.id).toMatch(/^custom-\d+$/)
   })

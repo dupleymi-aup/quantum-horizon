@@ -28,7 +28,7 @@ export function WaveFunctionVisualization({ isDark }: WaveFunctionVisualizationP
 
   useEffect(() => {
     const n = QueryParam.getNumber("wf.n", quantumNumber)
-    if (n !== quantumNumber) setQuantumNumber(n as 1 | 2 | 3 | 4 | 5)
+    if (n !== quantumNumber) setQuantumNumber(n)
     QueryParam.setNumber("wf.n", quantumNumber)
   }, [quantumNumber, setQuantumNumber])
 

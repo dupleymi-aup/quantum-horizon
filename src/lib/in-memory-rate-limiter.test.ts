@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { InMemoryRateLimiter, createInMemoryRateLimiter, cleanupExpiredEntries } from "./in-memory-rate-limiter"
+import { InMemoryRateLimiter, createInMemoryRateLimiter } from "./in-memory-rate-limiter"
 
 describe("InMemoryRateLimiter", () => {
   let limiter: InMemoryRateLimiter
@@ -148,18 +148,18 @@ describe("InMemoryRateLimiter", () => {
         count: 5,
         resetTime: Date.now() - 1000 // Expired 1 second ago
       }
-      limiter["rateLimitStore"].set(expiredKey, expiredEntry)
+      limiter.rateLimitStore.set(expiredKey, expiredEntry)
       
       // Verify both entries exist
-      expect(limiter["rateLimitStore"].has("test:user1")).toBe(true)
-      expect(limiter["rateLimitStore"].has(expiredKey)).toBe(true)
+      expect(limiter.rateLimitStore.has("test:user1")).toBe(true)
+      expect(limiter.rateLimitStore.has(expiredKey)).toBe(true)
       
       // Run cleanup
       limiter.cleanupExpiredEntries()
       
       // Expired entry should be removed, active entry should remain
-      expect(limiter["rateLimitStore"].has("test:user1")).toBe(true)
-      expect(limiter["rateLimitStore"].has(expiredKey)).toBe(false)
+      expect(limiter.rateLimitStore.has("test:user1")).toBe(true)
+      expect(limiter.rateLimitStore.has(expiredKey)).toBe(false)
     })
   })
 
@@ -169,7 +169,7 @@ describe("InMemoryRateLimiter", () => {
         autoCleanup: true
       })
 
-      expect(limiterWithAuto["cleanupTimer"]).not.toBeNull()
+      expect(limiterWithAuto.cleanupTimer).not.toBeNull()
 
       limiterWithAuto.stopCleanup()
     })
@@ -179,7 +179,7 @@ describe("InMemoryRateLimiter", () => {
         autoCleanup: false
       })
 
-      expect(limiterWithoutAuto["cleanupTimer"]).toBeNull()
+      expect(limiterWithoutAuto.cleanupTimer).toBeNull()
     })
   })
 
@@ -251,7 +251,7 @@ describe("InMemoryRateLimiter", () => {
         count: 5,
         resetTime: Date.now() - 1000 // Expired 1 second ago
       }
-      limiter["rateLimitStore"].set(expiredKey, expiredEntry)
+      limiter.rateLimitStore.set(expiredKey, expiredEntry)
       
       // Add a third entry - should trigger cleanup and eviction
       limiter.limit("key3")
@@ -261,7 +261,7 @@ describe("InMemoryRateLimiter", () => {
       // Since we had 2 entries, one expired, after cleanup we have 1
       // Adding third makes it 2, which is at limit, so no eviction needed
       // But let's verify the store size is reasonable
-      expect(limiter["rateLimitStore"].size).toBeLessThanOrEqual(2)
+      expect(limiter.rateLimitStore.size).toBeLessThanOrEqual(2)
     })
   })
 })
