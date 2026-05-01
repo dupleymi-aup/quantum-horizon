@@ -1,7 +1,7 @@
 # Quantum Horizon — План улучшений
 
 **Дата:** 2026-05-01  
-**Обновлено:** 2026-05-01 — Обновлены зависимости, качество поддерживается  
+**Обновлено:** 2026-05-01 — Качество поддерживается, все проверки проходят  
 **Версия:** 0.4.10 (current)
 
 ---
@@ -25,8 +25,8 @@
 ### 📦 Зависимости
 
 **Актуальность:** Все пакеты обновлены (2026-05-01)  
-**Обновлено:** eslint, globals, jsdom, nodemailer, typescript-eslint  
-**Остались уязвимости:** 17 (9 low, 8 moderate) — транзитивные зависимости
+**Последние обновления:** eslint, globals, jsdom, nodemailer, typescript-eslint  
+**Остались уязвимости:** 17 (9 low, 8 moderate) — требуют breaking changes для исправления
 
 ### 📁 Структура визуализаций
 
@@ -46,20 +46,19 @@
 
 ### Высокий приоритет
 
-1. **Устранение уязвимостей** — address moderate vulnerabilities
-2. **Lighthouse замеры** — выполнить production замеры (цель: > 90)
-3. **E2E тесты auth** — 2 todo теста в proxy.test.ts покрыты E2E в auth.spec.ts
+1. **Lighthouse замеры** — выполнить production замеры (цель: > 90)
+2. **Устранение уязвимостей** — требует breaking changes (осторожно!)
 
 ### Средний приоритет
 
-4. **Bundle оптимизация** — анализ больших чанков через `npm run build:analyze`
-5. **Storybook документация** — добавить stories для missing компонентов
-6. **Дополнительные API тесты** — покрыть остальные API routes (auth, bookmarks, progress)
+3. **Bundle оптимизация** — анализ больших чанков через `npm run build:analyze`
+4. **Storybook документация** — добавить stories для missing компонентов
+5. **Дополнительные API тесты** — покрыть остальные API routes (auth, bookmarks, progress)
 
 ### Низкий приоритет
 
-7. **Accessibility** — расширить a11y тесты
-8. **PostgreSQL migration** — подготовка production БД конфигурации
+6. **Accessibility** — расширить a11y тесты
+7. **PostgreSQL migration** — подготовка production БД конфигурации
 
 ---
 
