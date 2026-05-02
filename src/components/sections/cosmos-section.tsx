@@ -25,7 +25,10 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
   const t = useTranslations()
 
   return (
-    <>
+    <section aria-labelledby="cosmos-heading" className="space-y-6">
+      <h2 id="cosmos-heading" className="sr-only">
+        {t("cosmosSection")}
+      </h2>
       <VisualizationCard
         title={t("hrDiagram")}
         description={t("hrDiagramDesc")}
@@ -34,7 +37,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <HRDiagramVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("neutronStar")}
         description={t("neutronStarDesc")}
@@ -43,7 +45,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <NeutronStarVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("blackHole")}
         description={t("blackHoleDesc")}
@@ -52,7 +53,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <BlackHoleVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("whiteHole")}
         description={t("whiteHoleDesc")}
@@ -61,7 +61,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <WhiteHoleVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("solarSystem")}
         description={t("solarSystemDesc")}
@@ -70,11 +69,14 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <SolarSystemVisualization isDark={isDark} />
       </VisualizationCard>
-
-      <VisualizationCard title={t("cmb")} description={t("cmbDesc")} color="blue" isDark={isDark}>
+      <VisualizationCard
+        title={t("cmb")}
+        description={t("cmbDesc")}
+        color="blue"
+        isDark={isDark}
+      >
         <CMBVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("darkEnergy")}
         description={t("darkEnergyDesc")}
@@ -83,7 +85,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <DarkEnergyVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("wormhole")}
         description={t("wormholeDesc")}
@@ -92,7 +93,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <WormholeVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("pulsar")}
         description={t("pulsarDesc")}
@@ -101,7 +101,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <PulsarVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("quasar")}
         description={t("quasarDesc")}
@@ -110,7 +109,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <QuasarVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("protoplanetaryDisk")}
         description={t("protoplanetaryDiskDesc")}
@@ -119,6 +117,6 @@ export const CosmosSection = memo(function CosmosSection({ isDark }: CosmosSecti
       >
         <ProtoplanetaryDiskVisualization isDark={isDark} />
       </VisualizationCard>
-    </>
+    </section>
   )
 })

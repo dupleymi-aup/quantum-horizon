@@ -15,13 +15,14 @@ interface ThermodynamicsSectionProps {
   isDark: boolean
 }
 
-export const ThermodynamicsSection = memo(function ThermodynamicsSection({
-  isDark,
-}: ThermodynamicsSectionProps) {
+export const ThermodynamicsSection = memo(function ThermodynamicsSection({ isDark }: ThermodynamicsSectionProps) {
   const t = useTranslations()
 
   return (
-    <>
+    <section aria-labelledby="thermodynamics-heading" className="space-y-6">
+      <h2 id="thermodynamics-heading" className="sr-only">
+        {t("thermodynamicsSection")}
+      </h2>
       <VisualizationCard
         title={t("thermalRadiation")}
         description={t("thermalRadiationDesc")}
@@ -30,7 +31,6 @@ export const ThermodynamicsSection = memo(function ThermodynamicsSection({
       >
         <ThermalRadiationVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("entropy")}
         description={t("entropyDesc")}
@@ -39,7 +39,6 @@ export const ThermodynamicsSection = memo(function ThermodynamicsSection({
       >
         <EntropyVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("phaseTransition")}
         description={t("phaseTransitionDesc")}
@@ -48,7 +47,6 @@ export const ThermodynamicsSection = memo(function ThermodynamicsSection({
       >
         <PhaseTransitionVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("idealGas")}
         description={t("idealGasDesc")}
@@ -57,7 +55,6 @@ export const ThermodynamicsSection = memo(function ThermodynamicsSection({
       >
         <IdealGasVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("carnotEngine")}
         description={t("carnotEngineDesc")}
@@ -66,6 +63,6 @@ export const ThermodynamicsSection = memo(function ThermodynamicsSection({
       >
         <CarnotEngineVisualization isDark={isDark} />
       </VisualizationCard>
-    </>
+    </section>
   )
 })

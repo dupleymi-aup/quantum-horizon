@@ -13,13 +13,14 @@ interface RelativitySectionProps {
   isDark: boolean
 }
 
-export const RelativitySection = memo(function RelativitySection({
-  isDark,
-}: RelativitySectionProps) {
+export const RelativitySection = memo(function RelativitySection({ isDark }: RelativitySectionProps) {
   const t = useTranslations()
 
   return (
-    <>
+    <section aria-labelledby="relativity-heading" className="space-y-6">
+      <h2 id="relativity-heading" className="sr-only">
+        {t("relativitySection")}
+      </h2>
       <VisualizationCard
         title={t("timeDilation")}
         description={t("timeDilationDesc")}
@@ -28,7 +29,6 @@ export const RelativitySection = memo(function RelativitySection({
       >
         <TimeDilationVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("lengthContraction")}
         description={t("lengthContractionDesc")}
@@ -37,7 +37,6 @@ export const RelativitySection = memo(function RelativitySection({
       >
         <LengthContractionVisualization isDark={isDark} />
       </VisualizationCard>
-
       <VisualizationCard
         title={t("massEnergy")}
         description={t("massEnergyDesc")}
@@ -46,6 +45,6 @@ export const RelativitySection = memo(function RelativitySection({
       >
         <MassEnergyVisualization isDark={isDark} />
       </VisualizationCard>
-    </>
+    </section>
   )
 })
