@@ -64,11 +64,16 @@
 
 ## 📋 История версий
 
-### v0.4.11 (2026-05-02) — Расширенное API тестирование
+### v0.4.11 (2026-05-02) — Lighthouse замеры и API тестирование
 
 **Тип:** Patch release
 
 **Изменения:**
+- Выполнены Lighthouse production замеры:
+  - Performance: 61% (цель > 90%)
+  - Accessibility: 88% (цель > 90%)
+  - Best Practices: 75% (цель > 90%)
+  - SEO: 100% ✅
 - Добавлены unit тесты для API routes (48 новых тестов)
 - `/api/visualizations/bookmarks` — CRUD операции (14 тестов)
 - `/api/visualizations/progress` — управление прогрессом (12 тестов)
@@ -129,6 +134,10 @@
 | Build time | ~6.6s | < 20s | ✅ |
 | Bundle size (chunks) | ~1.3 MB | < 2 MB | ✅ |
 | Visualizations | 35 | 40+ | 🔄 |
+| **Lighthouse Performance** | **61%** | > 90 | 🔄 |
+| **Lighthouse Accessibility** | **88%** | > 90 | 🔄 |
+| **Lighthouse Best Practices** | **75%** | > 90 | 🔄 |
+| **Lighthouse SEO** | **100%** | > 90 | ✅ |
 
 ---
 
@@ -138,3 +147,4 @@
 - Все изменения должны проходить lint, TypeScript и тесты перед слиянием
 - Git tags следуют семантическому версионированию
 - 2026-05-02: Qwen Code выполнил проверку: lint OK, тесты прошли (66 API тестов), сборка успешна (6.6s)
+- **Lighthouse замеры (2026-05-02):** Performance: 61%, Accessibility: 88%, Best Practices: 75%, SEO: 100%
