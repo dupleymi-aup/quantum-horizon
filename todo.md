@@ -15,10 +15,10 @@
 
 | Метрика | Значение |
 |---------|----------|
-| Build | ✅ успешен (6.6s) |
+| Build | ✅ успешен (16.4s) |
 | Lint | ✅ 0 ошибок |
 | TypeScript | ✅ 0 ошибок |
-| Unit тесты | ✅ 357 passed, 2 todo |
+| Unit тесты | ✅ 405 passed, 2 todo |
 | E2E тесты | ✅ 13 тестов (3 файла) |
 | API тесты | ✅ 66 тестов (7 файлов) |
 
@@ -128,10 +128,10 @@
 |---------|-----------------|------|--------|
 | Lint errors | 0 | 0 | ✅ |
 | TypeScript errors | 0 | 0 | ✅ |
-| Unit tests passing | 357/359 (99.4%) | > 95% | ✅ |
+| Unit tests passing | 405/407 (99.5%) | > 95% | ✅ |
 | API tests | 66 (7 files) | > 50 | ✅ |
 | E2E tests | 13 | > 20 | 🔄 |
-| Build time | ~6.6s | < 20s | ✅ |
+| Build time | ~16.4s | < 20s | ✅ |
 | Bundle size (chunks) | ~1.3 MB | < 2 MB | ✅ |
 | Visualizations | 35 | 40+ | 🔄 |
 | **Lighthouse Performance** | **61%** | > 90 | 🔄 |
@@ -146,5 +146,10 @@
 - Разработка ведётся в **main** ветке
 - Все изменения должны проходить lint, TypeScript и тесты перед слиянием
 - Git tags следуют семантическому версионированию
-- 2026-05-02: Qwen Code выполнил проверку: lint OK, тесты прошли (66 API тестов), сборка успешна (6.6s)
+- 2026-05-02: Qwen Code выполнил проверку: lint OK, тесты прошли (405 passed, 66 API тестов), сборка успешна (16.4s)
 - **Lighthouse замеры (2026-05-02):** Performance: 61%, Accessibility: 88%, Best Practices: 75%, SEO: 100%
+- **Qwen Code оптимизации (2026-05-02):**
+  - ✅ Code splitting: lazy loading для всех визуализаций
+  - ✅ Оптимизация изображений: Next.js Image с AVIF/WebP
+  - ✅ Оптимизация шрифтов: system-ui
+  - ✅ Bundle анализ: ~1.3 MB chunks
