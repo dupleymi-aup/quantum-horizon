@@ -5,13 +5,6 @@ import { useLocale } from "next-intl"
 import dynamic from "next/dynamic"
 import { useOnboarding } from "@/components/ui/onboarding-tour"
 import { useCommandPalette } from "@/components/ui/enhanced-command-palette"
-import {
-  QuantumSection,
-  RelativitySection,
-  CosmosSection,
-  ThermodynamicsSection,
-  AdvancedSection,
-} from "@/components/sections"
 import { SECTIONS, type Section, type Language } from "@/lib/constants-ui"
 import type { Theme } from "@/types"
 
@@ -56,6 +49,32 @@ const HeaderControls = dynamic(
 const Navigation = dynamic(
   () => import("@/components/layout/navigation").then((m) => m.Navigation),
   { ssr: false, loading: () => null }
+)
+
+// Lazy load sections to reduce initial bundle size
+const QuantumSection = dynamic(
+  () => import("@/components/sections/quantum-section").then((m) => m.QuantumSection),
+  { ssr: false }
+)
+
+const RelativitySection = dynamic(
+  () => import("@/components/sections/relativity-section").then((m) => m.RelativitySection),
+  { ssr: false }
+)
+
+const CosmosSection = dynamic(
+  () => import("@/components/sections/cosmos-section").then((m) => m.CosmosSection),
+  { ssr: false }
+)
+
+const ThermodynamicsSection = dynamic(
+  () => import("@/components/sections/thermodynamics-section").then((m) => m.ThermodynamicsSection),
+  { ssr: false }
+)
+
+const AdvancedSection = dynamic(
+  () => import("@/components/sections/advanced-section").then((m) => m.AdvancedSection),
+  { ssr: false }
 )
 
 const STORAGE_KEYS = {
