@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react"
 import { useLocale } from "next-intl"
 import dynamic from "next/dynamic"
-import { SideMenu } from "@/components/layout/side-menu"
-import { HeaderControls } from "@/components/layout/header-controls"
-import { Navigation } from "@/components/layout/navigation"
 import { useOnboarding } from "@/components/ui/onboarding-tour"
 import { useCommandPalette } from "@/components/ui/enhanced-command-palette"
 import {
@@ -19,9 +16,10 @@ import { SECTIONS, type Section, type Language } from "@/lib/constants-ui"
 import type { Theme } from "@/types"
 
 // Lazy load heavy UI components to reduce initial bundle
+// Lazy load heavy UI components to reduce initial bundle (critical for FCP/LCP)
 const OnboardingTour = dynamic(
   () => import("@/components/ui/onboarding-tour").then((m) => m.OnboardingTour),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 )
 
 const EnhancedCommandPalette = dynamic(
@@ -33,15 +31,31 @@ const EnhancedCommandPalette = dynamic(
 )
 
 // Lazy load QuickActions to defer framer-motion bundle
+// Lazy load QuickActions to defer framer-motion bundle
 const QuickActions = dynamic(
   () => import("@/components/ui/quick-actions").then((m) => m.QuickActions),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 )
 
 // Lazy load AnimatedBackground to defer canvas/animation bundle
+// Lazy load AnimatedBackground to defer canvas/animation bundle
 const AnimatedBackground = dynamic(
   () => import("@/components/layout/animated-background").then((m) => m.AnimatedBackground),
-  { ssr: false }
+  { ssr: false, loading: () => null }
+)
+
+// Lazy load layout components to improve FCP
+const SideMenu = dynamic(
+  () => import("@/components/layout/side-menu").then((m) => m.SideMenu),
+  { ssr: false, loading: () => null }
+)
+const HeaderControls = dynamic(
+  () => import("@/components/layout/header-controls").then((m) => m.HeaderControls),
+  { ssr: false, loading: () => null }
+)
+const Navigation = dynamic(
+  () => import("@/components/layout/navigation").then((m) => m.Navigation),
+  { ssr: false, loading: () => null }
 )
 
 const STORAGE_KEYS = {
