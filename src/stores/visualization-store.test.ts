@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { describe, it, expect, beforeEach } from "vitest"
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
 import {
   useVisualizationStore,
   selectVisualizationSettings,
@@ -82,14 +82,12 @@ describe("useVisualizationStore", () => {
   describe("General actions", () => {
     it("should set selected visualization", () => {
       useVisualizationStore.getState().setSelectedVisualization("waveFunction")
-
       const state = useVisualizationStore.getState()
       expect(state.selectedVisualization).toBe("waveFunction")
     })
 
     it("should toggle fullscreen", () => {
       useVisualizationStore.getState().toggleFullscreen()
-
       const state = useVisualizationStore.getState()
       expect(state.isFullscreen).toBe(true)
 
@@ -99,13 +97,11 @@ describe("useVisualizationStore", () => {
 
     it("should set fullscreen directly", () => {
       useVisualizationStore.getState().setIsFullscreen(true)
-
       expect(useVisualizationStore.getState().isFullscreen).toBe(true)
     })
 
     it("should toggle playing", () => {
       useVisualizationStore.getState().togglePlaying()
-
       const state = useVisualizationStore.getState()
       expect(state.isPlaying).toBe(false)
 
@@ -115,7 +111,6 @@ describe("useVisualizationStore", () => {
 
     it("should set playing directly", () => {
       useVisualizationStore.getState().setIsPlaying(false)
-
       expect(useVisualizationStore.getState().isPlaying).toBe(false)
     })
 
@@ -134,31 +129,25 @@ describe("useVisualizationStore", () => {
   describe("Wave Function actions", () => {
     it("should set quantum number", () => {
       useVisualizationStore.getState().setQuantumNumber(3)
-
       const state = useVisualizationStore.getState()
       expect(state.waveFunction.quantumNumber).toBe(3)
     })
 
     it("should clamp quantum number to minimum 1", () => {
       useVisualizationStore.getState().setQuantumNumber(0)
-
       expect(useVisualizationStore.getState().waveFunction.quantumNumber).toBe(1)
     })
 
     it("should toggle showProbability", () => {
       useVisualizationStore.getState().toggleShowProbability()
-
       expect(useVisualizationStore.getState().waveFunction.showProbability).toBe(false)
-
       useVisualizationStore.getState().toggleShowProbability()
       expect(useVisualizationStore.getState().waveFunction.showProbability).toBe(true)
     })
 
     it("should toggle showWaveFunction", () => {
       useVisualizationStore.getState().toggleShowWaveFunction()
-
       expect(useVisualizationStore.getState().waveFunction.showWaveFunction).toBe(false)
-
       useVisualizationStore.getState().toggleShowWaveFunction()
       expect(useVisualizationStore.getState().waveFunction.showWaveFunction).toBe(true)
     })
@@ -167,7 +156,6 @@ describe("useVisualizationStore", () => {
   describe("Time Dilation actions", () => {
     it("should set velocity", () => {
       useVisualizationStore.getState().setVelocity(0.8)
-
       const state = useVisualizationStore.getState()
       expect(state.timeDilation.velocity).toBe(0.8)
     })
@@ -182,9 +170,7 @@ describe("useVisualizationStore", () => {
 
     it("should toggle showClock", () => {
       useVisualizationStore.getState().toggleShowClock()
-
       expect(useVisualizationStore.getState().timeDilation.showClock).toBe(false)
-
       useVisualizationStore.getState().toggleShowClock()
       expect(useVisualizationStore.getState().timeDilation.showClock).toBe(true)
     })
@@ -193,31 +179,25 @@ describe("useVisualizationStore", () => {
   describe("Black Hole actions", () => {
     it("should set black hole mass", () => {
       useVisualizationStore.getState().setBlackHoleMass(25)
-
       const state = useVisualizationStore.getState()
       expect(state.blackHole.mass).toBe(25)
     })
 
     it("should clamp mass to minimum 1", () => {
       useVisualizationStore.getState().setBlackHoleMass(0)
-
       expect(useVisualizationStore.getState().blackHole.mass).toBe(1)
     })
 
     it("should toggle accretion disk", () => {
       useVisualizationStore.getState().toggleAccretionDisk()
-
       expect(useVisualizationStore.getState().blackHole.showAccretionDisk).toBe(false)
-
       useVisualizationStore.getState().toggleAccretionDisk()
       expect(useVisualizationStore.getState().blackHole.showAccretionDisk).toBe(true)
     })
 
     it("should toggle Hawking radiation", () => {
       useVisualizationStore.getState().toggleHawkingRadiation()
-
       expect(useVisualizationStore.getState().blackHole.showHawkingRadiation).toBe(true)
-
       useVisualizationStore.getState().toggleHawkingRadiation()
       expect(useVisualizationStore.getState().blackHole.showHawkingRadiation).toBe(false)
     })
@@ -262,7 +242,6 @@ describe("Selectors", () => {
   it("should select visualization settings", () => {
     const state = useVisualizationStore.getState()
     const selected = selectVisualizationSettings(state)
-
     expect(selected).toEqual({
       isPlaying: false,
       animationSpeed: 1.5,
@@ -273,7 +252,6 @@ describe("Selectors", () => {
   it("should select wave function settings", () => {
     const state = useVisualizationStore.getState()
     const selected = selectWaveFunctionSettings(state)
-
     expect(selected).toEqual({
       quantumNumber: 1,
       showProbability: true,
@@ -284,7 +262,6 @@ describe("Selectors", () => {
   it("should select time dilation settings", () => {
     const state = useVisualizationStore.getState()
     const selected = selectTimeDilationSettings(state)
-
     expect(selected).toEqual({
       velocity: 0.5,
       showClock: true,
@@ -294,7 +271,6 @@ describe("Selectors", () => {
   it("should select black hole settings", () => {
     const state = useVisualizationStore.getState()
     const selected = selectBlackHoleSettings(state)
-
     expect(selected).toEqual({
       mass: 10,
       showAccretionDisk: true,
@@ -304,27 +280,37 @@ describe("Selectors", () => {
 })
 
 describe("Persistence", () => {
-  it("should persist settings to localStorage", () => {
-    // Set some settings
-    useVisualizationStore.getState().setIsFullscreen(true)
+  it("should write to localStorage with correct key", () => {
+    // The store uses persist middleware with key "visualization-settings"
+    // Write directly to verify the key is correct
     useVisualizationStore.getState().setAnimationSpeed(1.5)
 
-    // Get persisted state
-    const persisted = localStorage.getItem("visualization-settings")
-    expect(persisted).toBeTruthy()
-
-    const parsed = JSON.parse(persisted!)
-    expect(parsed.state.isFullscreen).toBe(true)
-    expect(parsed.state.animationSpeed).toBe(1.5)
+    // Wait for throttled storage to flush (it uses setTimeout internally)
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        const persisted = localStorage.getItem("visualization-settings")
+        expect(persisted).toBeTruthy()
+        const parsed = JSON.parse(persisted!)
+        // Verify partialize: isFullscreen should be excluded
+        expect(parsed.state.isFullscreen).toBeUndefined()
+        // animationSpeed should be persisted
+        expect(parsed.state.animationSpeed).toBe(1.5)
+        resolve()
+      }, 600)
+    })
   })
 
-  it("should not persist selectedVisualization", () => {
+  it("should persist selectedVisualization via partialize", () => {
     useVisualizationStore.getState().setSelectedVisualization("blackHole")
 
-    const persisted = localStorage.getItem("visualization-settings")
-    const parsed = JSON.parse(persisted!)
-
-    // selectedVisualization is now persisted (removed partialize)
-    expect(parsed.state.selectedVisualization).toBe("blackHole")
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        const persisted = localStorage.getItem("visualization-settings")
+        expect(persisted).toBeTruthy()
+        const parsed = JSON.parse(persisted!)
+        expect(parsed.state.selectedVisualization).toBe("blackHole")
+        resolve()
+      }, 600)
+    })
   })
 })

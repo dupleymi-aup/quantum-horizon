@@ -43,9 +43,10 @@ function getRateLimiter(prefix: string, requests: number, window: "1 m" | "1 h")
   }
 
   // Fallback to in-memory rate limiter with caching to ensure same instance for same prefix
-  const cacheKey = `${prefix}:${requests}:${window}`
+  const cacheKey = `${prefix}:${String(requests)}:${window}`
   if (inMemoryLimiterCache.has(cacheKey)) {
-    return inMemoryLimiterCache.get(cacheKey)!
+    const cached = inMemoryLimiterCache.get(cacheKey)
+    if (cached) return cached
   }
 
   const limiter = createInMemoryRateLimiter(requests, window, prefix)
@@ -117,15 +118,9 @@ async function applyRateLimit(
 
   // Get client identifier (IP or fallback)
   const clientIp =
-    request.headers.get("x-forwarded-for") ??
-    request.headers.get("x-real-ip") ??
-    "127.0.0.1"
+    request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "127.0.0.1"
 
-  const rateLimiter = getRateLimiter(
-    rateConfig.prefix,
-    rateConfig.requests,
-    rateConfig.window
-  )
+  const rateLimiter = getRateLimiter(rateConfig.prefix, rateConfig.requests, rateConfig.window)
 
   const result = await rateLimiter.limit(clientIp)
 

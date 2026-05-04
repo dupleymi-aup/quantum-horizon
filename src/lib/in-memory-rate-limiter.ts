@@ -39,16 +39,12 @@ export function createInMemoryRateLimiter(
   options: InMemoryRateLimiterOptions = {}
 ): InMemoryRateLimiter {
   const windowMs = window === "1 m" ? 60 * 1000 : 60 * 60 * 1000
-  const {
-    autoCleanup = true,
-    cleanupIntervalMs = 60 * 1000,
-    maxStorageSize = 1000
-  } = options
+  const { autoCleanup = true, cleanupIntervalMs = 60 * 1000, maxStorageSize = 1000 } = options
 
   return new InMemoryRateLimiter(requests, windowMs, prefix, {
     autoCleanup,
     cleanupIntervalMs,
-    maxStorageSize
+    maxStorageSize,
   })
 }
 
@@ -56,20 +52,20 @@ export function createInMemoryRateLimiter(
  * In-memory rate limiter class
  */
 export class InMemoryRateLimiter {
-  private maxRequests: number
-  private windowMs: number
-  private prefix: string
-  private autoCleanup: boolean
-  private cleanupIntervalMs: number
-  private maxStorageSize: number
+  public maxRequests: number
+  public windowMs: number
+  public prefix: string
+  public autoCleanup: boolean
+  public cleanupIntervalMs: number
+  public maxStorageSize: number
 
   // Each instance has its own storage
-  private rateLimitStore: Map<string, RateLimitEntry>
+  public rateLimitStore: Map<string, RateLimitEntry>
   // Queue to track insertion order for FIFO eviction
-  private keyQueue: string[]
+  public keyQueue: string[]
 
   // Cleanup timer reference
-  private cleanupTimer: NodeJS.Timeout | null = null
+  public cleanupTimer: NodeJS.Timeout | null = null
 
   constructor(
     maxRequests: number,
@@ -159,7 +155,7 @@ export class InMemoryRateLimiter {
    * Evict the oldest entry when storage limit is reached
    * Uses FIFO eviction based on insertion order
    */
-  private evictOldestEntry(): void {
+  public evictOldestEntry(): void {
     // Remove expired entries first
     this.cleanupExpiredEntries()
 
@@ -175,7 +171,7 @@ export class InMemoryRateLimiter {
   /**
    * Start the cleanup timer
    */
-  private startCleanup(): void {
+  public startCleanup(): void {
     if (this.cleanupTimer) {
       return
     }
@@ -198,7 +194,7 @@ export class InMemoryRateLimiter {
   /**
    * Remove expired entries from storage
    */
-  private cleanupExpiredEntries(): void {
+  public cleanupExpiredEntries(): void {
     const now = Date.now()
     for (const [key, entry] of this.rateLimitStore.entries()) {
       if (now > entry.resetTime) {

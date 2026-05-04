@@ -6,7 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { cardHoverEffects } from "@/lib/micro-interactions"
 import { cn } from "@/lib/utils"
 
-type CardColor = "purple" | "blue" | "green" | "orange" | "yellow" | "red" | "cyan" | "pink"
+type CardColor =
+  | "purple"
+  | "blue"
+  | "green"
+  | "orange"
+  | "yellow"
+  | "red"
+  | "cyan"
+  | "pink"
+  | "indigo"
 
 interface VisualizationCardProps {
   title: string
@@ -25,6 +34,7 @@ const borderColors: Record<CardColor, string> = {
   red: "border-red-500/30 hover:border-red-500/50",
   cyan: "border-cyan-500/30 hover:border-cyan-500/50",
   pink: "border-pink-500/30 hover:border-pink-500/50",
+  indigo: "border-indigo-500/30 hover:border-indigo-500/50",
 }
 
 const textColors: Record<CardColor, string> = {
@@ -36,6 +46,7 @@ const textColors: Record<CardColor, string> = {
   red: "text-red-400 dark:text-red-600",
   cyan: "text-cyan-400 dark:text-cyan-600",
   pink: "text-pink-400 dark:text-pink-600",
+  indigo: "text-indigo-400 dark:text-indigo-600",
 }
 
 const bgGradients: Record<CardColor, string> = {
@@ -47,6 +58,7 @@ const bgGradients: Record<CardColor, string> = {
   red: "from-red-500/5 to-pink-500/5",
   cyan: "from-cyan-500/5 to-blue-500/5",
   pink: "from-pink-500/5 to-rose-500/5",
+  indigo: "from-indigo-500/5 to-violet-500/5",
 }
 
 export function VisualizationCard({
