@@ -17,7 +17,7 @@ const publicPaths = [
 // Публичные API маршруты
 const publicApiPaths = [
   "/api/auth",
-  "/api", // API index
+  "/api", // API index (exact match only)
 ]
 
 // Статические ресурсы и Next.js internals
@@ -37,7 +37,8 @@ const staticFileRegex = /\.(ico|svg|png|jpg|jpeg|webp|avif|woff2?|ttf|eot|css|js
 
 function isPublicPath(pathname: string): boolean {
   if (publicPaths.includes(pathname)) return true
-  if (publicApiPaths.some((p) => pathname.startsWith(p))) return true
+  if (publicApiPaths.some((p) => (p === "/api" ? pathname === p : pathname.startsWith(p))))
+    return true
   if (excludedPaths.some((p) => pathname.startsWith(p))) return true
   if (staticFileRegex.exec(pathname)) return true
   return false
@@ -50,7 +51,7 @@ function isProtectedApiPath(pathname: string): boolean {
   return protectedPaths.some((p) => pathname.startsWith(p))
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Пропускаем публичные маршруты
