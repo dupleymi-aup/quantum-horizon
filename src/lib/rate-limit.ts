@@ -14,6 +14,8 @@ const RATE_LIMITS = {
   "/api/visualizations": { requests: 100, window: "1 m" as const },
   "/api/activity": { requests: 60, window: "1 m" as const },
   "/api/achievements": { requests: 60, window: "1 m" as const },
+  "/api/sessions": { requests: 30, window: "1 m" as const },
+  "/api/admin": { requests: 30, window: "1 m" as const },
 } as const
 
 type RateLimitPath = keyof typeof RATE_LIMITS

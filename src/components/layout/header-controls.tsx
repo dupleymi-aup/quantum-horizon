@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import dynamic from "next/dynamic"
 import { MobileNavigation } from "@/components/ui/mobile-navigation"
 import { LANGUAGES, type Section, type Language } from "@/lib/constants-ui"
+import { useHasRole } from "@/hooks/api/use-auth"
+import Link from "next/link"
 
 // Lazy load CommandPalette to reduce initial bundle
 const CommandPalette = dynamic(
@@ -21,6 +23,24 @@ interface HeaderControlsProps {
   onSectionChange: (section: Section) => void
   language: string
   onLanguageChange: (lang: Language) => void
+}
+
+function AdminLink() {
+  const { hasRole } = useHasRole(["ADMIN", "MODERATOR"])
+  if (!hasRole) return null
+
+  return (
+    <Link
+      href="/admin"
+      className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:flex"
+      title="Admin Dashboard"
+    >
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      Admin
+    </Link>
+  )
 }
 
 export function HeaderControls({
@@ -74,6 +94,9 @@ export function HeaderControls({
 
       {/* Controls */}
       <div className="flex items-center gap-2">
+        {/* Admin Link */}
+        <AdminLink />
+
         {/* Mobile Navigation Drawer */}
         <MobileNavigation
           activeSection={activeSection}

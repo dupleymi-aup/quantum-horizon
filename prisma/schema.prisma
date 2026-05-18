@@ -151,7 +151,96 @@ model UserActivity {
   topic     String?
   xpGained Int      @default(0)
   createdAt DateTime @default(now())
-  
+
   @@index([userId])
+  @@index([createdAt])
+  @@index([action])
   @@map("user_activity")
+}
+
+/// User session tracking
+model UserSession {
+  id          String   @id @default(cuid())
+  userId      String
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  durationSec Int      @default(0)
+  topic       String?
+
+  @@index([userId])
+  @@index([startedAt])
+  @@map("user_sessions")
+}
+
+/// Assessments (quizzes, tests, assignments)
+model Assessment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  topic       String
+  maxScore    Int      @default(100)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  grades      Grade[]
+
+  @@index([topic])
+  @@index([createdBy])
+  @@map("assessments")
+}
+
+/// Student grades on assessments
+model Grade {
+  id           String   @id @default(cuid())
+  assessmentId String
+  userId       String
+  score        Int
+  maxScore     Int
+  completedAt  DateTime @default(now())
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, userId])
+  @@index([userId])
+  @@map("grades")
+}
+
+/// Student groups for cohort analysis
+model StudentGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  members     StudentGroupMember[]
+
+  @@index([createdBy])
+  @@map("student_groups")
+}
+
+/// Group membership
+model StudentGroupMember {
+  id      String @id @default(cuid())
+  groupId String
+  userId  String
+  group   StudentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+  @@map("student_group_members")
+}
+
+/// Admin alerts and notifications
+model AdminAlert {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  message   String
+  severity  String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("admin_alerts")
 }
