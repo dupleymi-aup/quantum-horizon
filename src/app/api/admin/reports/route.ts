@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:reports")
@@ -13,11 +14,11 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
-    const range = searchParams.get("range") || "30d"
+    const range = searchParams.get("range") ?? "30d"
     const days = range === "7d" ? 7 : range === "90d" ? 90 : 30
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     const now = new Date()
@@ -76,7 +77,7 @@ async function GETHandler(request: NextRequest) {
         ? Math.round(((totalActivities - prevActivities) / prevActivities) * 100)
         : 0
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         period: { start: startDate.toISOString(), end: now.toISOString(), days },
@@ -96,7 +97,7 @@ async function GETHandler(request: NextRequest) {
       "Error generating report:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
+    return adminJson({ error: "Failed to generate report" }, { status: 500 })
   }
 }
 

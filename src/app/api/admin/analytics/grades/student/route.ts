@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:analytics:grades:student")
@@ -13,13 +14,13 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get("userId")
     if (!userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 })
+      return adminJson({ error: "userId is required" }, { status: 400 })
     }
 
     const user = await db.user.findUnique({
@@ -27,7 +28,7 @@ async function GETHandler(request: NextRequest) {
       select: { id: true, name: true, email: true },
     })
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return adminJson({ error: "User not found" }, { status: 404 })
     }
 
     const grades = await db.grade.findMany({
@@ -39,7 +40,7 @@ async function GETHandler(request: NextRequest) {
     })
 
     if (grades.length === 0) {
-      return NextResponse.json({
+      return adminJson({
         success: true,
         data: {
           student: { id: user.id, name: user.name, email: user.email },
@@ -64,10 +65,7 @@ async function GETHandler(request: NextRequest) {
     }))
 
     // Per-topic improvement
-    const topicMap = new Map<
-      string,
-      { scores: number[]; assessments: string[] }
-    >()
+    const topicMap = new Map<string, { scores: number[]; assessments: string[] }>()
     for (let i = 0; i < grades.length; i++) {
       const topic = grades[i].assessment.topic
       const existing = topicMap.get(topic) ?? { scores: [], assessments: [] }
@@ -92,7 +90,7 @@ async function GETHandler(request: NextRequest) {
       })
       .sort((a, b) => b.avgScore - a.avgScore)
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         student: { id: user.id, name: user.name, email: user.email },
@@ -106,7 +104,7 @@ async function GETHandler(request: NextRequest) {
       "Error fetching student grade data:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to fetch student grade data" }, { status: 500 })
+    return adminJson({ error: "Failed to fetch student grade data" }, { status: 500 })
   }
 }
 

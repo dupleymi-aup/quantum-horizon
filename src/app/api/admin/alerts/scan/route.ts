@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 
 const logger = createLogger("api:admin:alerts:scan")
 
@@ -31,26 +32,51 @@ async function POSTHandler() {
       select: { id: true, name: true, email: true, createdAt: true },
     })
 
+    const eligibleUsers = allUsers.filter((u) => new Date(u.createdAt) <= fourteenDaysAgo)
+    const userIds = eligibleUsers.map((u) => u.id)
+
+    // Fetch all activities in 2 queries instead of N*2
+    const [recentActivities, prevActivities] = await Promise.all([
+      db.userActivity.findMany({
+        where: { userId: { in: userIds }, createdAt: { gte: fourteenDaysAgo } },
+        select: { userId: true },
+      }),
+      db.userActivity.findMany({
+        where: {
+          userId: { in: userIds },
+          createdAt: { gte: twentyEightDaysAgo, lt: fourteenDaysAgo },
+        },
+        select: { userId: true },
+      }),
+    ])
+
+    // Fetch all progress counts in 1 query instead of N
+    const progressData = await db.userProgress.groupBy({
+      by: ["userId"],
+      _count: { id: true },
+      where: { userId: { in: userIds }, completedCount: { gt: 0 } },
+    })
+
+    // Aggregate in memory
+    const recentCountMap = new Map<string, number>()
+    for (const a of recentActivities) {
+      recentCountMap.set(a.userId, (recentCountMap.get(a.userId) ?? 0) + 1)
+    }
+    const prevCountMap = new Map<string, number>()
+    for (const a of prevActivities) {
+      prevCountMap.set(a.userId, (prevCountMap.get(a.userId) ?? 0) + 1)
+    }
+    const progressCountMap = new Map<string, number>()
+    for (const p of progressData) {
+      progressCountMap.set(p.userId, p._count.id)
+    }
+
     const newAlerts: Array<{ userId: string; type: string; message: string; severity: string }> = []
 
-    for (const user of allUsers) {
-      // Skip users registered less than 14 days ago
-      if (new Date(user.createdAt) > fourteenDaysAgo) continue
-
-      const [recentCount, prevCount, progressCount] = await Promise.all([
-        db.userActivity.count({
-          where: { userId: user.id, createdAt: { gte: fourteenDaysAgo } },
-        }),
-        db.userActivity.count({
-          where: {
-            userId: user.id,
-            createdAt: { gte: twentyEightDaysAgo, lt: fourteenDaysAgo },
-          },
-        }),
-        db.userProgress.count({
-          where: { userId: user.id, completedCount: { gt: 0 } },
-        }),
-      ])
+    for (const user of eligibleUsers) {
+      const recentCount = recentCountMap.get(user.id) ?? 0
+      const prevCount = prevCountMap.get(user.id) ?? 0
+      const progressCount = progressCountMap.get(user.id) ?? 0
 
       // Inactive for 14+ days
       if (recentCount === 0) {
@@ -81,35 +107,35 @@ async function POSTHandler() {
       }
     }
 
-    const created = []
-    for (const alert of newAlerts) {
-      const existing = await db.adminAlert.findFirst({
-        where: {
-          userId: alert.userId,
-          type: alert.type,
-          createdAt: { gte: fourteenDaysAgo },
-        },
-      })
-      if (!existing) {
-        created.push(
-          await db.adminAlert.create({
-            data: {
-              userId: alert.userId,
-              type: alert.type,
-              message: alert.message,
-              severity: alert.severity,
-            },
-          })
-        )
-      }
+    // Check for existing alerts in batch
+    const existingAlerts = await db.adminAlert.findMany({
+      where: {
+        userId: { in: newAlerts.map((a) => a.userId) },
+        type: { in: [...new Set(newAlerts.map((a) => a.type))] },
+        createdAt: { gte: fourteenDaysAgo },
+      },
+      select: { userId: true, type: true },
+    })
+    const existingSet = new Set<string>()
+    for (const a of existingAlerts) {
+      const key = [a.userId, a.type].join(":")
+      existingSet.add(key)
     }
+
+    const alertsToCreate = newAlerts.filter((a) => !existingSet.has(`${a.userId}:${a.type}`))
+
+    // Batch create
+    const created =
+      alertsToCreate.length > 0
+        ? await db.adminAlert.createMany({ data: alertsToCreate })
+        : { count: 0 }
 
     return NextResponse.json({
       success: true,
       data: {
         scanned: allUsers.length,
-        alertsCreated: created.length,
-        alerts: created,
+        alertsCreated: created.count,
+        alerts: alertsToCreate,
       },
     })
   } catch (error) {
@@ -121,4 +147,4 @@ async function POSTHandler() {
   }
 }
 
-export const POST = withRateLimit(POSTHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))

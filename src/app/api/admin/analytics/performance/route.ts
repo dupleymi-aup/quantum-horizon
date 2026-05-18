@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:analytics:performance")
@@ -13,14 +13,17 @@ async function GETHandler() {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
+
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
 
     const userActivities = await db.userActivity.groupBy({
       by: ["userId"],
       _sum: { xpGained: true },
       _count: { id: true },
       _max: { createdAt: true },
+      where: { createdAt: { gte: ninetyDaysAgo } },
     })
 
     const userIds = userActivities.map((u) => u.userId)
@@ -80,7 +83,7 @@ async function GETHandler() {
       }))
       .sort((a, b) => a.cohort.localeCompare(b.cohort))
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         rankings,
@@ -93,7 +96,7 @@ async function GETHandler() {
       "Error fetching performance analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to fetch performance analytics" }, { status: 500 })
+    return adminJson({ error: "Failed to fetch performance analytics" }, { status: 500 })
   }
 }
 

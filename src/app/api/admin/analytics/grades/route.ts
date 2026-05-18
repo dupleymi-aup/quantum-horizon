@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:analytics:grades")
@@ -20,10 +20,13 @@ async function GETHandler() {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+
     const grades = await db.grade.findMany({
+      where: { completedAt: { gte: ninetyDaysAgo } },
       include: {
         assessment: { select: { title: true, topic: true, maxScore: true } },
       },
@@ -34,7 +37,7 @@ async function GETHandler() {
     const totalGrades = grades.length
 
     if (totalGrades === 0) {
-      return NextResponse.json({
+      return adminJson({
         success: true,
         data: {
           totalAssessments,
@@ -50,11 +53,10 @@ async function GETHandler() {
     }
 
     const percentages = grades.map((g) => (g.score / g.maxScore) * 100)
-    const avgScorePercentage = Math.round(
-      percentages.reduce((a, b) => a + b, 0) / totalGrades * 10
-    ) / 10
+    const avgScorePercentage =
+      Math.round((percentages.reduce((a, b) => a + b, 0) / totalGrades) * 10) / 10
     const passCount = percentages.filter((p) => p >= 60).length
-    const passRate = Math.round(passCount / totalGrades * 1000) / 10
+    const passRate = Math.round((passCount / totalGrades) * 1000) / 10
 
     // Trends over time
     const dailyMap = new Map<string, { total: number; count: number }>()
@@ -71,7 +73,7 @@ async function GETHandler() {
     const trendsOverTime = Array.from(dailyMap.entries())
       .map(([date, d]) => ({
         date,
-        avgScore: Math.round(d.total / d.count * 10) / 10,
+        avgScore: Math.round((d.total / d.count) * 10) / 10,
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
 
@@ -82,7 +84,7 @@ async function GETHandler() {
       bucketCounts[idx]++
     }
     const gradeDistribution = bucketCounts.map((count, i) => ({
-      range: i === 10 ? "100" : `${i * 10}-${i * 10 + 9}`,
+      range: i === 10 ? "100" : `${String(i * 10)}-${String(i * 10 + 9)}`,
       count,
     }))
 
@@ -98,16 +100,13 @@ async function GETHandler() {
     const avgByTopic = Array.from(topicMap.entries())
       .map(([topic, d]) => ({
         topic,
-        avgScore: Math.round(d.total / d.count * 10) / 10,
+        avgScore: Math.round((d.total / d.count) * 10) / 10,
         count: d.count,
       }))
       .sort((a, b) => b.avgScore - a.avgScore)
 
     // Assessment difficulty
-    const assessmentMap = new Map<
-      string,
-      { scores: number[]; title: string; topic: string }
-    >()
+    const assessmentMap = new Map<string, { scores: number[]; title: string; topic: string }>()
     for (let i = 0; i < grades.length; i++) {
       const g = grades[i]
       const key = g.assessmentId
@@ -123,13 +122,13 @@ async function GETHandler() {
       .map(([, d]) => ({
         title: d.title,
         topic: d.topic,
-        avgScore: Math.round(d.scores.reduce((a, b) => a + b, 0) / d.scores.length * 10) / 10,
+        avgScore: Math.round((d.scores.reduce((a, b) => a + b, 0) / d.scores.length) * 10) / 10,
         count: d.scores.length,
         stdDev: Math.round(calcStdDev(d.scores) * 10) / 10,
       }))
       .sort((a, b) => a.avgScore - b.avgScore)
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         totalAssessments,
@@ -147,7 +146,7 @@ async function GETHandler() {
       "Error fetching grade analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to fetch grade analytics" }, { status: 500 })
+    return adminJson({ error: "Failed to fetch grade analytics" }, { status: 500 })
   }
 }
 

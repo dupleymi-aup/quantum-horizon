@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:analytics:activity")
@@ -19,13 +20,13 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
-    const periodStr = searchParams.get("period") || "30d"
+    const periodStr = searchParams.get("period") ?? "30d"
     const days = PERIOD_MAP[periodStr] ?? 30
-    const topic = searchParams.get("topic") || undefined
+    const topic = searchParams.get("topic") ?? undefined
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
     const where = {
@@ -58,8 +59,8 @@ async function GETHandler(request: NextRequest) {
           comparison_performed: 0,
         })
       }
-      const day = dailyMap.get(date)!
-      if (a.action in day) {
+      const day = dailyMap.get(date)
+      if (day && a.action in day) {
         day[a.action]++
       }
     }
@@ -86,13 +87,13 @@ async function GETHandler(request: NextRequest) {
       _count: true,
     })
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         dailyData,
         topicBreakdown: topicBreakdown
           .filter((t) => t.topic)
-          .map((t) => ({ topic: t.topic!, count: t._count })),
+          .map((t) => ({ topic: t.topic, count: t._count })),
       },
     })
   } catch (error) {
@@ -100,10 +101,7 @@ async function GETHandler(request: NextRequest) {
       "Error fetching activity analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json(
-      { error: "Failed to fetch activity analytics" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch activity analytics" }, { status: 500 })
   }
 }
 

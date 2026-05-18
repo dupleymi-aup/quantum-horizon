@@ -4,7 +4,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:admin:alerts")
@@ -21,12 +23,12 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
     const unreadOnly = searchParams.get("unread") === "true"
-    const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 100)
+    const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10), 100)
 
     const alerts = await db.adminAlert.findMany({
       where: unreadOnly ? { read: false } : {},
@@ -36,16 +38,13 @@ async function GETHandler(request: NextRequest) {
 
     const unreadCount = await db.adminAlert.count({ where: { read: false } })
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: { alerts, unreadCount },
     })
   } catch (error) {
-    logger.error(
-      "Error fetching alerts:",
-      error instanceof Error ? error.message : "Unknown error"
-    )
-    return NextResponse.json({ error: "Failed to fetch alerts" }, { status: 500 })
+    logger.error("Error fetching alerts:", error instanceof Error ? error.message : "Unknown error")
+    return adminJson({ error: "Failed to fetch alerts" }, { status: 500 })
   }
 }
 
@@ -54,7 +53,7 @@ async function POSTHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -68,13 +67,10 @@ async function POSTHandler(request: NextRequest) {
     }
 
     const alert = await db.adminAlert.create({ data: validationResult.data })
-    return NextResponse.json({ success: true, data: alert })
+    return adminJson({ success: true, data: alert })
   } catch (error) {
-    logger.error(
-      "Error creating alert:",
-      error instanceof Error ? error.message : "Unknown error"
-    )
-    return NextResponse.json({ error: "Failed to create alert" }, { status: 500 })
+    logger.error("Error creating alert:", error instanceof Error ? error.message : "Unknown error")
+    return adminJson({ error: "Failed to create alert" }, { status: 500 })
   }
 }
 
@@ -83,7 +79,7 @@ async function PATCHHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
@@ -95,16 +91,16 @@ async function PATCHHandler(request: NextRequest) {
       await db.adminAlert.updateMany({ where: { read: false }, data: { read: true } })
     }
 
-    return NextResponse.json({ success: true })
+    return adminJson({ success: true })
   } catch (error) {
     logger.error(
       "Error marking alerts as read:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to update alerts" }, { status: 500 })
+    return adminJson({ error: "Failed to update alerts" }, { status: 500 })
   }
 }
 
 export const GET = withRateLimit(GETHandler)
-export const POST = withRateLimit(POSTHandler)
-export const PATCH = withRateLimit(PATCHHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))
+export const PATCH = withCsrf(withRateLimit(PATCHHandler))

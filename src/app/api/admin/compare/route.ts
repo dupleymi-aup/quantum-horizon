@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:compare")
@@ -13,17 +14,14 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
     const userIds = searchParams.get("ids")?.split(",") ?? []
 
     if (userIds.length < 2 || userIds.length > 5) {
-      return NextResponse.json(
-        { error: "Compare requires 2-5 student IDs" },
-        { status: 400 }
-      )
+      return adminJson({ error: "Compare requires 2-5 student IDs" }, { status: 400 })
     }
 
     const users = await db.user.findMany({
@@ -44,7 +42,13 @@ async function GETHandler(request: NextRequest) {
       }),
       db.userAchievement.findMany({
         where: { userId: { in: userIds } },
-        select: { userId: true, achievementId: true, progress: true, target: true, unlockedAt: true },
+        select: {
+          userId: true,
+          achievementId: true,
+          progress: true,
+          target: true,
+          unlockedAt: true,
+        },
       }),
       db.userSession.findMany({
         where: { userId: { in: userIds } },
@@ -72,27 +76,41 @@ async function GETHandler(request: NextRequest) {
       }
 
       return {
-        user: user ?? { id: uid, name: null, email: null, role: "USER", createdAt: null, image: null },
+        user: user ?? {
+          id: uid,
+          name: null,
+          email: null,
+          role: "USER",
+          createdAt: null,
+          image: null,
+        },
         totalXp,
         totalActivities: userActivities.length,
         totalAchievements: userAchievements.length,
         totalSessionTime,
         topicsCompleted: userProgress.length,
-        topicCompletion: Array.from(topicCompletion.entries()).map(([topic, count]) => ({ topic, count })),
-        activityByType: Array.from(activityByType.entries()).map(([action, count]) => ({ action, count })),
-        lastActive: userActivities.length > 0
-          ? Math.max(...userActivities.map((a) => new Date(a.createdAt).getTime()))
-          : null,
+        topicCompletion: Array.from(topicCompletion.entries()).map(([topic, count]) => ({
+          topic,
+          count,
+        })),
+        activityByType: Array.from(activityByType.entries()).map(([action, count]) => ({
+          action,
+          count,
+        })),
+        lastActive:
+          userActivities.length > 0
+            ? Math.max(...userActivities.map((a) => new Date(a.createdAt).getTime()))
+            : null,
       }
     })
 
-    return NextResponse.json({ success: true, data: comparisons })
+    return adminJson({ success: true, data: comparisons })
   } catch (error) {
     logger.error(
       "Error comparing students:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to compare students" }, { status: 500 })
+    return adminJson({ error: "Failed to compare students" }, { status: 500 })
   }
 }
 

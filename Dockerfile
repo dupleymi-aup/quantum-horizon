@@ -61,6 +61,13 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Copy Prisma schema and run migrations
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Generate Prisma client for production and push schema
+RUN npx prisma generate && npx prisma db push --accept-data-loss
+
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
 

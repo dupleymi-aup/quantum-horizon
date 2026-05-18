@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { UserRole } from "@prisma/client"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:users")
@@ -14,7 +15,7 @@ async function GETHandler(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { searchParams } = new URL(request.url)
@@ -78,7 +79,7 @@ async function GETHandler(request: NextRequest) {
       lastActive: activityMap.get(u.id)?.lastActive ?? null,
     }))
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         users: usersWithStats,
@@ -90,7 +91,7 @@ async function GETHandler(request: NextRequest) {
     })
   } catch (error) {
     logger.error("Error fetching users:", error instanceof Error ? error.message : "Unknown error")
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
+    return adminJson({ error: "Failed to fetch users" }, { status: 500 })
   }
 }
 

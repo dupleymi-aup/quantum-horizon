@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:admin:assessments")
@@ -145,4 +146,4 @@ async function POSTHandler(request: NextRequest) {
 }
 
 export const GET = withRateLimit(GETHandler)
-export const POST = withRateLimit(POSTHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))

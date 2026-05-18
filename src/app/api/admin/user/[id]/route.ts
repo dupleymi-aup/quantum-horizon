@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
+import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:user-detail")
@@ -13,7 +14,7 @@ async function GETHandler(_request: NextRequest, { params }: { params: Promise<{
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+      return adminJson({ error: authResult.error }, { status: authResult.status })
     }
 
     const { id: userId } = await params
@@ -32,7 +33,7 @@ async function GETHandler(_request: NextRequest, { params }: { params: Promise<{
     })
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return adminJson({ error: "User not found" }, { status: 404 })
     }
 
     const [activities, progress, bookmarks, achievements, sessions] = await Promise.all([
@@ -77,7 +78,7 @@ async function GETHandler(_request: NextRequest, { params }: { params: Promise<{
         action: a.action,
       }))
 
-    return NextResponse.json({
+    return adminJson({
       success: true,
       data: {
         user,
@@ -100,7 +101,7 @@ async function GETHandler(_request: NextRequest, { params }: { params: Promise<{
       "Error fetching user detail:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json({ error: "Failed to fetch user details" }, { status: 500 })
+    return adminJson({ error: "Failed to fetch user details" }, { status: 500 })
   }
 }
 
