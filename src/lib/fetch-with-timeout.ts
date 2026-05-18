@@ -1,5 +1,6 @@
 /**
  * Fetch с таймаутом для предотвращения бесконечных загрузок
+ * Automatically includes CSRF token for state-changing requests.
  */
 
 export class FetchTimeoutError extends Error {
@@ -13,11 +14,39 @@ interface FetchWithTimeoutOptions extends RequestInit {
   timeoutMs?: number
 }
 
+/**
+ * Read a cookie by name from document.cookie
+ */
+function getCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop()?.split(";").shift()
+  return undefined
+}
+
+/**
+ * Check if the HTTP method requires CSRF protection
+ */
+function isStateChangingMethod(method?: string): boolean {
+  if (!method) return false
+  return ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())
+}
+
 export async function fetchWithTimeout(
   url: string,
   options: FetchWithTimeoutOptions = {}
 ): Promise<Response> {
   const { timeoutMs = 10000, ...fetchOptions } = options
+
+  // Auto-add CSRF token for state-changing requests
+  const headers = new Headers(fetchOptions.headers)
+  if (isStateChangingMethod(options.method) && typeof document !== "undefined") {
+    const csrfToken = getCookie("csrf-token")
+    if (csrfToken) {
+      headers.set("X-CSRF-Token", csrfToken)
+    }
+  }
 
   const controller = new AbortController()
   const timeoutId = setTimeout(() => {
@@ -27,6 +56,7 @@ export async function fetchWithTimeout(
   try {
     const response = await fetch(url, {
       ...fetchOptions,
+      headers,
       signal: controller.signal,
     })
     return response

@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
-import { withRateLimit } from "@/lib/rate-limit"
 import { withCsrf } from "@/lib/csrf"
+import { withRateLimit } from "@/lib/rate-limit"
 import { z, treeifyError } from "zod"
 
 const logger = createLogger("api:achievements")

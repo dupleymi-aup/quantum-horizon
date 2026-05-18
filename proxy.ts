@@ -10,6 +10,7 @@ import { Redis } from "@upstash/redis"
 import { getToken } from "next-auth/jwt"
 import createIntlMiddleware from "next-intl/middleware"
 import { createInMemoryRateLimiter, InMemoryRateLimiter } from "@/lib/in-memory-rate-limiter"
+import { generateCsrfToken } from "@/lib/csrf"
 
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
@@ -156,8 +157,8 @@ function isAuthPath(pathname: string): boolean {
  * Create intl middleware for i18n support
  */
 const intlMiddlewareFn = createIntlMiddleware({
-  locales: ["en", "ru", "de", "es"],
-  defaultLocale: "en",
+  locales: ["ru", "en", "zh", "he"],
+  defaultLocale: "ru",
 })
 
 /**
@@ -212,8 +213,19 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
     return applyCorsHeaders(response, origin)
   }
 
-  // Default: proceed with intl middleware
-  return intlMiddlewareFn(request)
+  // Set CSRF token cookie for page requests (if not already set)
+  // This enables the Double Submit Cookie CSRF protection pattern
+  const defaultResponse = intlMiddlewareFn(request)
+  if (!request.cookies.has("csrf-token")) {
+    const token = generateCsrfToken()
+    defaultResponse.cookies.set("csrf-token", token, {
+      httpOnly: false, // Must be readable by client-side JS for header submission
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    })
+  }
+  return defaultResponse
 }
 
 // Export config

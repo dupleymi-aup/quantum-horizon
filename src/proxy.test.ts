@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { NextRequest } from "next/server"
 
@@ -55,8 +56,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
@@ -69,8 +70,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
@@ -83,8 +84,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
@@ -99,8 +100,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff")
       expect(response.headers.get("X-Frame-Options")).toBe("DENY")
@@ -118,8 +119,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.status).toBe(401)
     })
@@ -132,8 +133,8 @@ describe("Proxy", () => {
         },
       })
 
-      const { proxy } = await import("./proxy")
-      const response = await proxy(request)
+      const proxyModule = await import("../../proxy")
+      const response = await proxyModule.default(request)
 
       expect(response.status).toBe(307)
     })
