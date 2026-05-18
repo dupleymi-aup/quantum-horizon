@@ -96,7 +96,7 @@ export function useUserProgress() {
   // Update progress using mutation
   const { mutateAsync: updateProgressMutation } = useMutation({
     mutationFn: async ({ topic, title }: { topic: string; title: string }) => {
-      const response = await fetchWithTimeout("/api/visualizations/bookmarks", {
+      const response = await fetchWithTimeout("/api/visualizations/progress", {
         timeoutMs: 10000,
         method: "POST",
         headers: {

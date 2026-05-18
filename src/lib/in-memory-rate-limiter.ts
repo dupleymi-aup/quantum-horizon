@@ -93,6 +93,37 @@ export class InMemoryRateLimiter {
   }
 
   /**
+   * Check rate limit for a key without incrementing
+   */
+  peek(key: string): {
+    success: boolean
+    limit: number
+    remaining: number
+    reset: number
+  } {
+    const now = Date.now()
+    const storeKey = `${this.prefix}:${key}`
+    const entry = this.rateLimitStore.get(storeKey)
+
+    if (!entry || now > entry.resetTime) {
+      return {
+        success: true,
+        limit: this.maxRequests,
+        remaining: this.maxRequests,
+        reset: now + this.windowMs,
+      }
+    }
+
+    const remaining = Math.max(0, this.maxRequests - entry.count)
+    return {
+      success: remaining > 0,
+      limit: this.maxRequests,
+      remaining,
+      reset: entry.resetTime,
+    }
+  }
+
+  /**
    * Check rate limit for a key
    */
   limit(key: string): {

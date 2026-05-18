@@ -10,8 +10,7 @@ export type Language = "ru" | "en" | "zh" | "he"
 // Используем ru как базовый тип, но разрешаем неполные переводы для других языков
 export type Translation = typeof ruTranslations
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const translations: Record<Language, any> = {
+export const translations: Record<Language, Partial<Translation>> = {
   ru: ruTranslations,
   en: enTranslations,
   zh: zhTranslations,

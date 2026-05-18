@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -11,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { metadata } from "./metadata"
 import { locales, type Locale } from "@/i18n/config"
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { metadata }
 
 function isValidLocale(locale: string): locale is Locale {

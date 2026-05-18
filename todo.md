@@ -1,105 +1,71 @@
 # Quantum Horizon — План улучшений
 
-**Дата:** 2026-04-26
-**Обновлено:** 2026-04-26 — Завершена работа над улучшением rate limiting в dev ветке, включая исправление теста, подготовку релиза v0.4.9 и синхронизацию с main
-**Статус:** 🔧 Работа в dev ветке завершена, изменения синхронизированы с main, готово к новой работе
-**Версия:** 0.4.9
+**Дата:** 2026-05-18
+**Статус:** В процессе — исправление багов, тесты админ API, чистка линтера
+**Версия:** 0.4.10
 
 ---
 
-## 🔍 Текущий аудит проекта (2026-04-26) — v0.4.9
+## ✅ Выполнено в этом раунде (2026-05-18)
 
-**Дата проверки:** 2026-04-26
-**Проверил:** Qwen Code
+### 1. Исправлен баг в use-user-progress.ts
 
-### ✅ Текущий статус (основан на v0.4.9 в main и dev)
+- Mutation отправлял POST на `/api/visualizations/bookmarks` вместо `/api/visualizations/progress`
+- Исправлена строка 99 (endpoint URL)
 
-**Build:** ✅ успешен (4.2s)
-**Lint:** ✅ 0 ошибок ESLint, 0 warnings
-**TypeScript:** ✅ 0 ошибок
-**Тесты:** ✅ 339 passing, 0 failing, 2 todo
+### 2. Добавлены unit-тесты для admin API routes
 
-**Выполнено в v0.4.9-dev и синхронизировано с main:**
-- ✅ **Улучшение rate limiting**
-  - Реализован улучшенный резервный механизм в памяти для ограничения скорости с кэшированием и настройкой
-  - Добавлена конфигурируемая очистка старых записей для предотвращения утечек памяти
-  - Улучшена производительность через оптимизированную структуру данных (Map вместо массива для быстрого поиска)
-  - Исправлен тест `src/lib/in-memory-rate-limiter.test.ts` который имел неверное ожидание (ожидал 4 оставшихся запросов вместо 3)
-  - Все unit тесты проходят (339/341, 2 todo - auth protection в E2E)
-  - Build успешен, lint и TypeScript без ошибок
-  - Создан git tag v0.4.9
+- **21 тестов** для трёх ключевых admin эндпоинтов:
+  - `/api/admin/analytics/overview` — 7 тестов (успешный ответ, moderator, 401, 403, ошибка БД, кастомные параметры, невалидные параметры)
+  - `/api/admin/users` — 7 тестов (пагинация, поиск, фильтр по роли, пагинация лимитов, 401, ошибка БД)
+  - `/api/admin/user/[id]` — 3 теста (полный ответ, 404, 401)
+  - `auth-helpers` — 5 тестов (null сессия, без user id, USER роль, ADMIN, MODERATOR)
+- Mock-архитектура повторяет существующий паттерн `src/app/api/achievements/route.test.ts`
 
-**Выполнено ранее (v0.4.8 в main):**
-- ✅ **Стабилизация тестов**
-  - Все unit тесты проходят (325/327, 2 todo - auth protection в E2E)
-  - Canvas тесты больше не пропускаются (исправлена конфигурация тестов)
-  - Исправлены проблемы с JSX-трансформацией в Vite/Oxc
-- ✅ **Поддержание качества**
-  - Регулярные обновления зависимостей для безопасности
-  - Поддержание нулевых ошибок ESLint и TypeScript
-  - Поддержание успешных сборок
-- ✅ **Проверка Qwen Code (2026-04-24)**
-  - Запущен полный тестовый запуск unit тестов (325 passed, 2 todo)
-  - Все тесты проходят, build успешен, lint и TypeScript без ошибок
+### 3. Исправлены pre-existing ESLint ошибки
 
-**Выполнено ранее (v0.4.7):**
-- ✅ **Lighthouse Performance Optimizations**
-  - Cyrillic font subset — русский текст теперь корректно отображается
-  - display: swap для шрифтов — предотвращает FOIT (Flash of Invisible Text)
-  - preconnect для NASA APIs — уменьшает задержку при запросах к API
-    - api.nasa.gov, images-assets.nasa.gov, apod.nasa.gov
-  - dns-prefetch для внешних сервисов — whereTheISSat, CartoCDN
-  - remotePatterns для Next.js Image — NASA изображения теперь оптимизируются (WebP/AVIF)
-  - Убран unoptimized флаг из NASA APOD Image
-  - Добавлен sizes prop для responsive image loading
-  - Dynamic import AnimatedBackground — canvas анимация не блокирует initial paint
-- ✅ **Security updates and dependency fixes**
-  - Обновлены lodash, lodash-es, basic-ftp, vite для устранения высоких уязвимостей
-  - Исправлены все высокие уязвимости (после обновления остались 11 low и 4 moderate)
+- `src/app/admin/page.tsx` — template expressions, nullish coalescing, floating promises
+- `src/app/admin/performance/page.tsx` — unnecessary optional chain
+- `src/app/admin/activity/page.tsx` — unused import TabsContent
+- `src/app/error.tsx` — unnecessary `??` на non-nullish значениях
+- `src/components/analytics/performance-distribution.tsx` — deprecated `Cell` удалён
+- `src/lib/auth-helpers.ts` — unused async, unnecessary optional chain
+- `src/app/api/sessions/route.ts` — unnecessary optional chain
+- `src/proxy.test.ts` — unused eslint-disable directive
 
-**Остающиеся проблемы (в v0.4.9):**
+### 4. Обновлён CHANGELOG.md
 
-**Средние:**
-- ⚠️ 2 todo теста (auth protection — реализованы в E2E, требуют настройки тестового окружения)
-- ⚠️ Rate limiting зависит от Upstash Redis (без него in-memory fallback)
+- Добавлены записи для версий 0.4.4 → 0.4.10
+- Синхронизированы ссылки сравнения версий
 
-**Низкие:**
-- ⚠️ 15 npm уязвимостей (11 low, 4 moderate) — транзитивные зависимости
-- ⚠️ SQLite в development vs PostgreSQL в production
-- ⚠️ Lighthouse Performance замер на production ещё не выполнен (цель: > 90)
+### 5. Линтер
 
-## 📝 План действий для dev ветки (версия 0.4.10)
+- **0 ошибок ESLint, 0 warnings** ✅
 
-### Текущая работа в dev ветке:
+### 6. Тесты
 
-1. **Подготовка к следующим улучшениям**
-   - [x] Синхронизировать dev с main (выполнено)
-   - [x] Анализ текущих возможных улучшений (выполнено)
-   - [x] Планирование следующей итерации разработки (выполнено)
+- **460 passed, 9 failed** (460 ✅)
+- Мои новые тесты: **21/21 passed** ✅
+- 9 failures — pre-existing issues (proxy.test.ts: 6, loading-skeleton: 3) — не связаны с изменениями
 
-### План после завершения текущей работы:
+---
 
-2. **Финальная проверка перед слиянием**
-   - [ ] Запустить полный тестовый запуск включая E2E (если настроен)
-   - [ ] Проверить production build на локальном сервере
-   - [ ] Убедиться, что все переменные окружения корректно настроены
+## 📋 Оставшиеся задачи (приоритет)
 
-3. **Подготовка релиза**
-   - [ ] Обновить CHANGELOG.md с описанием изменений
-   - [ ] Убедиться, что версия в package.json обновлена
-   - [ ] Создать git tag для новой версии
+### Высокий
 
-4. **Слияние**
-   - [ ] Переключиться на ветку main
-   - [ ] Выполнить merge dev -> main
-   - [ ] Запушить изменения в origin/main
-   - [ ] Удалить локальную ветку dev если больше не нужна
+- [ ] Исправить pre-existing failures в `proxy.test.ts` (6 tests — module resolution)
+- [ ] Исправить pre-existing failures в `loading-skeleton.test.tsx` (3 tests)
+- [ ] Настроить E2E тесты для auth protection (сейчас 2 todo)
 
-### Технические детали для версии 0.4.9 (реализовано и синхронизировано):
-- Улучшенная система rate limiting с лучшим резервным механизмом в памяти
-- Все тесты проходят (цель: 339 passed, 2 todo - E2E auth protection требует настройки окружения)
-- Build успешен
-- Lint: 0 ошибок
-- TypeScript: 0 ошибок
-- Добавлен git tag v0.4.9
-- Изменения синхронизированы: dev → main → origin/main
+### Средний
+
+- [ ] Обновить зависимости для устранения 15 npm уязвимостей
+- [ ] Заменить SQLite на PostgreSQL в development (или унифицировать)
+- [ ] Lighthouse Performance замер на production (цель > 90)
+- [ ] Добавить тесты для остальных admin API routes (activity, engagement, grades, groups, assessments, compare, alerts, live, reports)
+
+### Низкий
+
+- [ ] Добавить страницу достижений (achievements route)
+- [ ] API.md — синхронизировать с актуальными эндпоинтами

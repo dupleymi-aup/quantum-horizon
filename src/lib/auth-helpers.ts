@@ -18,10 +18,9 @@ export function isAuthError(result: AuthGuardResult): result is AuthCheckResult 
   return "error" in result
 }
 
-export async function requireAdminRole(
-  session: Session | null
-): Promise<AuthGuardResult> {
-  if (!session?.user?.id) {
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function requireAdminRole(session: Session | null): Promise<AuthGuardResult> {
+  if (!session?.user.id) {
     return { error: "Unauthorized", status: 401 }
   }
   const role = session.user.role

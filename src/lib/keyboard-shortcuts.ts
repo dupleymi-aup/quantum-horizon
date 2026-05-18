@@ -10,13 +10,28 @@ export interface KeyboardShortcut {
   modifier?: "ctrl" | "shift" | "alt" | "meta"
 }
 
+const SHORTCUT_EVENT = "quantum-shortcut"
+
+export function dispatchShortcut(id: string): void {
+  window.dispatchEvent(new CustomEvent(SHORTCUT_EVENT, { detail: id }))
+}
+
+export function onShortcut(id: string, handler: () => void): () => void {
+  const listener = (e: Event) => {
+    if ((e as CustomEvent).detail === id) handler()
+  }
+  window.addEventListener(SHORTCUT_EVENT, listener)
+  return () => {
+    window.removeEventListener(SHORTCUT_EVENT, listener)
+  }
+}
+
 export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
-  // Playback
   {
     key: "Space",
     description: "Старт/Пауза анимации",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("play-toggle")
     },
     category: "playback",
   },
@@ -24,7 +39,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "R",
     description: "Сброс настроек",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("play-reset")
     },
     category: "playback",
   },
@@ -32,7 +47,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "+",
     description: "Увеличить скорость",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("play-speed-up")
     },
     category: "playback",
   },
@@ -40,17 +55,15 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "-",
     description: "Уменьшить скорость",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("play-speed-down")
     },
     category: "playback",
   },
-
-  // Navigation
   {
     key: "1",
     description: "Квантовая механика",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("nav-quantum")
     },
     category: "navigation",
   },
@@ -58,7 +71,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "2",
     description: "Теория относительности",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("nav-relativity")
     },
     category: "navigation",
   },
@@ -66,7 +79,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "3",
     description: "Космология",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("nav-cosmos")
     },
     category: "navigation",
   },
@@ -74,7 +87,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "4",
     description: "Термодинамика",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("nav-thermodynamics")
     },
     category: "navigation",
   },
@@ -82,17 +95,15 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "5",
     description: "Продвинутые",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("nav-advanced")
     },
     category: "navigation",
   },
-
-  // Settings
   {
     key: "F",
     description: "Полноэкранный режим",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("toggle-fullscreen")
     },
     category: "settings",
   },
@@ -100,7 +111,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "T",
     description: "Сменить тему",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("toggle-theme")
     },
     category: "settings",
   },
@@ -108,17 +119,15 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "L",
     description: "Сменить язык",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("cycle-language")
     },
     category: "settings",
   },
-
-  // General
   {
     key: "H",
     description: "Показать справку",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("show-help")
     },
     category: "general",
   },
@@ -126,7 +135,7 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     key: "?",
     description: "Показать горячие клавиши",
     action: () => {
-      /* Реализуется в компоненте */
+      dispatchShortcut("show-shortcuts")
     },
     category: "general",
   },

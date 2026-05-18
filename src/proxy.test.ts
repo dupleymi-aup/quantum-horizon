@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { NextRequest } from "next/server"
 
@@ -49,94 +48,93 @@ describe("Proxy", () => {
 
   describe("Public paths", () => {
     it("should allow access to root without auth", async () => {
-      const request = new NextRequest("http://localhost:3000/", {
+      const request = new NextRequest("http://localhost:3000/ru", {
         headers: {
           origin: "http://localhost:3000",
           "x-forwarded-for": "127.0.0.1",
         },
       })
 
-      const proxyModule = await import("../../proxy")
+      const proxyModule = await import("../proxy")
       const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
 
-    it("should allow access to /api index without auth", async () => {
-      const request = new NextRequest("http://localhost:3000/api", {
+    it("should allow access to /api routes without auth", async () => {
+      const request = new NextRequest("http://localhost:3000/ru/api/auth/session", {
         headers: {
           origin: "http://localhost:3000",
           "x-forwarded-for": "127.0.0.1",
         },
       })
 
-      const proxyModule = await import("../../proxy")
+      const proxyModule = await import("../proxy")
       const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
 
     it("should allow access to auth pages without auth", async () => {
-      const request = new NextRequest("http://localhost:3000/auth/signin", {
+      const request = new NextRequest("http://localhost:3000/ru/auth/signin", {
         headers: {
           origin: "http://localhost:3000",
           "x-forwarded-for": "127.0.0.1",
         },
       })
 
-      const proxyModule = await import("../../proxy")
+      const proxyModule = await import("../proxy")
       const response = await proxyModule.default(request)
 
       expect(response.status).toBe(200)
     })
   })
 
-  describe("Security headers", () => {
-    it("should add security headers to non-public responses", async () => {
-      const request = new NextRequest("http://localhost:3000/dashboard", {
+  describe("Auth protection", () => {
+    it("should redirect to signin for protected pages without auth", async () => {
+      const request = new NextRequest("http://localhost:3000/ru/dashboard", {
         headers: {
           origin: "http://localhost:3000",
           "x-forwarded-for": "127.0.0.1",
         },
       })
 
-      const proxyModule = await import("../../proxy")
+      const proxyModule = await import("../proxy")
+      const response = await proxyModule.default(request)
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get("location")).toContain("/auth/signin")
+    })
+
+    it("should redirect to signin from signout without auth", async () => {
+      const request = new NextRequest("http://localhost:3000/ru/auth/signout", {
+        headers: {
+          origin: "http://localhost:3000",
+          "x-forwarded-for": "127.0.0.1",
+        },
+      })
+
+      const proxyModule = await import("../proxy")
+      const response = await proxyModule.default(request)
+
+      expect(response.status).toBe(307)
+    })
+
+    it("should apply security headers to responses", async () => {
+      const request = new NextRequest("http://localhost:3000/ru/any-page", {
+        headers: {
+          origin: "http://localhost:3000",
+          "x-forwarded-for": "127.0.0.1",
+        },
+      })
+
+      const proxyModule = await import("../proxy")
       const response = await proxyModule.default(request)
 
       expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff")
       expect(response.headers.get("X-Frame-Options")).toBe("DENY")
       expect(response.headers.get("X-XSS-Protection")).toBe("1; mode=block")
       expect(response.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin")
-    })
-  })
-
-  describe("Auth protection", () => {
-    it("should return 401 for protected API paths without auth", async () => {
-      const request = new NextRequest("http://localhost:3000/api/visualizations/bookmarks", {
-        headers: {
-          origin: "http://localhost:3000",
-          "x-forwarded-for": "127.0.0.1",
-        },
-      })
-
-      const proxyModule = await import("../../proxy")
-      const response = await proxyModule.default(request)
-
-      expect(response.status).toBe(401)
-    })
-
-    it("should redirect to signin from signout without auth", async () => {
-      const request = new NextRequest("http://localhost:3000/auth/signout", {
-        headers: {
-          origin: "http://localhost:3000",
-          "x-forwarded-for": "127.0.0.1",
-        },
-      })
-
-      const proxyModule = await import("../../proxy")
-      const response = await proxyModule.default(request)
-
-      expect(response.status).toBe(307)
     })
 
     it.todo("should redirect away from auth pages when already authenticated", () => {

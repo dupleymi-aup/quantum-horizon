@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { db } from "@/lib/db"
 import { z } from "zod"
+import { sendWelcomeEmail } from "@/lib/email"
 import { createLogger } from "@/lib/logger"
 
 const logger = createLogger("api:register")
@@ -75,6 +76,12 @@ export async function POST(request: NextRequest) {
         language: "ru",
       },
     })
+
+    // Отправка приветственного письма
+    const welcomeResult = await sendWelcomeEmail(user.email, user.name ?? undefined)
+    if (!welcomeResult.success) {
+      logger.warn("Failed to send welcome email:", welcomeResult.error)
+    }
 
     return NextResponse.json(
       {

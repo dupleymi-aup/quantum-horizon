@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 // Физические формулы и расчёты
 import {
   G,
@@ -16,9 +15,15 @@ import {
   wiensConstant,
 } from "./constants"
 
-// Simple memoization cache for expensive calculations
-const memoCache = new Map<string, number>()
+// Memoization cache for expensive calculations with TTL
+interface CacheEntry {
+  value: number
+  timestamp: number
+}
+
+const memoCache = new Map<string, CacheEntry>()
 const MEMO_LIMIT = 1000
+const MEMO_TTL_MS = 5 * 60 * 1000
 
 function _memoize<T extends (...args: Parameters<T>) => number>(
   fn: T,
@@ -26,16 +31,16 @@ function _memoize<T extends (...args: Parameters<T>) => number>(
 ): T {
   return ((...args: Parameters<T>) => {
     const key = keyFn(...args)
-    if (memoCache.has(key)) {
-      return memoCache.get(key)!
+    const entry = memoCache.get(key)
+    if (entry !== undefined && Date.now() - entry.timestamp < MEMO_TTL_MS) {
+      return entry.value
     }
     const result = fn(...args)
     if (memoCache.size >= MEMO_LIMIT) {
-      // Clear oldest entry when limit reached
       const firstKey = memoCache.keys().next().value
-      if (firstKey) memoCache.delete(firstKey)
+      if (firstKey !== undefined) memoCache.delete(firstKey)
     }
-    memoCache.set(key, result)
+    memoCache.set(key, { value: result, timestamp: Date.now() })
     return result
   }) as T
 }
@@ -279,14 +284,6 @@ export function absoluteMagnitude(apparentMagnitude: number, distanceParsecs: nu
  */
 export function parallaxDistance(parallaxAngle: number): number {
   return 1 / parallaxAngle
-}
-
-/**
- * Расчёт энергии связи электрона в атоме водорода
- * E = -13.6 eV / n²
- */
-export function electronBindingEnergy(n: number): number {
-  return -13.6 / (n * n)
 }
 
 /**

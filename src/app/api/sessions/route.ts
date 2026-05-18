@@ -17,6 +17,7 @@ const sessionSchema = z.object({
 async function POSTHandler(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -45,10 +46,7 @@ async function POSTHandler(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    logger.error(
-      "Error saving session:",
-      error instanceof Error ? error.message : "Unknown error"
-    )
+    logger.error("Error saving session:", error instanceof Error ? error.message : "Unknown error")
     return NextResponse.json({ error: "Failed to save session" }, { status: 500 })
   }
 }

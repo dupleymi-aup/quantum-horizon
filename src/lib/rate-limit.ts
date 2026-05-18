@@ -4,19 +4,8 @@
  */
 
 import { createInMemoryRateLimiter } from "@/lib/in-memory-rate-limiter"
+import { RATE_LIMITS, getClientIdentifier } from "@/lib/api-config"
 import { NextRequest, NextResponse } from "next/server"
-
-// Rate limit configurations per endpoint pattern
-const RATE_LIMITS = {
-  "/api/auth/register": { requests: 3, window: "1 h" as const },
-  "/api/auth/reset-password": { requests: 2, window: "1 h" as const },
-  "/api/auth/nextauth": { requests: 5, window: "1 m" as const },
-  "/api/visualizations": { requests: 100, window: "1 m" as const },
-  "/api/activity": { requests: 60, window: "1 m" as const },
-  "/api/achievements": { requests: 60, window: "1 m" as const },
-  "/api/sessions": { requests: 30, window: "1 m" as const },
-  "/api/admin": { requests: 30, window: "1 m" as const },
-} as const
 
 type RateLimitPath = keyof typeof RATE_LIMITS
 
@@ -40,20 +29,6 @@ function matchRateLimit(pathname: string): RateLimitPath | null {
   }
 
   return null
-}
-
-/**
- * Extract client identifier from request
- * Uses IP address or falls back to a generic identifier
- */
-function getClientIdentifier(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for")
-  const realIp = request.headers.get("x-real-ip")
-
-  if (forwarded) return forwarded.split(",")[0].trim()
-  if (realIp) return realIp.trim()
-
-  return "anonymous"
 }
 
 /**
@@ -107,7 +82,7 @@ export function addRateLimitHeaders(response: NextResponse, request: NextRequest
   if (!limiter) return response
 
   const clientId = getClientIdentifier(request)
-  const result = limiter.limit(clientId)
+  const result = limiter.peek(clientId)
 
   response.headers.set("X-RateLimit-Limit", String(result.limit))
   response.headers.set("X-RateLimit-Remaining", String(result.remaining))

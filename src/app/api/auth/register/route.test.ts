@@ -31,8 +31,13 @@ vi.mock("@/lib/logger", () => ({
   })),
 }))
 
+vi.mock("@/lib/email", () => ({
+  sendWelcomeEmail: vi.fn(() => Promise.resolve({ success: true, messageId: "mock-123" })),
+}))
+
 import { hash } from "bcryptjs"
 import { db } from "@/lib/db"
+import { sendWelcomeEmail } from "@/lib/email"
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -239,5 +244,47 @@ describe("api/auth/register/route", () => {
     expect(response.status).toBe(500)
     const data = await response.json()
     expect(data.error).toBe("Ошибка при регистрации")
+  })
+
+  it("should send welcome email after registration", async () => {
+    const mockBody = {
+      email: "test@example.com",
+      password: "password123",
+      name: "Test User",
+    }
+
+    const mockUser = {
+      id: "user-123",
+      email: mockBody.email,
+      name: mockBody.name,
+      role: "USER",
+    }
+
+    vi.mocked(hash).mockResolvedValue("hashedPassword")
+    vi.mocked(db.user.findUnique).mockResolvedValue(null)
+    vi.mocked(db.user.create).mockResolvedValue(mockUser)
+    vi.mocked(db.userProgress.create).mockResolvedValue({
+      id: "progress-1",
+      userId: mockUser.id,
+      topic: "general",
+      completedCount: 0,
+      lastCompleted: null,
+    })
+    vi.mocked(db.userSettings.create).mockResolvedValue({
+      id: "settings-1",
+      userId: mockUser.id,
+      theme: "system",
+      language: "ru",
+    })
+
+    const request = new NextRequest("http://localhost/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(mockBody),
+    })
+
+    await POST(request)
+
+    expect(sendWelcomeEmail).toHaveBeenCalledWith("test@example.com", "Test User")
   })
 })

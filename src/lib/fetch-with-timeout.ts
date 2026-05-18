@@ -3,6 +3,8 @@
  * Automatically includes CSRF token for state-changing requests.
  */
 
+import { isStateChangingMethod } from "@/lib/api-config"
+
 export class FetchTimeoutError extends Error {
   constructor(timeoutMs: number) {
     super(`Request timed out after ${String(timeoutMs)}ms`)
@@ -25,14 +27,6 @@ function getCookie(name: string): string | undefined {
   return undefined
 }
 
-/**
- * Check if the HTTP method requires CSRF protection
- */
-function isStateChangingMethod(method?: string): boolean {
-  if (!method) return false
-  return ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())
-}
-
 export async function fetchWithTimeout(
   url: string,
   options: FetchWithTimeoutOptions = {}
@@ -41,7 +35,7 @@ export async function fetchWithTimeout(
 
   // Auto-add CSRF token for state-changing requests
   const headers = new Headers(fetchOptions.headers)
-  if (isStateChangingMethod(options.method) && typeof document !== "undefined") {
+  if (options.method && isStateChangingMethod(options.method) && typeof document !== "undefined") {
     const csrfToken = getCookie("csrf-token")
     if (csrfToken) {
       headers.set("X-CSRF-Token", csrfToken)

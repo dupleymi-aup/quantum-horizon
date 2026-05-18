@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 // Система пресетов для настроек визуализаций
 
 import { type VisualizationType, type VisualizationSettings } from "@/stores/visualization-store"
@@ -224,7 +221,7 @@ export const DEFAULT_PRESETS: Record<string, Preset[]> = {
 // Хранение пользовательских пресетов в localStorage
 const PRESETS_STORAGE_KEY = "visualization-presets"
 
-export function getUserPresets(): Record<string, Preset[]> {
+export function getUserPresets(): Record<string, Preset[] | undefined> {
   if (typeof window === "undefined") {
     return {}
   }
@@ -241,9 +238,7 @@ export function getUserPresets(): Record<string, Preset[]> {
 export function saveUserPreset(visualizationType: string, preset: Preset): void {
   try {
     const presets = getUserPresets()
-    if (!presets[visualizationType]) {
-      presets[visualizationType] = []
-    }
+    presets[visualizationType] ??= []
     presets[visualizationType].push(preset)
     localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets))
   } catch {
@@ -264,9 +259,9 @@ export function deleteUserPreset(visualizationType: string, presetId: string): v
 }
 
 export function getAllPresets(visualizationType: string): Preset[] {
-  const defaults = DEFAULT_PRESETS[visualizationType] || []
+  const defaults = DEFAULT_PRESETS[visualizationType] ?? []
   const presets = getUserPresets()
-  const userPresets = presets[visualizationType] || []
+  const userPresets = presets[visualizationType] ?? []
   return [...defaults, ...userPresets]
 }
 
@@ -277,23 +272,21 @@ export function exportPresets(): string {
 
 export function importPresets(jsonString: string): boolean {
   try {
-    const presets: Record<string, Preset[]> = JSON.parse(jsonString)
+    const presets = JSON.parse(jsonString) as Record<string, Preset[]>
     const currentPresets = getUserPresets()
 
     // Merge imported presets with current
     Object.keys(presets).forEach((type) => {
       const visualizationType = type as VisualizationType
       const typePresets = presets[visualizationType]
-      if (!typePresets) return
+      if (!Array.isArray(typePresets)) return
 
-      if (!currentPresets[visualizationType]) {
-        currentPresets[visualizationType] = []
-      }
+      const target = (currentPresets[visualizationType] ??= [])
       // Add imported presets, avoiding duplicates by id
-      const existingIds = new Set(currentPresets[visualizationType].map((p) => p.id))
+      const existingIds = new Set(target.map((p) => p.id))
       typePresets.forEach((preset) => {
         if (!existingIds.has(preset.id)) {
-          currentPresets[visualizationType].push(preset)
+          target.push(preset)
         }
       })
     })

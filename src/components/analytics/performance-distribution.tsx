@@ -1,15 +1,6 @@
 "use client"
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { XpBucket } from "@/hooks/api/use-admin-analytics"
 
@@ -20,7 +11,10 @@ interface PerformanceDistributionProps {
   title?: string
 }
 
-export function PerformanceDistribution({ data, title = "XP Distribution" }: PerformanceDistributionProps) {
+export function PerformanceDistribution({
+  data,
+  title = "XP Distribution",
+}: PerformanceDistributionProps) {
   if (!data.length) {
     return (
       <Card>
@@ -28,7 +22,9 @@ export function PerformanceDistribution({ data, title = "XP Distribution" }: Per
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-8">No distribution data available</p>
+          <p className="text-muted-foreground py-8 text-center text-sm">
+            No distribution data available
+          </p>
         </CardContent>
       </Card>
     )
@@ -46,11 +42,7 @@ export function PerformanceDistribution({ data, title = "XP Distribution" }: Per
             <XAxis dataKey="range" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]}>
-              {data.map((_, index) => (
-                <Cell key={`cell-${String(index)}`} fill={BUCKET_COLORS[index % BUCKET_COLORS.length]} />
-              ))}
-            </Bar>
+            <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]} fill={BUCKET_COLORS[0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

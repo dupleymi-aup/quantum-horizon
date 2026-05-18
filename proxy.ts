@@ -11,19 +11,13 @@ import { getToken } from "next-auth/jwt"
 import createIntlMiddleware from "next-intl/middleware"
 import { createInMemoryRateLimiter, InMemoryRateLimiter } from "@/lib/in-memory-rate-limiter"
 import { generateCsrfToken } from "@/lib/csrf"
-
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:64764",
-  "https://quantum-horizon.vercel.app",
-]
+import { RATE_LIMITS, ALLOWED_ORIGINS } from "@/lib/api-config"
 
 // Protected paths that require authentication
 const PROTECTED_PATHS = ["/dashboard", "/profile", "/settings"]
 
 // Auth paths that should redirect if already authenticated
-const AUTH_PATHS = ["/auth/signin", "/auth/signup", "/auth/forgot-password"]
+const AUTH_PATHS = ["/auth/signin", "/auth/signup", "/auth/forgot-password", "/auth/signout"]
 
 // CORS configuration
 const CORS_HEADERS = {
@@ -58,14 +52,12 @@ function getRateLimiter(prefix: string, requests: number, window: "1 m" | "1 h")
 // Cache for in-memory rate limiters to ensure same instance is used for same prefix
 const inMemoryLimiterCache = new Map<string, InMemoryRateLimiter>()
 
-// Rate limit configurations for different endpoints
-const RATE_LIMITS = {
-  "api/auth/nextauth": { requests: 5, window: "1 m" as const, prefix: "auth" },
-  "api/auth/register": { requests: 3, window: "1 h" as const, prefix: "auth_register" },
-  "api/auth/reset-password": { requests: 2, window: "1 h" as const, prefix: "auth_reset" },
-  "api/visualizations": { requests: 100, window: "1 m" as const, prefix: "viz" },
-  "api/activity": { requests: 60, window: "1 m" as const, prefix: "activity" },
-  "api/achievements": { requests: 60, window: "1 m" as const, prefix: "achievements" },
+// Security headers applied to all responses
+const SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
 }
 
 /**
@@ -75,6 +67,16 @@ function applyCorsHeaders(response: NextResponse, origin: string): NextResponse 
   response.headers.set("Access-Control-Allow-Origin", origin)
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
   Object.entries(CORS_HEADERS).forEach(([key, value]) => {
+    response.headers.set(key, value)
+  })
+  return response
+}
+
+/**
+ * Apply security headers to response
+ */
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
     response.headers.set(key, value)
   })
   return response
@@ -107,7 +109,7 @@ async function applyRateLimit(
   let rateConfig: { requests: number; window: "1 m" | "1 h"; prefix: string } | undefined
 
   for (const [path, config] of Object.entries(RATE_LIMITS)) {
-    if (pathname.startsWith(`/${path}`)) {
+    if (pathname.startsWith(path)) {
       rateConfig = config
       break
     }
@@ -162,6 +164,18 @@ const intlMiddlewareFn = createIntlMiddleware({
 })
 
 /**
+ * Strip locale prefix from pathname for path matching
+ */
+function stripLocalePrefix(pathname: string): string {
+  // Match /ru/, /en/, /zh/, /he/ prefix
+  const match = /^\/(ru|en|zh|he)(\/|$)/.exec(pathname)
+  if (match) {
+    return "/" + pathname.slice(match[0].length)
+  }
+  return pathname
+}
+
+/**
  * Main proxy handler
  */
 export default async function proxy(request: NextRequest): Promise<NextResponse> {
@@ -189,33 +203,40 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
     }
   }
 
+  // Strip locale prefix for path matching
+  const matchPath = stripLocalePrefix(pathname)
+
   // Auth protection: redirect to signin if accessing protected path without auth
-  if (isProtectedPath(pathname)) {
+  if (isProtectedPath(matchPath)) {
     const token = await getToken({ req: request })
     if (!token) {
       const url = new URL("/auth/signin", request.url)
-      url.searchParams.set("callbackUrl", pathname)
+      url.searchParams.set("callbackUrl", matchPath)
       return NextResponse.redirect(url)
     }
   }
 
   // Auth protection: redirect away from auth pages if already authenticated
-  if (isAuthPath(pathname)) {
+  if (isAuthPath(matchPath)) {
     const token = await getToken({ req: request })
     if (token) {
       return NextResponse.redirect(new URL("/dashboard", request.url))
+    }
+    // Redirect unauthenticated users from signout to signin
+    if (matchPath === "/auth/signout") {
+      return NextResponse.redirect(new URL("/auth/signin", request.url))
     }
   }
 
   // Apply CORS headers to API responses
   if (pathname.startsWith("/api/") && origin) {
     const response = intlMiddlewareFn(request)
-    return applyCorsHeaders(response, origin)
+    return applySecurityHeaders(applyCorsHeaders(response, origin))
   }
 
   // Set CSRF token cookie for page requests (if not already set)
   // This enables the Double Submit Cookie CSRF protection pattern
-  const defaultResponse = intlMiddlewareFn(request)
+  const defaultResponse = applySecurityHeaders(intlMiddlewareFn(request))
   if (!request.cookies.has("csrf-token")) {
     const token = generateCsrfToken()
     defaultResponse.cookies.set("csrf-token", token, {

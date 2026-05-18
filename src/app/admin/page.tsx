@@ -11,9 +11,9 @@ import {
 } from "@/hooks/api/use-admin-analytics"
 
 function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`
-  if (seconds < 3600) return `${Math.round(seconds / 60)}m`
-  return `${Math.round(seconds / 3600)}h ${Math.round((seconds % 3600) / 60)}m`
+  if (seconds < 60) return String(seconds) + "s"
+  if (seconds < 3600) return String(Math.round(seconds / 60)) + "m"
+  return String(Math.round(seconds / 3600)) + "h " + String(Math.round((seconds % 3600) / 60)) + "m"
 }
 
 export default function AdminOverviewPage() {
@@ -22,16 +22,16 @@ export default function AdminOverviewPage() {
   const progress = useAdminProgressAnalytics()
 
   const isLoading = overview.isLoading || activity.isLoading || progress.isLoading
-  const hasError = overview.error || activity.error || progress.error
+  const hasError = overview.error ?? activity.error ?? progress.error
 
   if (hasError) {
     return (
       <AdminError
         message="Failed to load dashboard data"
         onRetry={() => {
-          overview.refetch()
-          activity.refetch()
-          progress.refetch()
+          void overview.refetch()
+          void activity.refetch()
+          void progress.refetch()
         }}
       />
     )
@@ -56,11 +56,7 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={Users}
-          label="Total Users"
-          value={overview.data?.totalUsers ?? 0}
-        />
+        <StatCard icon={Users} label="Total Users" value={overview.data?.totalUsers ?? 0} />
         <StatCard
           icon={Activity}
           label="Active (7 days)"
@@ -79,14 +75,8 @@ export default function AdminOverviewPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ActivityLineChart
-          data={activity.data?.dailyData ?? []}
-          title="Activity (Last 30 Days)"
-        />
-        <ProgressBarChart
-          data={progress.data?.topicStats ?? []}
-          title="Topic Completion Rates"
-        />
+        <ActivityLineChart data={activity.data?.dailyData ?? []} title="Activity (Last 30 Days)" />
+        <ProgressBarChart data={progress.data?.topicStats ?? []} title="Topic Completion Rates" />
       </div>
 
       {overview.data?.activitiesByType && overview.data.activitiesByType.length > 0 && (
@@ -94,11 +84,8 @@ export default function AdminOverviewPage() {
           <h3 className="mb-3 text-lg font-semibold">Activity Breakdown</h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {overview.data.activitiesByType.map((item) => (
-              <div
-                key={item.action}
-                className="rounded-lg border bg-card p-4"
-              >
-                <p className="text-sm text-muted-foreground capitalize">
+              <div key={item.action} className="bg-card rounded-lg border p-4">
+                <p className="text-muted-foreground text-sm capitalize">
                   {item.action.replace(/_/g, " ")}
                 </p>
                 <p className="text-xl font-bold">{item.count.toLocaleString()}</p>

@@ -74,6 +74,74 @@ export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
   }
 }
 
+export async function sendWelcomeEmail(email: string, name?: string) {
+  const displayName = name ?? email.split("@")[0]
+  const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+          .button { display: inline-block; background: #6366f1; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .topics { background: #f0f0ff; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✨ Добро пожаловать в Quantum Horizon!</h1>
+          </div>
+          <div class="content">
+            <p>Привет, ${displayName}!</p>
+            <p>Ваш аккаунт успешно создан. Теперь вы можете исследовать удивительный мир физики — от квантовой механики до космологии.</p>
+            <div class="topics">
+              <p><strong>Что вас ждёт:</strong></p>
+              <ul>
+                <li>⚛️ Квантовая механика — волновые функции, туннелирование, запутанность</li>
+                <li>🚀 Теория относительности — замедление времени, E=mc²</li>
+                <li>🌌 Космос — чёрные дыры, Большой взрыв, тёмная материя</li>
+                <li>🔥 Термодинамика — энтропия, фазовые переходы, двигатель Карно</li>
+              </ul>
+            </div>
+            <p style="text-align: center;">
+              <a href="${appUrl}" class="button">Начать изучение</a>
+            </p>
+            <p>Ваш прогресс, закладки и достижения будут сохраняться автоматически.</p>
+          </div>
+          <div class="footer">
+            <p>© ${String(new Date().getFullYear())} Quantum Horizon. Все права защищены.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+
+  const text = `
+    Добро пожаловать в Quantum Horizon, ${displayName}!
+
+    Ваш аккаунт успешно создан. Исследуйте мир физики — от квантовой механики до космологии.
+
+    Начать изучение: ${appUrl}
+
+    Ваш прогресс будет сохраняться автоматически.
+
+    © ${String(new Date().getFullYear())} Quantum Horizon
+  `
+
+  return sendEmail({
+    to: email,
+    subject: "✨ Добро пожаловать в Quantum Horizon!",
+    html,
+    text,
+  })
+}
+
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/auth/reset-password?token=${token}`
 

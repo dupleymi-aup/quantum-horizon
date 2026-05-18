@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ActivityLineChart } from "@/components/analytics"
 import { AdminError } from "@/components/admin/admin-error"
 import { AdminChartSkeleton, AdminTableSkeleton } from "@/components/admin/admin-skeleton"
@@ -29,7 +29,15 @@ export default function AdminActivityPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Tabs value={period}><TabsList>{PERIODS.map((p) => <TabsTrigger key={p} value={p}>{p}</TabsTrigger>)}</TabsList></Tabs>
+        <Tabs value={period}>
+          <TabsList>
+            {PERIODS.map((p) => (
+              <TabsTrigger key={p} value={p}>
+                {p}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         <AdminChartSkeleton title="Activity Over Time" />
         <AdminTableSkeleton rows={5} />
       </div>
@@ -48,10 +56,7 @@ export default function AdminActivityPage() {
         </TabsList>
       </Tabs>
 
-      <ActivityLineChart
-        data={data?.dailyData ?? []}
-        title={`Activity — Last ${period}`}
-      />
+      <ActivityLineChart data={data?.dailyData ?? []} title={`Activity — Last ${period}`} />
 
       {data?.topicBreakdown && data.topicBreakdown.length > 0 && (
         <Card>
@@ -72,9 +77,7 @@ export default function AdminActivityPage() {
                   .map((item) => (
                     <TableRow key={item.topic}>
                       <TableCell className="font-medium">{item.topic}</TableCell>
-                      <TableCell className="text-right">
-                        {item.count.toLocaleString()}
-                      </TableCell>
+                      <TableCell className="text-right">{item.count.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

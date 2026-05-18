@@ -1,44 +1,66 @@
 ﻿"use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useLocale } from "next-intl"
 import dynamic from "next/dynamic"
 import { SideMenu } from "@/components/layout/side-menu"
 import { HeaderControls } from "@/components/layout/header-controls"
 import { Navigation } from "@/components/layout/navigation"
+import { HeroSection } from "@/components/layout/hero-section"
+import { SiteFooter } from "@/components/layout/site-footer"
 import { useOnboarding } from "@/components/ui/onboarding-tour"
 import { useCommandPalette } from "@/components/ui/enhanced-command-palette"
-import {
-  QuantumSection,
-  RelativitySection,
-  CosmosSection,
-  ThermodynamicsSection,
-  AdvancedSection,
-} from "@/components/sections"
-import { SECTIONS, type Section, type Language } from "@/lib/constants-ui"
+import { useHomeKeyboard } from "@/hooks/use-home-keyboard"
+import { type Section, type Language } from "@/lib/constants-ui"
 import type { Theme } from "@/types"
 
-// Lazy load heavy UI components to reduce initial bundle
+const QuantumSection = dynamic(
+  () => import("@/components/sections/quantum-section").then((m) => m.QuantumSection),
+  { loading: () => <SectionSkeleton /> }
+)
+const RelativitySection = dynamic(
+  () => import("@/components/sections/relativity-section").then((m) => m.RelativitySection),
+  { loading: () => <SectionSkeleton /> }
+)
+const CosmosSection = dynamic(
+  () => import("@/components/sections/cosmos-section").then((m) => m.CosmosSection),
+  { loading: () => <SectionSkeleton /> }
+)
+const ThermodynamicsSection = dynamic(
+  () => import("@/components/sections/thermodynamics-section").then((m) => m.ThermodynamicsSection),
+  { loading: () => <SectionSkeleton /> }
+)
+const AdvancedSection = dynamic(
+  () => import("@/components/sections/advanced-section").then((m) => m.AdvancedSection),
+  { loading: () => <SectionSkeleton /> }
+)
+import { VisualizationCardSkeleton } from "@/components/ui/loading-skeleton"
+
+function SectionSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <VisualizationCardSkeleton />
+      <VisualizationCardSkeleton />
+      <VisualizationCardSkeleton />
+    </div>
+  )
+}
+
 const OnboardingTour = dynamic(
   () => import("@/components/ui/onboarding-tour").then((m) => m.OnboardingTour),
   { ssr: false }
 )
 
 const EnhancedCommandPalette = dynamic(
-  () =>
-    import("@/components/ui/enhanced-command-palette").then(
-      (m) => m.EnhancedCommandPalette,
-    ),
+  () => import("@/components/ui/enhanced-command-palette").then((m) => m.EnhancedCommandPalette),
   { ssr: false }
 )
 
-// Lazy load QuickActions to defer framer-motion bundle
 const QuickActions = dynamic(
   () => import("@/components/ui/quick-actions").then((m) => m.QuickActions),
   { ssr: false }
 )
 
-// Lazy load AnimatedBackground to defer canvas/animation bundle
 const AnimatedBackground = dynamic(
   () => import("@/components/layout/animated-background").then((m) => m.AnimatedBackground),
   { ssr: false }
@@ -61,7 +83,6 @@ export default function Home() {
   })
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Initialize hooks
   const { showOnboarding, completeOnboarding } = useOnboarding()
   const { isOpen: commandPaletteOpen, close: closeCommandPalette } = useCommandPalette()
 
@@ -75,25 +96,18 @@ export default function Home() {
     }
   }, [locale])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
-
-      if (e.key >= "1" && e.key <= "5") {
-        const index = parseInt(e.key) - 1
-        if (SECTIONS[index]) setActiveSection(SECTIONS[index])
-      } else if (e.key === "m" || e.key === "M") {
-        setMenuOpen((prev) => !prev)
-      } else if (e.key === "Escape") {
-        setMenuOpen(false)
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
+  const handleMenuToggle = useCallback(() => {
+    setMenuOpen((prev) => !prev)
   }, [])
+  const handleMenuClose = useCallback(() => {
+    setMenuOpen(false)
+  }, [])
+
+  useHomeKeyboard({
+    onSectionChange: setActiveSection,
+    onMenuToggle: handleMenuToggle,
+    onMenuClose: handleMenuClose,
+  })
 
   const isRTL = locale === "he"
   const isDark = theme === "dark"
@@ -105,10 +119,6 @@ export default function Home() {
     }
   }
 
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme)
-  }
-
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${
@@ -118,24 +128,20 @@ export default function Home() {
       }`}
       dir={isRTL ? "rtl" : "ltr"}
     >
-      {/* Interactive Onboarding Tour */}
       {showOnboarding && <OnboardingTour onComplete={completeOnboarding} />}
 
-      {/* Enhanced Command Palette (Ctrl+K) */}
       <EnhancedCommandPalette
         isOpen={commandPaletteOpen}
         onClose={closeCommandPalette}
         activeSection={activeSection}
         onSectionChange={setActiveSection}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={setTheme}
         isDark={isDark}
       />
 
-      {/* Quick Actions Floating Buttons */}
       <QuickActions />
 
-      {/* Animated background particles */}
       {isDark && (
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="animate-pulse-glow absolute top-1/4 left-1/4 h-1 w-1 rounded-full bg-purple-500/30" />
@@ -144,19 +150,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* Animated background with particles */}
       <AnimatedBackground isDark={isDark} />
 
       <SideMenu
         isOpen={menuOpen}
-        onClose={() => {
-          setMenuOpen(false)
-        }}
+        onClose={handleMenuClose}
         activeSection={activeSection}
         onSectionSelect={setActiveSection}
         locale={locale}
         theme={theme}
-        onThemeChange={handleThemeChange}
+        onThemeChange={setTheme}
         onLanguageChange={handleLanguageChange}
         isDark={isDark}
       />
@@ -168,7 +171,6 @@ export default function Home() {
             : "border-gray-200/80 bg-white/50 backdrop-blur-xl"
         }`}
       >
-        {/* Animated gradient header */}
         <div
           className={`animate-gradient-shift absolute inset-0 opacity-50 ${
             isDark
@@ -181,7 +183,7 @@ export default function Home() {
           <HeaderControls
             locale={locale}
             theme={theme}
-            onThemeChange={handleThemeChange}
+            onThemeChange={setTheme}
             _onMenuOpen={() => {
               setMenuOpen(true)
             }}
@@ -192,33 +194,7 @@ export default function Home() {
             onLanguageChange={handleLanguageChange}
           />
 
-          <div className="mt-6 text-center">
-            <h1 className="animate-float mb-3 bg-gradient-to-r from-purple-400 via-blue-400 to-pink-400 bg-clip-text text-3xl font-bold text-transparent md:text-5xl lg:text-6xl">
-              Quantum Horizon
-            </h1>
-            <p
-              className={`mx-auto max-w-2xl text-sm md:text-base lg:text-lg ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
-              Интерактивные визуализации законов физики
-            </p>
-
-            {/* Decorative divider */}
-            <div className="mx-auto mt-6 flex items-center justify-center gap-2">
-              <div
-                className={`h-px w-16 ${isDark ? "bg-gradient-to-r from-transparent to-purple-500/50" : "bg-gradient-to-r from-transparent to-purple-400/30"}`}
-              />
-              <div className="flex gap-1">
-                <span className="text-purple-500">⚛️</span>
-                <span className="text-blue-500">🌌</span>
-                <span className="text-pink-500">🔬</span>
-              </div>
-              <div
-                className={`h-px w-16 ${isDark ? "bg-gradient-to-l from-transparent to-purple-500/50" : "bg-gradient-to-l from-transparent to-purple-400/30"}`}
-              />
-            </div>
-          </div>
+          <HeroSection isDark={isDark} />
         </div>
       </header>
 
@@ -238,32 +214,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer
-        className={`mt-8 border-t py-6 transition-colors duration-300 ${
-          isDark ? "border-white/10 bg-gray-950/50" : "border-gray-200/80 bg-white/50"
-        }`}
-      >
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className={`text-sm ${isDark ? "text-gray-500" : "text-gray-600"}`}>
-              © 2026 Quantum Horizon. Образовательный проект по физике
-            </p>
-            <p
-              className={`flex items-center gap-2 text-xs ${
-                isDark ? "text-gray-600" : "text-gray-500"
-              }`}
-            >
-              <span className="rounded-md bg-purple-500/10 px-2 py-1 text-purple-400">⌨️</span>
-              <span>
-                {locale === "ru" && "1-5 разделы, M меню, Esc закрыть"}
-                {locale === "en" && "1-5 sections, M menu, Esc close"}
-                {locale === "zh" && "1-5 章节，M 菜单，Esc 关闭"}
-                {locale === "he" && "1-5 סעיפים, M תפריט, Esc סגור"}
-              </span>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter isDark={isDark} locale={locale} />
     </div>
   )
 }

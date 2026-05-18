@@ -29,7 +29,6 @@ import {
   stellarLuminosity,
   absoluteMagnitude,
   parallaxDistance,
-  electronBindingEnergy,
   gravitationalWaveFrequency,
   gravitationalWavePower,
   cmbTemperatureAtRedshift,
@@ -437,13 +436,13 @@ describe("Physics formulas", () => {
     })
   })
 
-  describe("electronBindingEnergy", () => {
+  describe("hydrogenEnergy", () => {
     it("returns -13.6 eV for n=1", () => {
-      expect(electronBindingEnergy(1)).toBeCloseTo(-13.6, 5)
+      expect(hydrogenEnergy(1)).toBeCloseTo(-13.6, 5)
     })
 
     it("approaches 0 as n increases", () => {
-      expect(electronBindingEnergy(10)).toBeCloseTo(-0.136, 5)
+      expect(hydrogenEnergy(10)).toBeCloseTo(-0.136, 5)
     })
   })
 

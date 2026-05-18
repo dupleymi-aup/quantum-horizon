@@ -27,6 +27,7 @@ export default function AdminPerformancePage() {
   const { data, isLoading, error, refetch } = useAdminPerformanceAnalytics()
 
   const handleExportCSV = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!data?.rankings?.length) return
 
     const headers = ["Rank", "Name", "Email", "Total XP", "Activities", "Last Active"]
@@ -57,8 +58,8 @@ export default function AdminPerformancePage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="h-7 w-48 rounded bg-muted" />
-          <div className="h-9 w-28 rounded bg-muted" />
+          <div className="bg-muted h-7 w-48 rounded" />
+          <div className="bg-muted h-9 w-28 rounded" />
         </div>
         <AdminTableSkeleton rows={10} />
         <div className="grid gap-6 lg:grid-cols-2">

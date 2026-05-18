@@ -7,15 +7,9 @@
  */
 import { NextRequest, NextResponse } from "next/server"
 import { createLogger } from "@/lib/logger"
+import { ALLOWED_ORIGINS, isStateChangingMethod } from "@/lib/api-config"
 
 const logger = createLogger("csrf")
-
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  process.env.NEXT_PUBLIC_APP_URL,
-].filter(Boolean) as string[]
 
 /**
  * Validate that the request origin matches allowed origins
@@ -80,13 +74,6 @@ function validateCsrfToken(request: NextRequest): boolean {
   }
 
   return mismatch === 0
-}
-
-/**
- * Check if request is a state-changing method that requires CSRF protection
- */
-function isStateChangingMethod(method: string): boolean {
-  return ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())
 }
 
 /**
