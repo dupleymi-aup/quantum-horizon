@@ -1,15 +1,6 @@
 "use client"
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { TopicStat } from "@/hooks/api/use-admin-analytics"
 
@@ -24,7 +15,10 @@ interface ProgressBarChartProps {
   title?: string
 }
 
-export function ProgressBarChart({ data, title = "Topic Completion Rates" }: ProgressBarChartProps) {
+export function ProgressBarChart({
+  data,
+  title = "Topic Completion Rates",
+}: ProgressBarChartProps) {
   if (!data.length) {
     return (
       <Card>
@@ -32,7 +26,9 @@ export function ProgressBarChart({ data, title = "Topic Completion Rates" }: Pro
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-8">No progress data available</p>
+          <p className="text-muted-foreground py-8 text-center text-sm">
+            No progress data available
+          </p>
         </CardContent>
       </Card>
     )
@@ -55,12 +51,8 @@ export function ProgressBarChart({ data, title = "Topic Completion Rates" }: Pro
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground) / 0.2)" />
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} unit="%" />
             <YAxis dataKey="topic" type="category" tick={{ fontSize: 11 }} width={120} />
-            <Tooltip formatter={(value: number) => `${value}%`} />
-            <Bar dataKey="completionRate" radius={[0, 4, 4, 0]} name="Completion Rate">
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${String(index)}`} fill={entry.fill} />
-              ))}
-            </Bar>
+            <Tooltip formatter={(value) => `${String(value)}%`} />
+            <Bar dataKey="completionRate" radius={[0, 4, 4, 0]} name="Completion Rate" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

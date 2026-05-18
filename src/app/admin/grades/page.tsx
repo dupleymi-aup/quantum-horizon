@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAdminGradesOverview } from "@/hooks/api/use-admin-analytics"
-import { FileText, Percent, TrendingUp, CheckCircle, ArrowUpDown } from "lucide-react"
+import { FileText, Percent, TrendingUp, CheckCircle } from "lucide-react"
 
 type SortKey = "title" | "avgScore" | "count" | "stdDev"
 
@@ -75,6 +75,10 @@ export default function AdminGradesPage() {
   const topicProgressData = (data?.avgByTopic ?? []).map((t) => ({
     topic: t.topic,
     completionRate: t.avgScore,
+    avgProgress: t.avgScore,
+    totalUsers: 0,
+    bookmarkCount: 0,
+    lastActivity: null,
   }))
 
   return (
@@ -83,26 +87,14 @@ export default function AdminGradesPage() {
 
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={FileText}
-          label="Total Assessments"
-          value={data?.totalAssessments ?? 0}
-        />
-        <StatCard
-          icon={Percent}
-          label="Total Grades"
-          value={data?.totalGrades ?? 0}
-        />
+        <StatCard icon={FileText} label="Total Assessments" value={data?.totalAssessments ?? 0} />
+        <StatCard icon={Percent} label="Total Grades" value={data?.totalGrades ?? 0} />
         <StatCard
           icon={TrendingUp}
           label="Average Score"
-          value={`${data?.avgScorePercentage ?? 0}%`}
+          value={`${String(data?.avgScorePercentage ?? 0)}%`}
         />
-        <StatCard
-          icon={CheckCircle}
-          label="Pass Rate"
-          value={`${data?.passRate ?? 0}%`}
-        />
+        <StatCard icon={CheckCircle} label="Pass Rate" value={`${String(data?.passRate ?? 0)}%`} />
       </div>
 
       {/* Grade Trend Chart */}
@@ -126,26 +118,34 @@ export default function AdminGradesPage() {
                 <TableRow>
                   <TableHead
                     className="cursor-pointer"
-                    onClick={() => handleSort("title")}
+                    onClick={() => {
+                      handleSort("title")
+                    }}
                   >
                     Assessment {sortKey === "title" && (sortAsc ? "▲" : "▼")}
                   </TableHead>
                   <TableHead>Topic</TableHead>
                   <TableHead
                     className="cursor-pointer text-right"
-                    onClick={() => handleSort("avgScore")}
+                    onClick={() => {
+                      handleSort("avgScore")
+                    }}
                   >
                     Avg Score {sortKey === "avgScore" && (sortAsc ? "▲" : "▼")}
                   </TableHead>
                   <TableHead
                     className="cursor-pointer text-right"
-                    onClick={() => handleSort("count")}
+                    onClick={() => {
+                      handleSort("count")
+                    }}
                   >
                     Grades {sortKey === "count" && (sortAsc ? "▲" : "▼")}
                   </TableHead>
                   <TableHead
                     className="cursor-pointer text-right"
-                    onClick={() => handleSort("stdDev")}
+                    onClick={() => {
+                      handleSort("stdDev")
+                    }}
                   >
                     Std Dev {sortKey === "stdDev" && (sortAsc ? "▲" : "▼")}
                   </TableHead>
@@ -153,7 +153,7 @@ export default function AdminGradesPage() {
               </TableHeader>
               <TableBody>
                 {sortedDifficulty.map((a, i) => (
-                  <TableRow key={`${a.title}-${i}`}>
+                  <TableRow key={`${a.title}-${String(i)}`}>
                     <TableCell className="font-medium">{a.title}</TableCell>
                     <TableCell className="text-muted-foreground">{a.topic}</TableCell>
                     <TableCell className="text-right">

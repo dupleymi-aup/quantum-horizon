@@ -1,7 +1,6 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
 import {
   LineChart,
   Line,
@@ -23,7 +22,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { AdminError } from "@/components/admin/admin-error"
-import { AdminStatCardSkeleton, AdminChartSkeleton, AdminTableSkeleton } from "@/components/admin/admin-skeleton"
+import {
+  AdminStatCardSkeleton,
+  AdminChartSkeleton,
+  AdminTableSkeleton,
+} from "@/components/admin/admin-skeleton"
 import { ArrowLeft, Award, BookOpen, Clock, Star, Target } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
@@ -40,47 +43,47 @@ interface UserDetail {
   }
   totalXp: number
   totalActivities: number
-  activityByType: { action: string; count: number }[]
-  activities: {
+  activityByType: Array<{ action: string; count: number }>
+  activities: Array<{
     id: string
     action: string
     topic: string | null
     xpGained: number
     createdAt: string
-  }[]
-  progress: {
+  }>
+  progress: Array<{
     id: string
     topic: string
     completedCount: number
     lastCompleted: string
-  }[]
-  bookmarks: {
+  }>
+  bookmarks: Array<{
     id: string
     topic: string
     title: string
     createdAt: string
-  }[]
-  achievements: {
+  }>
+  achievements: Array<{
     id: string
     achievementId: string
     progress: number
     target: number
     unlockedAt: string
-  }[]
-  sessions: {
+  }>
+  sessions: Array<{
     id: string
     startedAt: string
     endedAt: string | null
     durationSec: number
     topic: string | null
-  }[]
-  xpOverTime: { date: string; xp: number; action: string }[]
+  }>
+  xpOverTime: Array<{ date: string; xp: number; action: string }>
 }
 
 function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`
-  if (seconds < 3600) return `${Math.round(seconds / 60)}m`
-  return `${Math.round(seconds / 3600)}h ${Math.round((seconds % 3600) / 60)}m`
+  if (seconds < 60) return `${String(seconds)}s`
+  if (seconds < 3600) return `${String(Math.round(seconds / 60))}m`
+  return `${String(Math.round(seconds / 3600))}h ${String(Math.round((seconds % 3600) / 60))}m`
 }
 
 function formatDate(iso: string): string {
@@ -98,8 +101,8 @@ export default function UserDetailPage() {
       const res = await fetchWithTimeout(`/api/admin/user/${userId}`, {
         timeoutMs: 15000,
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: UserDetail }
       return json.data
     },
     staleTime: 2 * 60 * 1000,
@@ -108,7 +111,13 @@ export default function UserDetailPage() {
   if (error) {
     return (
       <div className="space-y-4">
-        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            router.back()
+          }}
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Users
         </Button>
@@ -120,7 +129,7 @@ export default function UserDetailPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-9 w-32 rounded bg-muted" />
+        <div className="bg-muted h-9 w-32 rounded" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <AdminStatCardSkeleton key={i} />
@@ -136,7 +145,13 @@ export default function UserDetailPage() {
     return (
       <div className="py-12 text-center">
         <p className="text-muted-foreground">Student not found</p>
-        <Button variant="link" onClick={() => router.back()} className="mt-2">
+        <Button
+          variant="link"
+          onClick={() => {
+            router.back()
+          }}
+          className="mt-2"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Users
         </Button>
@@ -144,13 +159,30 @@ export default function UserDetailPage() {
     )
   }
 
-  const { user, totalXp, totalActivities, activityByType, activities, progress, bookmarks, achievements, sessions, xpOverTime } = data
+  const {
+    user,
+    totalXp,
+    totalActivities,
+    activityByType,
+    activities,
+    progress,
+    bookmarks,
+    achievements,
+    sessions,
+    xpOverTime,
+  } = data
 
   const totalSessionTime = sessions.reduce((sum, s) => sum + s.durationSec, 0)
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => router.back()}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => {
+          router.back()
+        }}
+      >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Users
       </Button>
@@ -165,21 +197,27 @@ export default function UserDetailPage() {
               className="h-16 w-16 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+            <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold">
               {(user.name ?? user.email ?? "?").charAt(0).toUpperCase()}
             </div>
           )}
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold">{user.name || "Unnamed"}</h2>
-              <Badge variant={user.role === "ADMIN" ? "destructive" : user.role === "MODERATOR" ? "default" : "secondary"}>
+              <h2 className="text-2xl font-bold">{user.name ?? "Unnamed"}</h2>
+              <Badge
+                variant={
+                  user.role === "ADMIN"
+                    ? "destructive"
+                    : user.role === "MODERATOR"
+                      ? "default"
+                      : "secondary"
+                }
+              >
                 {user.role}
               </Badge>
             </div>
             <p className="text-muted-foreground">{user.email}</p>
-            <p className="text-sm text-muted-foreground">
-              Registered {formatDate(user.createdAt)}
-            </p>
+            <p className="text-muted-foreground text-sm">Registered {formatDate(user.createdAt)}</p>
           </div>
         </CardContent>
       </Card>
@@ -188,44 +226,44 @@ export default function UserDetailPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <Star className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+              <Star className="text-primary h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total XP</p>
+              <p className="text-muted-foreground text-sm">Total XP</p>
               <p className="text-2xl font-bold">{totalXp.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <Target className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+              <Target className="text-primary h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Activities</p>
+              <p className="text-muted-foreground text-sm">Activities</p>
               <p className="text-2xl font-bold">{totalActivities}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <Clock className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+              <Clock className="text-primary h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Session Time</p>
+              <p className="text-muted-foreground text-sm">Session Time</p>
               <p className="text-2xl font-bold">{formatDuration(totalSessionTime)}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <Award className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+              <Award className="text-primary h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Achievements</p>
+              <p className="text-muted-foreground text-sm">Achievements</p>
               <p className="text-2xl font-bold">{achievements.length}</p>
             </div>
           </CardContent>
@@ -271,7 +309,10 @@ export default function UserDetailPage() {
                 {activityByType
                   .sort((a, b) => b.count - a.count)
                   .map((item) => (
-                    <div key={item.action} className="flex items-center justify-between rounded-lg border p-3">
+                    <div
+                      key={item.action}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
                       <span className="text-sm capitalize">{item.action.replace(/_/g, " ")}</span>
                       <span className="font-medium">{item.count}</span>
                     </div>
@@ -296,11 +337,11 @@ export default function UserDetailPage() {
                   <div key={p.id} className="rounded-lg border p-3">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{p.topic}</span>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-muted-foreground text-sm">
                         {p.completedCount} completions
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Last: {formatDate(p.lastCompleted)}
                     </p>
                   </div>
@@ -348,7 +389,7 @@ export default function UserDetailPage() {
               {activities.slice(0, 20).map((a) => (
                 <TableRow key={a.id}>
                   <TableCell className="capitalize">{a.action.replace(/_/g, " ")}</TableCell>
-                  <TableCell>{a.topic || "—"}</TableCell>
+                  <TableCell>{a.topic ?? "—"}</TableCell>
                   <TableCell className="text-right">+{a.xpGained}</TableCell>
                   <TableCell>{formatDate(a.createdAt)}</TableCell>
                 </TableRow>

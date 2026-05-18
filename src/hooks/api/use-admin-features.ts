@@ -17,8 +17,8 @@ export interface ComparisonStudent {
   totalAchievements: number
   totalSessionTime: number
   topicsCompleted: number
-  topicCompletion: { topic: string; count: number }[]
-  activityByType: { action: string; count: number }[]
+  topicCompletion: Array<{ topic: string; count: number }>
+  activityByType: Array<{ action: string; count: number }>
   lastActive: number | null
 }
 
@@ -34,16 +34,16 @@ export interface AdminAlert {
 
 export interface LiveData {
   currentlyActive: number
-  recentActivities: {
+  recentActivities: Array<{
     id: string
     action: string
     topic: string | null
     userName: string | null
     createdAt: string
-  }[]
+  }>
   todayStats: {
     uniqueUsers: number
-    byType: { action: string; count: number }[]
+    byType: Array<{ action: string; count: number }>
   }
   fiveMinCount: number
 }
@@ -57,8 +57,8 @@ export interface ReportData {
     avgSessionDuration: number
     activityTrend: number
   }
-  activityBreakdown: { action: string; count: number }[]
-  topTopics: { topic: string; users: number; completions: number }[]
+  activityBreakdown: Array<{ action: string; count: number }>
+  topTopics: Array<{ topic: string; users: number; completions: number }>
 }
 
 // Comparison
@@ -67,12 +67,11 @@ export function useStudentComparison(userIds: string[]) {
     queryKey: ["adminCompare", userIds],
     queryFn: async () => {
       if (userIds.length < 2) return []
-      const res = await fetchWithTimeout(
-        `/api/admin/compare?ids=${userIds.join(",")}`,
-        { timeoutMs: 15000 }
-      )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      const res = await fetchWithTimeout(`/api/admin/compare?ids=${userIds.join(",")}`, {
+        timeoutMs: 15000,
+      })
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: ComparisonStudent[] }
       return json.data
     },
     enabled: userIds.length >= 2,
@@ -87,12 +86,11 @@ export function useAdminAlerts(unreadOnly = false) {
   const { data, isLoading, error } = useQuery<{ alerts: AdminAlert[]; unreadCount: number }>({
     queryKey: ["adminAlerts", unreadOnly],
     queryFn: async () => {
-      const res = await fetchWithTimeout(
-        `/api/admin/alerts?unread=${unreadOnly}`,
-        { timeoutMs: 10000 }
-      )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      const res = await fetchWithTimeout(`/api/admin/alerts?unread=${String(unreadOnly)}`, {
+        timeoutMs: 10000,
+      })
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: { alerts: AdminAlert[]; unreadCount: number } }
       return json.data
     },
     refetchInterval: unreadOnly ? 30000 : false,
@@ -101,14 +99,12 @@ export function useAdminAlerts(unreadOnly = false) {
 
   const markRead = useMutation({
     mutationFn: async (id?: string) => {
-      const url = id
-        ? `/api/admin/alerts?id=${id}`
-        : "/api/admin/alerts"
+      const url = id ? `/api/admin/alerts?id=${id}` : "/api/admin/alerts"
       const res = await fetchWithTimeout(url, {
         method: "PATCH",
         timeoutMs: 10000,
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["adminAlerts"] })
@@ -124,8 +120,8 @@ export function useAdminLiveData(refreshInterval = 15000) {
     queryKey: ["adminLive"],
     queryFn: async () => {
       const res = await fetchWithTimeout("/api/admin/live", { timeoutMs: 10000 })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: LiveData }
       return json.data
     },
     refetchInterval: refreshInterval,
@@ -141,8 +137,8 @@ export function useAdminReport(range = "30d") {
       const res = await fetchWithTimeout(`/api/admin/reports?range=${range}`, {
         timeoutMs: 15000,
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: ReportData }
       return json.data
     },
     staleTime: 5 * 60 * 1000,

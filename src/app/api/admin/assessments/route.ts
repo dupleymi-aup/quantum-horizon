@@ -37,11 +37,23 @@ async function GETHandler(request: NextRequest) {
       const grades = await db.grade.findMany({
         where: { assessmentId },
         include: {
-          user: { select: { id: true, name: true, email: true } },
           assessment: { select: { title: true, maxScore: true, topic: true } },
         },
       })
-      return NextResponse.json({ success: true, data: grades })
+
+      const userIds = grades.map((g) => g.userId)
+      const users = await db.user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, name: true, email: true },
+      })
+      const userMap = new Map(users.map((u) => [u.id, u]))
+
+      const gradesWithUser = grades.map((g) => ({
+        ...g,
+        user: userMap.get(g.userId) ?? null,
+      }))
+
+      return NextResponse.json({ success: true, data: gradesWithUser })
     }
 
     const assessments = await db.assessment.findMany({

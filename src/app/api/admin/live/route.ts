@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
@@ -25,9 +25,6 @@ async function GETHandler() {
         where: { createdAt: { gte: thirtyMinAgo } },
         orderBy: { createdAt: "desc" },
         take: 50,
-        include: {
-          user: { select: { name: true, email: true } },
-        },
       }),
       db.userActivity.groupBy({
         by: ["userId"],
@@ -39,6 +36,13 @@ async function GETHandler() {
         select: { action: true, userId: true },
       }),
     ])
+
+    const userIds = [...new Set(recentActivities.map((a) => a.userId))]
+    const users = await db.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, name: true, email: true },
+    })
+    const userMap = new Map(users.map((u) => [u.id, u.name]))
 
     const currentlyActive = new Set(latestByUser.map((u) => u.userId)).size
 
@@ -57,7 +61,7 @@ async function GETHandler() {
           id: a.id,
           action: a.action,
           topic: a.topic,
-          userName: (a as unknown as { user: { name: string | null } }).user?.name,
+          userName: userMap.get(a.userId) ?? null,
           createdAt: a.createdAt.toISOString(),
         })),
         todayStats: {

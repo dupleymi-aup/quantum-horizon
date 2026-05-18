@@ -59,15 +59,25 @@ export default function AdminUsersPage() {
           <Input
             placeholder="Search by name or email..."
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            onChange={(e) => {
+              setInputValue(e.target.value)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch()
+            }}
             className="max-w-sm"
           />
           <Button variant="outline" size="icon" onClick={handleSearch}>
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        <Select value={roleFilter} onValueChange={(v) => { setRoleFilter(v); setPage(1) }}>
+        <Select
+          value={roleFilter}
+          onValueChange={(v) => {
+            setRoleFilter(v)
+            setPage(1)
+          }}
+        >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
@@ -82,9 +92,7 @@ export default function AdminUsersPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            Users ({data?.total ?? 0})
-          </CardTitle>
+          <CardTitle>Users ({data?.total ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -105,12 +113,12 @@ export default function AdminUsersPage() {
                   <TableCell>
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="font-medium text-primary hover:underline"
+                      className="text-primary font-medium hover:underline"
                     >
-                      {user.name || "—"}
+                      {user.name ?? "—"}
                     </Link>
                   </TableCell>
-                  <TableCell>{user.email || "—"}</TableCell>
+                  <TableCell>{user.email ?? "—"}</TableCell>
                   <TableCell>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -135,7 +143,7 @@ export default function AdminUsersPage() {
 
           {data && data.totalPages > 1 && (
             <div className="mt-4 flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Page {data.page} of {data.totalPages}
               </p>
               <div className="flex gap-2">
@@ -143,7 +151,9 @@ export default function AdminUsersPage() {
                   variant="outline"
                   size="sm"
                   disabled={data.page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
+                  onClick={() => {
+                    setPage((p) => p - 1)
+                  }}
                 >
                   Previous
                 </Button>
@@ -151,7 +161,9 @@ export default function AdminUsersPage() {
                   variant="outline"
                   size="sm"
                   disabled={data.page >= data.totalPages}
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => {
+                    setPage((p) => p + 1)
+                  }}
                 >
                   Next
                 </Button>

@@ -50,28 +50,33 @@ export default function AdminAssessmentsPage() {
   const [selectedAssessment, setSelectedAssessment] = useState<string>("")
   const queryClient = useQueryClient()
 
-  const { data: assessments, isLoading, error, refetch } = useQuery<Assessment[]>({
+  const {
+    data: assessments,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["adminAssessments"],
     queryFn: async () => {
       const res = await fetchWithTimeout("/api/admin/assessments", { timeoutMs: 10000 })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: Assessment[] }
       return json.data
     },
   })
 
-  const { data: grades } = useQuery<Grade[]>({
+  const { data: grades } = useQuery({
     queryKey: ["adminGrades", selectedAssessment],
     queryFn: async () => {
       const res = await fetchWithTimeout(
         `/api/admin/assessments?assessmentId=${selectedAssessment}`,
         { timeoutMs: 10000 }
       )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = await res.json()
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
+      const json = (await res.json()) as { data: Grade[] }
       return json.data
     },
-    enabled: !!selectedAssessment,
+    enabled: Boolean(selectedAssessment),
   })
 
   const createAssessment = useMutation({
@@ -82,7 +87,7 @@ export default function AdminAssessmentsPage() {
         body: JSON.stringify(data),
         timeoutMs: 10000,
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["adminAssessments"] })
@@ -95,20 +100,30 @@ export default function AdminAssessmentsPage() {
   }
 
   if (isLoading) {
-    return <p className="text-center text-muted-foreground py-8">Loading assessments...</p>
+    return <p className="text-muted-foreground py-8 text-center">Loading assessments...</p>
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Assessments & Grades</h2>
-        <Button onClick={() => setShowCreate(!showCreate)}>
+        <Button
+          onClick={() => {
+            setShowCreate(!showCreate)
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" />
           New Assessment
         </Button>
       </div>
 
-      {showCreate && <CreateForm onSubmit={(d) => createAssessment.mutate(d)} />}
+      {showCreate && (
+        <CreateForm
+          onSubmit={(d) => {
+            createAssessment.mutate(d)
+          }}
+        />
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
@@ -121,15 +136,17 @@ export default function AdminAssessmentsPage() {
                 {assessments.map((a) => (
                   <div
                     key={a.id}
-                    className="flex items-center justify-between rounded-lg border p-3 cursor-pointer hover:bg-accent transition-colors"
-                    onClick={() => setSelectedAssessment(a.id)}
+                    className="hover:bg-accent flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
+                    onClick={() => {
+                      setSelectedAssessment(a.id)
+                    }}
                   >
                     <div>
-                      <p className="font-medium flex items-center gap-2">
+                      <p className="flex items-center gap-2 font-medium">
                         <FileText className="h-4 w-4" />
                         {a.title}
                       </p>
-                      <p className="text-sm text-muted-foreground">{a.topic}</p>
+                      <p className="text-muted-foreground text-sm">{a.topic}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">{a.maxScore} pts</Badge>
@@ -139,7 +156,7 @@ export default function AdminAssessmentsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-4">No assessments yet</p>
+              <p className="text-muted-foreground py-4 text-center">No assessments yet</p>
             )}
           </CardContent>
         </Card>
@@ -167,14 +184,18 @@ export default function AdminAssessmentsPage() {
                     const pct = Math.round((g.score / g.maxScore) * 100)
                     return (
                       <TableRow key={g.id}>
-                        <TableCell>{g.user.name || g.user.email || "Unknown"}</TableCell>
+                        <TableCell>{g.user.name ?? g.user.email ?? "Unknown"}</TableCell>
                         <TableCell className="text-right">
                           {g.score}/{g.maxScore}
                         </TableCell>
                         <TableCell className="text-right">
                           <span
                             className={`font-medium ${
-                              pct >= 80 ? "text-green-600" : pct >= 60 ? "text-yellow-600" : "text-red-600"
+                              pct >= 80
+                                ? "text-green-600"
+                                : pct >= 60
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
                             }`}
                           >
                             {pct}%
@@ -186,7 +207,7 @@ export default function AdminAssessmentsPage() {
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-muted-foreground text-center py-4">
+              <p className="text-muted-foreground py-4 text-center">
                 {selectedAssessment ? "No grades recorded" : "Select an assessment"}
               </p>
             )}
@@ -194,7 +215,12 @@ export default function AdminAssessmentsPage() {
         </Card>
       </div>
 
-      <Button variant="outline" onClick={() => setShowGrade(!showGrade)}>
+      <Button
+        variant="outline"
+        onClick={() => {
+          setShowGrade(!showGrade)
+        }}
+      >
         <Plus className="mr-2 h-4 w-4" />
         Add Grade
       </Button>
@@ -204,19 +230,48 @@ export default function AdminAssessmentsPage() {
   )
 }
 
-function CreateForm({ onSubmit }: { onSubmit: (d: { title: string; topic: string; maxScore: number }) => void }) {
+function CreateForm({
+  onSubmit,
+}: {
+  onSubmit: (d: { title: string; topic: string; maxScore: number }) => void
+}) {
   const [title, setTitle] = useState("")
   const [topic, setTopic] = useState("")
   const [maxScore, setMaxScore] = useState(100)
 
   return (
     <Card>
-      <CardHeader><CardTitle>Create Assessment</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Create Assessment</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-3">
-        <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Input placeholder="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} />
-        <Input type="number" placeholder="Max Score" value={maxScore} onChange={(e) => setMaxScore(parseInt(e.target.value, 10))} />
-        <Button onClick={() => { if (title && topic) onSubmit({ title, topic, maxScore }) }}>
+        <Input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value)
+          }}
+        />
+        <Input
+          placeholder="Topic"
+          value={topic}
+          onChange={(e) => {
+            setTopic(e.target.value)
+          }}
+        />
+        <Input
+          type="number"
+          placeholder="Max Score"
+          value={maxScore}
+          onChange={(e) => {
+            setMaxScore(parseInt(e.target.value, 10))
+          }}
+        />
+        <Button
+          onClick={() => {
+            if (title && topic) onSubmit({ title, topic, maxScore })
+          }}
+        >
           Create
         </Button>
       </CardContent>
@@ -241,7 +296,7 @@ function GradeForm({ assessments }: { assessments: Assessment[] }) {
         body: JSON.stringify({ assessmentId, userId, score }),
         timeoutMs: 10000,
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      if (!res.ok) throw new Error(`HTTP ${String(res.status)}`)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["adminGrades"] })
@@ -251,32 +306,57 @@ function GradeForm({ assessments }: { assessments: Assessment[] }) {
 
   return (
     <Card>
-      <CardHeader><CardTitle>Add Grade</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Add Grade</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-3">
         <Select value={assessmentId} onValueChange={setAssessmentId}>
-          <SelectTrigger><SelectValue placeholder="Select assessment" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Select assessment" />
+          </SelectTrigger>
           <SelectContent>
             {assessments.map((a) => (
-              <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+              <SelectItem key={a.id} value={a.id}>
+                {a.title}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Input placeholder="Search student..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        <div className="max-h-32 overflow-y-auto space-y-1 border rounded p-1">
+        <Input
+          placeholder="Search student..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+          }}
+        />
+        <div className="max-h-32 space-y-1 overflow-y-auto rounded border p-1">
           {data?.users.map((u: AdminUser) => (
             <button
               key={u.id}
-              onClick={() => setUserId(u.id)}
-              className={`w-full text-left px-2 py-1 rounded text-sm ${userId === u.id ? "bg-primary/10" : "hover:bg-accent"}`}
+              onClick={() => {
+                setUserId(u.id)
+              }}
+              className={`w-full rounded px-2 py-1 text-left text-sm ${userId === u.id ? "bg-primary/10" : "hover:bg-accent"}`}
             >
-              {u.name || u.email}
+              {u.name ?? u.email}
             </button>
           ))}
         </div>
 
-        <Input type="number" placeholder="Score" value={score} onChange={(e) => setScore(parseInt(e.target.value, 10))} />
-        <Button onClick={() => { if (assessmentId && userId) submitGrade.mutate() }}>
+        <Input
+          type="number"
+          placeholder="Score"
+          value={score}
+          onChange={(e) => {
+            setScore(parseInt(e.target.value, 10))
+          }}
+        />
+        <Button
+          onClick={() => {
+            if (assessmentId && userId) submitGrade.mutate()
+          }}
+        >
           Submit Grade
         </Button>
       </CardContent>

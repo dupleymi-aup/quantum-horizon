@@ -17,7 +17,7 @@ async function GETHandler(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const days = parseInt(searchParams.get("days") || "30", 10)
+    const days = parseInt(searchParams.get("days") ?? "30", 10)
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
     const where = { createdAt: { gte: startDate } }
@@ -34,7 +34,8 @@ async function GETHandler(request: NextRequest) {
       if (!dailyActiveMap.has(date)) {
         dailyActiveMap.set(date, new Set())
       }
-      dailyActiveMap.get(date)!.add(a.userId)
+      const set = dailyActiveMap.get(date)
+      if (set) set.add(a.userId)
     }
 
     const activeUsersOverTime = Array.from(dailyActiveMap.entries())
@@ -68,9 +69,7 @@ async function GETHandler(request: NextRequest) {
 
     const sessionDistribution = ranges.map((r) => ({
       range: r.label,
-      count: userSessionCounts.filter(
-        (u) => u._count >= r.min && u._count <= r.max
-      ).length,
+      count: userSessionCounts.filter((u) => u._count.id >= r.min && u._count.id <= r.max).length,
     }))
 
     return NextResponse.json({
@@ -86,10 +85,7 @@ async function GETHandler(request: NextRequest) {
       "Error fetching engagement analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json(
-      { error: "Failed to fetch engagement analytics" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch engagement analytics" }, { status: 500 })
   }
 }
 

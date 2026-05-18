@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
+import { UserRole } from "@prisma/client"
 import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { withRateLimit } from "@/lib/rate-limit"
@@ -17,22 +18,19 @@ async function GETHandler(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const page = Math.max(parseInt(searchParams.get("page") || "1", 10), 1)
-    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "20", 10), 1), 100)
-    const search = searchParams.get("search") || ""
-    const role = searchParams.get("role") || ""
+    const page = Math.max(parseInt(searchParams.get("page") ?? "1", 10), 1)
+    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") ?? "20", 10), 1), 100)
+    const search = searchParams.get("search") ?? ""
+    const role = searchParams.get("role") ?? ""
     const skip = (page - 1) * limit
 
     const where = {
       ...(search
         ? {
-            OR: [
-              { name: { contains: search } },
-              { email: { contains: search } },
-            ],
+            OR: [{ name: { contains: search } }, { email: { contains: search } }],
           }
         : {}),
-      ...(role ? { role } : {}),
+      ...(role ? { role: role as UserRole } : {}),
     }
 
     const [users, total] = await Promise.all([
@@ -65,7 +63,11 @@ async function GETHandler(request: NextRequest) {
     const activityMap = new Map(
       activityCounts.map((a) => [
         a.userId,
-        { activityCount: a._count, totalXp: a._sum.xpGained ?? 0, lastActive: a._max.createdAt?.toISOString() ?? null },
+        {
+          activityCount: a._count,
+          totalXp: a._sum.xpGained ?? 0,
+          lastActive: a._max.createdAt?.toISOString() ?? null,
+        },
       ])
     )
 
@@ -87,10 +89,7 @@ async function GETHandler(request: NextRequest) {
       },
     })
   } catch (error) {
-    logger.error(
-      "Error fetching users:",
-      error instanceof Error ? error.message : "Unknown error"
-    )
+    logger.error("Error fetching users:", error instanceof Error ? error.message : "Unknown error")
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
   }
 }

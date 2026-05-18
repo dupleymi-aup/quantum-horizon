@@ -6,12 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminError } from "@/components/admin/admin-error"
+import { useAdminLiveData, useAdminAlerts, useAdminReport } from "@/hooks/api/use-admin-features"
 import {
-  useAdminLiveData,
-  useAdminAlerts,
-  useAdminReport,
-} from "@/hooks/api/use-admin-features"
-import { AlertTriangle, Bell, Check, RefreshCw, TrendingUp, Users, Clock, Award } from "lucide-react"
+  AlertTriangle,
+  Bell,
+  Check,
+  RefreshCw,
+  TrendingUp,
+  Users,
+  Clock,
+  Award,
+} from "lucide-react"
 
 const SEVERITY_COLORS: Record<string, string> = {
   info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
@@ -28,10 +33,10 @@ function LiveMonitor() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
           <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
           </span>
           Live Monitor
         </h3>
@@ -48,7 +53,7 @@ function LiveMonitor() {
               <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Active Now (1h)</p>
+              <p className="text-muted-foreground text-sm">Active Now (1h)</p>
               <p className="text-2xl font-bold">{data?.currentlyActive ?? 0}</p>
             </div>
           </CardContent>
@@ -59,7 +64,7 @@ function LiveMonitor() {
               <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Actions (5 min)</p>
+              <p className="text-muted-foreground text-sm">Actions (5 min)</p>
               <p className="text-2xl font-bold">{data?.fiveMinCount ?? 0}</p>
             </div>
           </CardContent>
@@ -70,7 +75,7 @@ function LiveMonitor() {
               <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Today's Users</p>
+              <p className="text-muted-foreground text-sm">Today's Users</p>
               <p className="text-2xl font-bold">{data?.todayStats.uniqueUsers ?? 0}</p>
             </div>
           </CardContent>
@@ -81,7 +86,7 @@ function LiveMonitor() {
               <Award className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Today's Actions</p>
+              <p className="text-muted-foreground text-sm">Today's Actions</p>
               <p className="text-2xl font-bold">
                 {data?.todayStats.byType.reduce((s, b) => s + b.count, 0) ?? 0}
               </p>
@@ -97,21 +102,16 @@ function LiveMonitor() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="max-h-64 space-y-2 overflow-y-auto">
               {data.recentActivities.slice(0, 20).map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center gap-3 rounded-lg border p-3 text-sm"
-                >
+                <div key={a.id} className="flex items-center gap-3 rounded-lg border p-3 text-sm">
                   <div className="h-2 w-2 rounded-full bg-green-500" />
                   <span className="font-medium capitalize">{a.action.replace(/_/g, " ")}</span>
-                  {a.topic && (
-                    <span className="text-muted-foreground">→ {a.topic}</span>
-                  )}
+                  {a.topic && <span className="text-muted-foreground">→ {a.topic}</span>}
                   {a.userName && (
-                    <span className="ml-auto text-muted-foreground">{a.userName}</span>
+                    <span className="text-muted-foreground ml-auto">{a.userName}</span>
                   )}
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     {new Date(a.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
@@ -133,15 +133,13 @@ function AlertsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
           <Bell className="h-5 w-5" />
           Alerts
-          {data?.unreadCount ? (
-            <Badge variant="destructive">{data.unreadCount}</Badge>
-          ) : null}
+          {data?.unreadCount ? <Badge variant="destructive">{data.unreadCount}</Badge> : null}
         </h3>
         {data?.unreadCount ? (
-          <Button variant="outline" size="sm" onClick={() => void markRead()}>
+          <Button variant="outline" size="sm" onClick={() => void markRead(undefined)}>
             <Check className="mr-1.5 h-3.5 w-3.5" />
             Mark All Read
           </Button>
@@ -154,11 +152,22 @@ function AlertsPanel() {
             <Card
               key={alert.id}
               className={!alert.read ? "border-l-4" : "opacity-70"}
-              style={!alert.read ? { borderLeftColor: alert.severity === "critical" ? "#ef4444" : alert.severity === "warning" ? "#f59e0b" : "#3b82f6" } : {}}
+              style={
+                !alert.read
+                  ? {
+                      borderLeftColor:
+                        alert.severity === "critical"
+                          ? "#ef4444"
+                          : alert.severity === "warning"
+                            ? "#f59e0b"
+                            : "#3b82f6",
+                    }
+                  : {}
+              }
             >
               <CardContent className="flex items-start gap-3 p-4">
                 <AlertTriangle
-                  className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                  className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
                     alert.severity === "critical"
                       ? "text-red-600"
                       : alert.severity === "warning"
@@ -166,12 +175,12 @@ function AlertsPanel() {
                         : "text-blue-600"
                   }`}
                 />
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <Badge className={SEVERITY_COLORS[alert.severity] || SEVERITY_COLORS.info}>
                       {alert.severity}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       {new Date(alert.createdAt).toLocaleString()}
                     </span>
                   </div>
@@ -188,9 +197,7 @@ function AlertsPanel() {
         </div>
       ) : (
         <Card>
-          <CardContent className="py-8 text-center text-muted-foreground">
-            No alerts
-          </CardContent>
+          <CardContent className="text-muted-foreground py-8 text-center">No alerts</CardContent>
         </Card>
       )}
     </div>
@@ -207,20 +214,23 @@ function ReportsPanel() {
   const handleExportText = () => {
     if (!data) return
     const lines = [
-      `Report: ${data.period.days} days (${new Date(data.period.start).toLocaleDateString()} - ${new Date(data.period.end).toLocaleDateString()})`,
+      `Report: ${data.period.days.toString()} days (${new Date(data.period.start).toLocaleDateString()} - ${new Date(data.period.end).toLocaleDateString()})`,
       "",
       "Summary:",
-      `  New Users: ${data.summary.newUsers}`,
-      `  Total Activities: ${data.summary.totalActivities}`,
-      `  Achievement Unlocks: ${data.summary.achievementUnlocks}`,
-      `  Avg Session Duration: ${Math.round(data.summary.avgSessionDuration / 60)}m`,
-      `  Activity Trend: ${data.summary.activityTrend > 0 ? "+" : ""}${data.summary.activityTrend}%`,
+      `  New Users: ${data.summary.newUsers.toString()}`,
+      `  Total Activities: ${data.summary.totalActivities.toLocaleString()}`,
+      `  Achievement Unlocks: ${data.summary.achievementUnlocks.toLocaleString()}`,
+      `  Avg Session Duration: ${Math.round(data.summary.avgSessionDuration / 60).toString()}m`,
+      `  Activity Trend: ${data.summary.activityTrend > 0 ? "+" : ""}${data.summary.activityTrend.toString()}%`,
       "",
       "Activity Breakdown:",
-      ...data.activityBreakdown.map((a) => `  ${a.action}: ${a.count}`),
+      ...data.activityBreakdown.map((a) => `  ${a.action}: ${a.count.toLocaleString()}`),
       "",
       "Top Topics:",
-      ...data.topTopics.map((t) => `  ${t.topic}: ${t.completions} completions (${t.users} users)`),
+      ...data.topTopics.map(
+        (t) =>
+          `  ${t.topic}: ${t.completions.toLocaleString()} completions (${t.users.toString()} users)`
+      ),
     ]
     const blob = new Blob([lines.join("\n")], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
@@ -234,7 +244,7 @@ function ReportsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
           <TrendingUp className="h-5 w-5" />
           Reports
         </h3>
@@ -256,21 +266,26 @@ function ReportsPanel() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">New Users</p>
+                <p className="text-muted-foreground text-sm">New Users</p>
                 <p className="text-2xl font-bold">{data.summary.newUsers}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">Total Activities</p>
-                <p className="text-2xl font-bold">{data.summary.totalActivities.toLocaleString()}</p>
+                <p className="text-muted-foreground text-sm">Total Activities</p>
+                <p className="text-2xl font-bold">
+                  {data.summary.totalActivities.toLocaleString()}
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">Activity Trend</p>
-                <p className={`text-2xl font-bold ${data.summary.activityTrend >= 0 ? "text-green-600" : "text-red-600"}`}>
-                  {data.summary.activityTrend > 0 ? "+" : ""}{data.summary.activityTrend}%
+                <p className="text-muted-foreground text-sm">Activity Trend</p>
+                <p
+                  className={`text-2xl font-bold ${data.summary.activityTrend >= 0 ? "text-green-600" : "text-red-600"}`}
+                >
+                  {data.summary.activityTrend > 0 ? "+" : ""}
+                  {data.summary.activityTrend}%
                 </p>
               </CardContent>
             </Card>
@@ -283,7 +298,7 @@ function ReportsPanel() {
               </CardHeader>
               <CardContent>
                 {data.activityBreakdown.map((a) => (
-                  <div key={a.action} className="flex justify-between py-2 border-b last:border-0">
+                  <div key={a.action} className="flex justify-between border-b py-2 last:border-0">
                     <span className="capitalize">{a.action.replace(/_/g, " ")}</span>
                     <span className="font-medium">{a.count.toLocaleString()}</span>
                   </div>
@@ -296,12 +311,12 @@ function ReportsPanel() {
               </CardHeader>
               <CardContent>
                 {data.topTopics.map((t, i) => (
-                  <div key={t.topic} className="flex justify-between py-2 border-b last:border-0">
+                  <div key={t.topic} className="flex justify-between border-b py-2 last:border-0">
                     <span>
                       <span className="text-muted-foreground mr-2">{i + 1}.</span>
                       {t.topic}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-muted-foreground text-sm">
                       {t.completions} ({t.users} users)
                     </span>
                   </div>

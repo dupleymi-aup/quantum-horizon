@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
@@ -36,10 +36,10 @@ async function GETHandler() {
         const user = userMap.get(u.userId)
         return {
           userId: u.userId,
-          name: user?.name || user?.email || "Unknown",
-          email: user?.email || "",
+          name: user?.name ?? user?.email ?? "Unknown",
+          email: user?.email ?? "",
           totalXp: u._sum.xpGained ?? 0,
-          activityCount: u._count,
+          activityCount: u._count.id,
           lastActive: u._max.createdAt?.toISOString() ?? null,
           registeredAt: user?.createdAt.toISOString() ?? null,
         }
@@ -93,10 +93,7 @@ async function GETHandler() {
       "Error fetching performance analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json(
-      { error: "Failed to fetch performance analytics" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch performance analytics" }, { status: 500 })
   }
 }
 

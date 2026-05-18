@@ -25,8 +25,11 @@ export default function AdminComparePage() {
   const [page, setPage] = useState(1)
 
   const { data: usersData, isLoading: usersLoading } = useAdminUsersList(page, search)
-  const { data: comparison, isLoading: compareLoading, error: compareError } =
-    useStudentComparison(selectedIds)
+  const {
+    data: comparison,
+    isLoading: compareLoading,
+    error: compareError,
+  } = useStudentComparison(selectedIds)
 
   const toggleUser = (id: string) => {
     setSelectedIds((prev) =>
@@ -51,12 +54,14 @@ export default function AdminComparePage() {
           <CardTitle>Select Students to Compare (2-5)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="mb-4 flex flex-wrap gap-2">
             {selectedIds.map((id) => (
               <Badge key={id} variant="default" className="gap-1">
                 {id.slice(-4)}
                 <button
-                  onClick={() => toggleUser(id)}
+                  onClick={() => {
+                    toggleUser(id)
+                  }}
                   className="ml-1 hover:text-red-300"
                 >
                   <X className="h-3 w-3" />
@@ -64,18 +69,22 @@ export default function AdminComparePage() {
               </Badge>
             ))}
             {selectedIds.length === 0 && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 No students selected. Click names below to add.
               </span>
             )}
           </div>
 
-          <div className="flex gap-2 mb-4">
+          <div className="mb-4 flex gap-2">
             <Input
               placeholder="Search students..."
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              onChange={(e) => {
+                setInputValue(e.target.value)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch()
+              }}
               className="max-w-sm"
             />
             <Button variant="outline" size="icon" onClick={handleSearch}>
@@ -84,23 +93,23 @@ export default function AdminComparePage() {
           </div>
 
           {usersLoading ? (
-            <p className="text-sm text-muted-foreground">Loading users...</p>
+            <p className="text-muted-foreground text-sm">Loading users...</p>
           ) : (
-            <div className="max-h-48 overflow-y-auto space-y-1 border rounded-lg p-2">
+            <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
               {usersData?.users.map((u: AdminUser) => (
                 <button
                   key={u.id}
-                  onClick={() => toggleUser(u.id)}
-                  className={`w-full text-left px-3 py-1.5 rounded text-sm transition-colors ${
+                  onClick={() => {
+                    toggleUser(u.id)
+                  }}
+                  className={`w-full rounded px-3 py-1.5 text-left text-sm transition-colors ${
                     selectedIds.includes(u.id)
                       ? "bg-primary/10 text-primary font-medium"
                       : "hover:bg-accent"
                   }`}
                 >
-                  {u.name || u.email || u.id.slice(-6)}
-                  <span className="text-xs text-muted-foreground ml-2">
-                    XP: {u.totalXp}
-                  </span>
+                  {u.name ?? u.email ?? u.id.slice(-6)}
+                  <span className="text-muted-foreground ml-2 text-xs">XP: {u.totalXp}</span>
                 </button>
               ))}
             </div>
@@ -125,7 +134,7 @@ export default function AdminComparePage() {
                     <TableHead>Metric</TableHead>
                     {comparison.map((s: ComparisonStudent) => (
                       <TableHead key={s.user.id} className="text-right">
-                        {s.user.name || s.user.email || "Unknown"}
+                        {s.user.name ?? s.user.email ?? "Unknown"}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -148,8 +157,8 @@ export default function AdminComparePage() {
                       label: "Session Time",
                       values: comparison.map((s: ComparisonStudent) =>
                         s.totalSessionTime < 3600
-                          ? `${Math.round(s.totalSessionTime / 60)}m`
-                          : `${Math.round(s.totalSessionTime / 3600)}h ${Math.round((s.totalSessionTime % 3600) / 60)}m`
+                          ? `${String(Math.round(s.totalSessionTime / 60))}m`
+                          : `${String(Math.round(s.totalSessionTime / 3600))}h ${String(Math.round((s.totalSessionTime % 3600) / 60))}m`
                       ),
                     },
                     {
@@ -184,7 +193,7 @@ export default function AdminComparePage() {
                       <TableHead>Topic</TableHead>
                       {comparison.map((s: ComparisonStudent) => (
                         <TableHead key={s.user.id} className="text-right">
-                          {(s.user.name || "").split(" ")[0] || "User"}
+                          {(s.user.name ?? "").split(" ")[0] ?? "User"}
                         </TableHead>
                       ))}
                     </TableRow>
@@ -218,7 +227,7 @@ export default function AdminComparePage() {
       )}
 
       {compareLoading && (
-        <p className="text-center text-muted-foreground py-4">Loading comparison...</p>
+        <p className="text-muted-foreground py-4 text-center">Loading comparison...</p>
       )}
     </div>
   )

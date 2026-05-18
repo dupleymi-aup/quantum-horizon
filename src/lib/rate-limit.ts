@@ -126,7 +126,8 @@ export function withRateLimit(
     const rateLimitResponse = applyRateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
-    const response = await handler(request, ...args)
+    const ctx = args[0] as { params?: unknown } | undefined
+    const response = await handler(request, ctx ?? {})
     return addRateLimitHeaders(response, request)
   }
 }

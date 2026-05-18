@@ -29,9 +29,7 @@ export function GradeTrendLineChart({
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-8">
-            No grade data available
-          </p>
+          <p className="text-muted-foreground py-8 text-center text-sm">No grade data available</p>
         </CardContent>
       </Card>
     )
@@ -55,9 +53,9 @@ export function GradeTrendLineChart({
             <YAxis
               domain={[0, 100]}
               tick={{ fontSize: 12 }}
-              tickFormatter={(v: number) => `${v}%`}
+              tickFormatter={(v: number) => `${String(v)}%`}
             />
-            <Tooltip formatter={(value: number) => `${value}%`} />
+            <Tooltip formatter={(value) => `${String(value)}%`} />
             <ReferenceLine y={60} stroke="#ef4444" strokeDasharray="4 4" label="60%" />
             <Line
               type="monotone"

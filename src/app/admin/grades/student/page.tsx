@@ -15,7 +15,11 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { StatCard, GradeTrendLineChart } from "@/components/analytics"
 import { AdminError } from "@/components/admin/admin-error"
-import { AdminStatCardSkeleton, AdminChartSkeleton, AdminTableSkeleton } from "@/components/admin/admin-skeleton"
+import {
+  AdminStatCardSkeleton,
+  AdminChartSkeleton,
+  AdminTableSkeleton,
+} from "@/components/admin/admin-skeleton"
 import { useAdminUsersList, type AdminUser } from "@/hooks/api/use-admin-analytics"
 import { useStudentGradeAnalytics } from "@/hooks/api/use-admin-analytics"
 import { Search, X, TrendingUp, Award, AlertTriangle, FileText } from "lucide-react"
@@ -47,11 +51,13 @@ export default function AdminStudentGradesPage() {
         </CardHeader>
         <CardContent>
           {selectedId && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="mb-4 flex flex-wrap gap-2">
               <Badge variant="default" className="gap-1">
-                {usersData?.users.find((u) => u.id === selectedId)?.name || selectedId.slice(-4)}
+                {usersData?.users.find((u) => u.id === selectedId)?.name ?? selectedId.slice(-4)}
                 <button
-                  onClick={() => setSelectedId("")}
+                  onClick={() => {
+                    setSelectedId("")
+                  }}
                   className="ml-1 hover:text-red-300"
                 >
                   <X className="h-3 w-3" />
@@ -60,12 +66,16 @@ export default function AdminStudentGradesPage() {
             </div>
           )}
 
-          <div className="flex gap-2 mb-4">
+          <div className="mb-4 flex gap-2">
             <Input
               placeholder="Search students..."
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              onChange={(e) => {
+                setInputValue(e.target.value)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch()
+              }}
               className="max-w-sm"
             />
             <Button variant="outline" size="icon" onClick={handleSearch}>
@@ -74,30 +84,30 @@ export default function AdminStudentGradesPage() {
           </div>
 
           {usersLoading ? (
-            <p className="text-sm text-muted-foreground">Loading users...</p>
+            <p className="text-muted-foreground text-sm">Loading users...</p>
           ) : (
-            <div className="max-h-48 overflow-y-auto space-y-1 border rounded-lg p-2">
+            <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
               {usersData?.users.map((u: AdminUser) => (
                 <button
                   key={u.id}
-                  onClick={() => setSelectedId(u.id)}
-                  className={`w-full text-left px-3 py-1.5 rounded text-sm transition-colors ${
+                  onClick={() => {
+                    setSelectedId(u.id)
+                  }}
+                  className={`w-full rounded px-3 py-1.5 text-left text-sm transition-colors ${
                     selectedId === u.id
                       ? "bg-primary/10 text-primary font-medium"
                       : "hover:bg-accent"
                   }`}
                 >
-                  {u.name || u.email || u.id.slice(-6)}
-                  <span className="text-xs text-muted-foreground ml-2">
-                    XP: {u.totalXp}
-                  </span>
+                  {u.name ?? u.email ?? u.id.slice(-6)}
+                  <span className="text-muted-foreground ml-2 text-xs">XP: {u.totalXp}</span>
                 </button>
               ))}
             </div>
           )}
 
           {!selectedId && (
-            <p className="text-sm text-muted-foreground mt-4">
+            <p className="text-muted-foreground mt-4 text-sm">
               Select a student to view grade history
             </p>
           )}
@@ -125,29 +135,25 @@ export default function AdminStudentGradesPage() {
             <StatCard
               icon={TrendingUp}
               label="Average Score"
-              value={`${data.overall.avgScore}%`}
+              value={`${String(data.overall.avgScore)}%`}
             />
             <StatCard
               icon={Award}
               label="Best Score"
-              value={`${data.overall.bestScore}%`}
+              value={`${String(data.overall.bestScore)}%`}
             />
             <StatCard
               icon={AlertTriangle}
               label="Worst Score"
-              value={`${data.overall.worstScore}%`}
+              value={`${String(data.overall.worstScore)}%`}
             />
-            <StatCard
-              icon={FileText}
-              label="Assessments Taken"
-              value={data.overall.totalTaken}
-            />
+            <StatCard icon={FileText} label="Assessments Taken" value={data.overall.totalTaken} />
           </div>
 
           {/* Grade Timeline */}
           <GradeTrendLineChart
             data={data.timeline.map((t) => ({ date: t.date, avgScore: t.score }))}
-            title={`Grade Timeline — ${data.student.name || data.student.email || "Student"}`}
+            title={`Grade Timeline — ${data.student.name ?? data.student.email ?? "Student"}`}
           />
 
           {/* Grade Improvement by Topic */}
@@ -212,10 +218,10 @@ export default function AdminStudentGradesPage() {
         </>
       )}
 
-      {data && data.overall.totalTaken === 0 && !isLoading && (
+      {data?.overall.totalTaken === 0 && !isLoading && (
         <Card>
           <CardContent className="py-8">
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-center text-sm">
               No grades recorded for this student
             </p>
           </CardContent>

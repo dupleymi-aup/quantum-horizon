@@ -8,7 +8,7 @@ export interface OverviewData {
   activeUsers7d: number
   activeUsers30d: number
   totalActivities: number
-  activitiesByType: { action: string; count: number }[]
+  activitiesByType: Array<{ action: string; count: number }>
   totalSessions: number
   avgSessionDuration: number
 }
@@ -119,9 +119,9 @@ export interface UsersListData {
 
 function parseQueryResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
+    throw new Error(`HTTP error! status: ${String(response.status)}`)
   }
-  return response.json().then((result) => result.data as T)
+  return response.json().then((result: { data: T }) => result.data)
 }
 
 export function useAdminOverview() {
@@ -141,10 +141,9 @@ export function useAdminActivityAnalytics(period = "30d") {
   return useQuery<ActivityData>({
     queryKey: ["adminAnalytics", "activity", period],
     queryFn: async () => {
-      const res = await fetchWithTimeout(
-        `/api/admin/analytics/activity?period=${period}`,
-        { timeoutMs: 15000 }
-      )
+      const res = await fetchWithTimeout(`/api/admin/analytics/activity?period=${period}`, {
+        timeoutMs: 15000,
+      })
       return parseQueryResponse<ActivityData>(res)
     },
     staleTime: 5 * 60 * 1000,
@@ -168,10 +167,9 @@ export function useAdminEngagementAnalytics(days = 30) {
   return useQuery<EngagementData>({
     queryKey: ["adminAnalytics", "engagement", days],
     queryFn: async () => {
-      const res = await fetchWithTimeout(
-        `/api/admin/analytics/engagement?days=${days}`,
-        { timeoutMs: 15000 }
-      )
+      const res = await fetchWithTimeout(`/api/admin/analytics/engagement?days=${String(days)}`, {
+        timeoutMs: 15000,
+      })
       return parseQueryResponse<EngagementData>(res)
     },
     staleTime: 5 * 60 * 1000,
@@ -284,10 +282,9 @@ export function useStudentGradeAnalytics(userId: string) {
   return useQuery<StudentGradeData>({
     queryKey: ["adminAnalytics", "grades", "student", userId],
     queryFn: async () => {
-      const res = await fetchWithTimeout(
-        `/api/admin/analytics/grades/student?userId=${userId}`,
-        { timeoutMs: 15000 }
-      )
+      const res = await fetchWithTimeout(`/api/admin/analytics/grades/student?userId=${userId}`, {
+        timeoutMs: 15000,
+      })
       return parseQueryResponse<StudentGradeData>(res)
     },
     enabled: !!userId,

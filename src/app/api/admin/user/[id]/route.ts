@@ -8,10 +8,7 @@ import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:admin:user-detail")
 
-async function GETHandler(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+async function GETHandler(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions)
     const authResult = await requireAdminRole(session)
@@ -38,13 +35,7 @@ async function GETHandler(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    const [
-      activities,
-      progress,
-      bookmarks,
-      achievements,
-      sessions,
-    ] = await Promise.all([
+    const [activities, progress, bookmarks, achievements, sessions] = await Promise.all([
       db.userActivity.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
@@ -113,4 +104,6 @@ async function GETHandler(
   }
 }
 
-export const GET = withRateLimit(GETHandler)
+export const GET = withRateLimit(
+  GETHandler as (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>
+)

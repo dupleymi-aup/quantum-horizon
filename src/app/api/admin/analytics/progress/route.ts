@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
@@ -32,12 +32,11 @@ async function GETHandler() {
 
     const bookmarkMap = new Map<string, number>()
     for (const b of bookmarksByTopic) {
-      bookmarkMap.set(b.topic, b._count)
+      bookmarkMap.set(b.topic, b._count.id)
     }
 
     const topicStats = progressByTopic.map((p) => {
-      const completionRate =
-        totalUsers > 0 ? Math.round((p._count.userId / totalUsers) * 100) : 0
+      const completionRate = totalUsers > 0 ? Math.round((p._count.userId / totalUsers) * 100) : 0
       return {
         topic: p.topic,
         completionRate,
@@ -62,10 +61,7 @@ async function GETHandler() {
       "Error fetching progress analytics:",
       error instanceof Error ? error.message : "Unknown error"
     )
-    return NextResponse.json(
-      { error: "Failed to fetch progress analytics" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch progress analytics" }, { status: 500 })
   }
 }
 

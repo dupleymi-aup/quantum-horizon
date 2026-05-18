@@ -24,7 +24,7 @@ function getMedal(rank: number): string {
   if (rank === 1) return "🥇"
   if (rank === 2) return "🥈"
   if (rank === 3) return "🥉"
-  return `${rank}`
+  return String(rank)
 }
 
 function formatDate(iso: string | null): string {
@@ -46,20 +46,15 @@ export function RankingTable({ data, title = "Student Rankings" }: RankingTableP
   }
 
   const sorted = [...data].sort((a, b) => {
-    let cmp = 0
-    if (sortKey === "rank") cmp = 0
-    else if (sortKey === "name") cmp = a.name.localeCompare(b.name)
-    else if (sortKey === "totalXp") cmp = a.totalXp - b.totalXp
-    else cmp = a.activityCount - b.activityCount
-
-    return sortDir === "asc" ? cmp : -cmp
+    const mul = sortDir === "asc" ? 1 : -1
+    if (sortKey === "name") return mul * a.name.localeCompare(b.name)
+    if (sortKey === "totalXp") return mul * (a.totalXp - b.totalXp)
+    return mul * (a.activityCount - b.activityCount)
   })
 
   const ranked = sorted.map((entry, i) => ({
     ...entry,
-    rank: sortKey === "rank"
-      ? (sortDir === "asc" ? i + 1 : sorted.length - i)
-      : i + 1,
+    rank: sortKey === "rank" ? (sortDir === "asc" ? i + 1 : sorted.length - i) : i + 1,
   }))
 
   if (!data.length) {
@@ -69,7 +64,9 @@ export function RankingTable({ data, title = "Student Rankings" }: RankingTableP
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-8">No ranking data available</p>
+          <p className="text-muted-foreground py-8 text-center text-sm">
+            No ranking data available
+          </p>
         </CardContent>
       </Card>
     )
@@ -87,19 +84,25 @@ export function RankingTable({ data, title = "Student Rankings" }: RankingTableP
               <TableHead className="w-16">#</TableHead>
               <TableHead
                 className="cursor-pointer select-none"
-                onClick={() => handleSort("name")}
+                onClick={() => {
+                  handleSort("name")
+                }}
               >
                 Student {sortKey === "name" ? (sortDir === "asc" ? "↑" : "↓") : ""}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none text-right"
-                onClick={() => handleSort("totalXp")}
+                className="cursor-pointer text-right select-none"
+                onClick={() => {
+                  handleSort("totalXp")
+                }}
               >
                 Total XP {sortKey === "totalXp" ? (sortDir === "asc" ? "↑" : "↓") : ""}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none text-right"
-                onClick={() => handleSort("activityCount")}
+                className="cursor-pointer text-right select-none"
+                onClick={() => {
+                  handleSort("activityCount")
+                }}
               >
                 Activities {sortKey === "activityCount" ? (sortDir === "asc" ? "↑" : "↓") : ""}
               </TableHead>
@@ -109,13 +112,11 @@ export function RankingTable({ data, title = "Student Rankings" }: RankingTableP
           <TableBody>
             {ranked.map((entry) => (
               <TableRow key={entry.userId}>
-                <TableCell className="font-medium">
-                  {getMedal(entry.rank)}
-                </TableCell>
+                <TableCell className="font-medium">{getMedal(entry.rank)}</TableCell>
                 <TableCell>
                   <div>
                     <p className="font-medium">{entry.name || "Unknown"}</p>
-                    <p className="text-xs text-muted-foreground">{entry.email}</p>
+                    <p className="text-muted-foreground text-xs">{entry.email}</p>
                   </div>
                 </TableCell>
                 <TableCell className="text-right">{entry.totalXp.toLocaleString()}</TableCell>

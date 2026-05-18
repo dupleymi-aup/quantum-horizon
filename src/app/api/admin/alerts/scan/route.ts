@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { db } from "@/lib/db"
@@ -31,7 +31,7 @@ async function POSTHandler() {
       select: { id: true, name: true, email: true, createdAt: true },
     })
 
-    const newAlerts: { userId: string; type: string; message: string; severity: string }[] = []
+    const newAlerts: Array<{ userId: string; type: string; message: string; severity: string }> = []
 
     for (const user of allUsers) {
       // Skip users registered less than 14 days ago
@@ -57,7 +57,7 @@ async function POSTHandler() {
         newAlerts.push({
           userId: user.id,
           type: "inactive_student",
-          message: `${user.name || user.email} has been inactive for 14+ days`,
+          message: `${user.name ?? user.email ?? "Unknown user"} has been inactive for 14+ days`,
           severity: "warning",
         })
       }
@@ -66,7 +66,7 @@ async function POSTHandler() {
         newAlerts.push({
           userId: user.id,
           type: "declining_activity",
-          message: `${user.name || user.email} activity dropped ${Math.round((1 - recentCount / prevCount) * 100)}% compared to previous period`,
+          message: `${user.name ?? user.email ?? "Unknown user"} activity dropped ${String(Math.round((1 - recentCount / prevCount) * 100))}% compared to previous period`,
           severity: "info",
         })
       }
@@ -75,7 +75,7 @@ async function POSTHandler() {
         newAlerts.push({
           userId: user.id,
           type: "low_engagement",
-          message: `${user.name || user.email} has progress in only ${progressCount} topic(s)`,
+          message: `${user.name ?? user.email ?? "Unknown user"} has progress in only ${String(progressCount)} topic(s)`,
           severity: progressCount === 0 ? "critical" : "warning",
         })
       }
