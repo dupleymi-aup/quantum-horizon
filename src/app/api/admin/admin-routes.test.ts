@@ -24,6 +24,7 @@ vi.mock("@/lib/db", () => ({
       count: vi.fn(),
       findMany: vi.fn(),
       groupBy: vi.fn(),
+      aggregate: vi.fn(),
     },
     userSession: {
       count: vi.fn(),
@@ -43,6 +44,7 @@ vi.mock("@/lib/db", () => ({
     },
     grade: {
       findMany: vi.fn(),
+      groupBy: vi.fn(),
       upsert: vi.fn(),
     },
     assessment: {
@@ -117,6 +119,8 @@ const { GET: AlertsGET, POST: AlertsPOST, PATCH: AlertsPATCH } = await import(".
 const { POST: AlertsScanPOST } = await import("./alerts/scan/route")
 const { GET: LiveGET } = await import("./live/route")
 const { GET: ReportsGET } = await import("./reports/route")
+const { GET: StudentPerformanceGET } = await import("./reports/student-performance/route")
+const { GET: ClassPerformanceGET } = await import("./reports/class-performance/route")
 const { requireAdminRole, isAuthError } = await import("@/lib/auth-helpers")
 
 const mockAdminUser = { user: { id: "admin-1", email: "admin@test.com", role: "ADMIN" } }
@@ -1151,5 +1155,134 @@ describe("auth-helpers (admin)", () => {
   it("should allow MODERATOR role", async () => {
     const result = await requireAdminRole({ user: { id: "mod-1", role: "MODERATOR" } } as never)
     expect(isAuthError(result)).toBe(false)
+  })
+})
+
+// ==================== STUDENT PERFORMANCE REPORT ====================
+
+describe("api/admin/reports/student-performance", () => {
+  const mockStudent = { id: "student-1", name: "Test Student", email: "test@test.com", createdAt: new Date("2026-01-01") }
+  const mockAssessment = { title: "Test Assessment", topic: "quantum", maxScore: 100 }
+  const mockGrades = [
+    { id: "g1", assessmentId: "a1", userId: "student-1", score: 85, maxScore: 100, completedAt: new Date("2026-03-01"), assessment: mockAssessment },
+    { id: "g2", assessmentId: "a2", userId: "student-1", score: 70, maxScore: 100, completedAt: new Date("2026-04-01"), assessment: { ...mockAssessment, title: "Assessment 2" } },
+  ]
+
+  it("should return student performance report", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    vi.mocked(db.user.findUnique).mockResolvedValue(mockStudent)
+    vi.mocked(db.grade.findMany).mockResolvedValue(mockGrades as never[])
+    vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
+    vi.mocked(db.userActivity.aggregate).mockResolvedValue({ _sum: { xpGained: 500 }, _count: 20 } as never)
+
+    const response = await StudentPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/student-performance?userId=student-1")
+    )
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.success).toBe(true)
+    expect(data.data.student.id).toBe("student-1")
+    expect(data.data.overall.avgScore).toBe(78)
+    expect(data.data.overall.totalXp).toBe(500)
+    expect(data.data.byTopic).toHaveLength(1)
+    expect(data.data.overall.overallMastery).toBe("proficient")
+    expect(data.data.trendDirection).toBe("declining")
+  })
+
+  it("should return 400 without userId", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    const response = await StudentPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/student-performance")
+    )
+    expect(response.status).toBe(400)
+  })
+
+  it("should return 404 for unknown user", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    vi.mocked(db.user.findUnique).mockResolvedValue(null)
+    const response = await StudentPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/student-performance?userId=nonexistent")
+    )
+    expect(response.status).toBe(404)
+  })
+
+  it("should handle empty grades", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    vi.mocked(db.user.findUnique).mockResolvedValue(mockStudent)
+    vi.mocked(db.grade.findMany).mockResolvedValue([])
+    vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
+    vi.mocked(db.userActivity.aggregate).mockResolvedValue({ _sum: { xpGained: 0 }, _count: 0 } as never)
+
+    const response = await StudentPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/student-performance?userId=student-1")
+    )
+    const data = await response.json()
+    expect(response.status).toBe(200)
+    expect(data.data.overall.totalTaken).toBe(0)
+    expect(data.data.weakestTopic).toBeNull()
+  })
+
+  it("should return 401 for unauthenticated", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(null)
+    const response = await StudentPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/student-performance?userId=student-1")
+    )
+    expect(response.status).toBe(401)
+  })
+})
+
+// ==================== CLASS PERFORMANCE REPORT ====================
+
+describe("api/admin/reports/class-performance", () => {
+  it("should return class performance report", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    vi.mocked(db.user.count).mockResolvedValue(30)
+    vi.mocked(db.grade.groupBy).mockResolvedValue([{ userId: "u1" }] as never[])
+    vi.mocked(db.grade.findMany).mockResolvedValue([
+      { id: "g1", assessmentId: "a1", userId: "u1", score: 85, maxScore: 100, completedAt: new Date(), assessment: { title: "Test", topic: "quantum", maxScore: 100 } },
+      { id: "g2", assessmentId: "a2", userId: "u2", score: 45, maxScore: 100, completedAt: new Date(), assessment: { title: "Test 2", topic: "quantum", maxScore: 100 } },
+    ] as never[])
+    vi.mocked(db.user.findMany).mockResolvedValue([
+      { id: "u1", name: "Alice", email: "alice@test.com" },
+      { id: "u2", name: "Bob", email: "bob@test.com" },
+    ] as never[])
+
+    const response = await ClassPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/class-performance")
+    )
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.success).toBe(true)
+    expect(data.data.totalStudents).toBe(30)
+    expect(data.data.gradedStudentCount).toBe(1)
+    expect(data.data.overall.avgScore).toBe(65)
+    expect(data.data.overall.passRate).toBe(50)
+    expect(data.data.topStudents).toHaveLength(2)
+    expect(data.data.mostDifficultAssessments).toHaveLength(2)
+  })
+
+  it("should handle empty grades", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
+    vi.mocked(db.user.count).mockResolvedValue(30)
+    vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
+    vi.mocked(db.grade.findMany).mockResolvedValue([] as never[])
+
+    const response = await ClassPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/class-performance")
+    )
+    const data = await response.json()
+    expect(response.status).toBe(200)
+    expect(data.data.overall.totalGrades).toBe(0)
+    expect(data.data.topStudents).toHaveLength(0)
+  })
+
+  it("should return 401 for unauthenticated", async () => {
+    vi.mocked(getServerSession).mockResolvedValue(null)
+    const response = await ClassPerformanceGET(
+      new NextRequest("http://localhost/api/admin/reports/class-performance")
+    )
+    expect(response.status).toBe(401)
   })
 })

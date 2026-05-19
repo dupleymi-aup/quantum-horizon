@@ -22,7 +22,9 @@ import {
 } from "@/components/admin/admin-skeleton"
 import { useAdminUsersList, type AdminUser } from "@/hooks/api/use-admin-analytics"
 import { useStudentPerformanceReport, type MasteryLevel } from "@/hooks/api/use-admin-reports"
+import { escapeCSV, buildCSV, downloadCSV } from "@/lib/csv"
 import { Search, X, TrendingUp, Award, AlertTriangle, FileText, Download, Target, ArrowUp, ArrowDown, Minus } from "lucide-react"
+import { escapeCSV, buildCSV, downloadCSV } from "@/lib/csv"
 
 const MASTERY_COLORS: Record<MasteryLevel, string> = {
   advanced: "text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400",
@@ -61,7 +63,6 @@ export default function AdminStudentPerformanceReportPage() {
 
   const handleExportCSV = () => {
     if (!data?.byTopic.length) return
-
     const headers = ["Topic", "First Score", "Latest Score", "Improvement", "Avg Score", "Mastery", "Class Avg", "vs Class Avg", "Assessments"]
     const rows = data.byTopic.map((t) => [
       escapeCSV(t.topic),
@@ -74,15 +75,7 @@ export default function AdminStudentPerformanceReportPage() {
       String(t.vsClassAvg),
       String(t.assessmentsTaken),
     ])
-
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `student_performance_${data.student.name ?? selectedId.slice(-4)}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCSV(buildCSV(headers, rows), `student_performance_${data.student.name ?? selectedId.slice(-4)}.csv`)
   }
 
   if (error) {

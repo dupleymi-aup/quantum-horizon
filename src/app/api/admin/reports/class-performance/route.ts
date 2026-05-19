@@ -11,7 +11,7 @@ const logger = createLogger("api:admin:reports:class-performance")
 async function GETHandler() {
   try {
     const session = await getServerSession(authOptions)
-    const authResult = requireAdminRole(session)
+    const authResult = await requireAdminRole(session)
     if (isAuthError(authResult)) {
       return adminJson({ error: authResult.error }, { status: authResult.status })
     }

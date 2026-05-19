@@ -15,21 +15,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 import { useAdminPerformanceAnalytics } from "@/hooks/api/use-admin-analytics"
-
-function escapeCSV(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
-}
+import { escapeCSV, buildCSV, downloadCSV } from "@/lib/csv"
 
 export default function AdminPerformancePage() {
   const { data, isLoading, error, refetch } = useAdminPerformanceAnalytics()
 
   const handleExportCSV = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!data?.rankings?.length) return
-
     const headers = ["Rank", "Name", "Email", "Total XP", "Activities", "Last Active"]
     const rows = data.rankings.map((r, i) => [
       String(i + 1),
@@ -39,15 +31,7 @@ export default function AdminPerformancePage() {
       String(r.activityCount),
       escapeCSV(r.lastActive ? new Date(r.lastActive).toLocaleDateString() : "Never"),
     ])
-
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "student_rankings.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCSV(buildCSV(headers, rows), "student_rankings.csv")
   }
 
   if (error) {

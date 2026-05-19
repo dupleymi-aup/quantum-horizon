@@ -18,14 +18,8 @@ import {
   AdminTableSkeleton,
 } from "@/components/admin/admin-skeleton"
 import { useClassPerformanceReport } from "@/hooks/api/use-admin-reports"
+import { escapeCSV, buildMultiSectionCSV, downloadCSV } from "@/lib/csv"
 import { Download, Users, CheckCircle, Award, TrendingUp, AlertTriangle, FileText } from "lucide-react"
-
-function escapeCSV(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
-}
 
 export default function AdminClassPerformanceReportPage() {
   const { data, isLoading, error, refetch } = useClassPerformanceReport()
@@ -33,51 +27,35 @@ export default function AdminClassPerformanceReportPage() {
   const handleExportCSV = () => {
     if (!data) return
 
-    const sections: string[] = []
+    const overallRows = [
+      ["Total Students", String(data.totalStudents)],
+      ["Graded Students", String(data.gradedStudentCount)],
+      ["Average Score", `${String(data.overall.avgScore)}%`],
+      ["Min Score", `${String(data.overall.minScore)}%`],
+      ["Max Score", `${String(data.overall.maxScore)}%`],
+      ["Pass Rate", `${String(data.overall.passRate)}%`],
+      ["Total Grades", String(data.overall.totalGrades)],
+    ]
 
-    sections.push("Class Performance Report")
-    sections.push(`Generated: ${new Date().toLocaleDateString()}`)
-    sections.push("")
+    const gradeDistRows = data.gradeDistribution.map((d) => [d.range, String(d.count)])
 
-    sections.push("Overall Statistics")
-    sections.push(`Total Students,${String(data.totalStudents)}`)
-    sections.push(`Graded Students,${String(data.gradedStudentCount)}`)
-    sections.push(`Average Score,${String(data.overall.avgScore)}%`)
-    sections.push(`Min Score,${String(data.overall.minScore)}%`)
-    sections.push(`Max Score,${String(data.overall.maxScore)}%`)
-    sections.push(`Pass Rate,${String(data.overall.passRate)}%`)
-    sections.push(`Total Grades,${String(data.overall.totalGrades)}`)
-    sections.push("")
+    const topicRows = data.byTopic.map((t) => [
+      escapeCSV(t.topic), `${String(t.avgScore)}%`, String(t.totalAttempts), `${String(t.passRate)}%`,
+    ])
 
-    sections.push("Grade Distribution")
-    sections.push("Range,Count")
-    for (const d of data.gradeDistribution) {
-      sections.push(`${d.range},${String(d.count)}`)
-    }
-    sections.push("")
+    const topStudentRows = data.topStudents.map((s, i) => [
+      String(i + 1), escapeCSV(s.name), `${String(s.avgScore)}%`, String(s.assessmentsTaken),
+    ])
 
-    sections.push("Performance by Topic")
-    sections.push("Topic,Avg Score,Attempts,Pass Rate")
-    for (const t of data.byTopic) {
-      sections.push(`${escapeCSV(t.topic)},${String(t.avgScore)}%,${String(t.totalAttempts)},${String(t.passRate)}%`)
-    }
-    sections.push("")
-
-    sections.push("Top Students")
-    sections.push("Rank,Name,Avg Score,Assessments")
-    for (let i = 0; i < data.topStudents.length; i++) {
-      const s = data.topStudents[i]
-      sections.push(`${String(i + 1)},${escapeCSV(s.name)},${String(s.avgScore)}%,${String(s.assessmentsTaken)}`)
-    }
-
-    const csv = sections.join("\n")
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "class_performance_report.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCSV(
+      buildMultiSectionCSV([
+        { title: "Class Performance Report", headers: ["Metric", "Value"], rows: overallRows },
+        { title: "Grade Distribution", headers: ["Range", "Count"], rows: gradeDistRows },
+        { title: "Performance by Topic", headers: ["Topic", "Avg Score", "Attempts", "Pass Rate"], rows: topicRows },
+        { title: "Top Students", headers: ["Rank", "Name", "Avg Score", "Assessments"], rows: topStudentRows },
+      ]),
+      "class_performance_report.csv"
+    )
   }
 
   if (error) {
