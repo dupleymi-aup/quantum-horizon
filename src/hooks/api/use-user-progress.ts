@@ -158,3 +158,51 @@ export function useUserProgress() {
     updateProgress,
   }
 }
+
+interface AchievementData {
+  id: string
+  userId: string
+  achievementId: string
+  progress: number
+  target: number
+  unlockedAt: string | null
+}
+
+interface AchievementResponse {
+  success: boolean
+  data: AchievementData
+  newlyUnlocked?: boolean
+  unlocked?: boolean
+  xpReward?: number
+}
+
+const ACHIEVEMENTS_QUERY_KEY = ["achievements"] as const
+
+/**
+ * Хук для добавления/разблокировки достижения
+ */
+export function useAddAchievement() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (body: { achievementId: string; progress?: number; target?: number }) => {
+      const response = await fetchWithTimeout("/api/achievements", {
+        timeoutMs: 10000,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) return null
+        if (response.status === 409) return null // already unlocked
+        throw new Error(`HTTP error! status: ${String(response.status)}`)
+      }
+
+      return (await response.json()) as AchievementResponse
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ACHIEVEMENTS_QUERY_KEY })
+    },
+  })
+}

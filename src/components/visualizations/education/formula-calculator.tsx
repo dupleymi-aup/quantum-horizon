@@ -2,14 +2,17 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n/use-i18n"
 
 type Category = "mechanics" | "electromagnetism" | "quantum" | "relativity"
+
+type UnitKey = "J" | "N" | "kg_ms" | "W" | "Pa" | "ms" | "V" | "Ohm" | "F" | "T" | "m" | "eV" | "s" | "kg" | "C" | "empty"
 
 interface Formula {
   id: string
   name: string
   inputs: string[]
-  unit: string
+  unit: UnitKey
   calc: (inputs: Record<string, number>) => number
 }
 
@@ -19,77 +22,77 @@ const FORMULAS: Record<Category, Formula[]> = {
       id: "kinetic_energy",
       name: "E = ½mv²",
       inputs: ["m", "v"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => 0.5 * i.m * i.v * i.v,
     },
     {
       id: "potential_energy",
       name: "E = mgh",
       inputs: ["m", "g", "h"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => i.m * i.g * i.h,
     },
-    { id: "force", name: "F = ma", inputs: ["m", "a"], unit: "Н", calc: (i) => i.m * i.a },
-    { id: "momentum", name: "p = mv", inputs: ["m", "v"], unit: "кг·м/с", calc: (i) => i.m * i.v },
+    { id: "force", name: "F = ma", inputs: ["m", "a"], unit: "N", calc: (i) => i.m * i.a },
+    { id: "momentum", name: "p = mv", inputs: ["m", "v"], unit: "kg_ms", calc: (i) => i.m * i.v },
     {
       id: "work",
       name: "W = F·s·cos(θ)",
       inputs: ["F", "s", "theta"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => i.F * i.s * Math.cos((i.theta * Math.PI) / 180),
     },
-    { id: "power", name: "P = W/t", inputs: ["W", "t"], unit: "Вт", calc: (i) => i.W / i.t },
-    { id: "pressure", name: "P = F/S", inputs: ["F", "S"], unit: "Па", calc: (i) => i.F / i.S },
+    { id: "power", name: "P = W/t", inputs: ["W", "t"], unit: "W", calc: (i) => i.W / i.t },
+    { id: "pressure", name: "P = F/S", inputs: ["F", "S"], unit: "Pa", calc: (i) => i.F / i.S },
     {
       id: "velocity_freefall",
       name: "v = √(2gh)",
       inputs: ["g", "h"],
-      unit: "м/с",
+      unit: "ms",
       calc: (i) => Math.sqrt(2 * i.g * i.h),
     },
   ],
   electromagnetism: [
-    { id: "ohm_law", name: "U = IR", inputs: ["I", "R"], unit: "В", calc: (i) => i.I * i.R },
+    { id: "ohm_law", name: "U = IR", inputs: ["I", "R"], unit: "V", calc: (i) => i.I * i.R },
     {
       id: "power_electric",
       name: "P = UI",
       inputs: ["U", "I"],
-      unit: "Вт",
+      unit: "W",
       calc: (i) => i.U * i.I,
     },
     {
       id: "resistance",
       name: "R = ρL/S",
       inputs: ["rho", "L", "S"],
-      unit: "Ом",
+      unit: "Ohm",
       calc: (i) => (i.rho * i.L) / i.S,
     },
     {
       id: "coulomb",
       name: "F = kq₁q₂/r²",
       inputs: ["q1", "q2", "r"],
-      unit: "Н",
+      unit: "N",
       calc: (i) => (8.99e9 * i.q1 * i.q2) / (i.r * i.r),
     },
     {
       id: "capacitance",
       name: "C = ε₀εS/d",
       inputs: ["epsilon", "S", "d"],
-      unit: "Ф",
+      unit: "F",
       calc: (i) => (8.85e-12 * i.epsilon * i.S) / i.d,
     },
     {
       id: "energy_capacitor",
       name: "E = ½CU²",
       inputs: ["C", "U"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => 0.5 * i.C * i.U * i.U,
     },
     {
       id: "magnetic_force",
       name: "F = BILsin(θ)",
       inputs: ["B", "I", "L", "theta"],
-      unit: "Н",
+      unit: "N",
       calc: (i) => i.B * i.I * i.L * Math.sin((i.theta * Math.PI) / 180),
     },
   ],
@@ -98,43 +101,43 @@ const FORMULAS: Record<Category, Formula[]> = {
       id: "photon_energy",
       name: "E = hf",
       inputs: ["f"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => 6.626e-34 * i.f,
     },
-    { id: "de_broglie", name: "λ = h/p", inputs: ["p"], unit: "м", calc: (i) => 6.626e-34 / i.p },
+    { id: "de_broglie", name: "λ = h/p", inputs: ["p"], unit: "m", calc: (i) => 6.626e-34 / i.p },
     {
       id: "de_broglie_mv",
       name: "λ = h/mv",
       inputs: ["m", "v"],
-      unit: "м",
+      unit: "m",
       calc: (i) => 6.626e-34 / (i.m * i.v),
     },
     {
       id: "uncertainty_xp",
       name: "Δx·Δp ≥ ℏ/2",
       inputs: ["delta_x"],
-      unit: "кг·м/с",
+      unit: "kg_ms",
       calc: (i) => 1.055e-34 / (2 * i.delta_x),
     },
     {
       id: "energy_levels",
       name: "Eₙ = -13.6/n² эВ",
       inputs: ["n"],
-      unit: "эВ",
+      unit: "eV",
       calc: (i) => -13.6 / (i.n * i.n),
     },
     {
       id: "photon_momentum",
       name: "p = h/λ",
       inputs: ["lambda"],
-      unit: "кг·м/с",
+      unit: "kg_ms",
       calc: (i) => 6.626e-34 / i.lambda,
     },
     {
       id: "photoelectric",
       name: "Eₖ = hf - A",
       inputs: ["f", "A"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => 6.626e-34 * i.f - i.A,
     },
   ],
@@ -143,90 +146,49 @@ const FORMULAS: Record<Category, Formula[]> = {
       id: "lorentz_factor",
       name: "γ = 1/√(1-v²/c²)",
       inputs: ["v_fraction"],
-      unit: "",
+      unit: "empty",
       calc: (i) => 1 / Math.sqrt(1 - i.v_fraction * i.v_fraction),
     },
     {
       id: "time_dilation",
       name: "t' = t/γ",
       inputs: ["t", "v_fraction"],
-      unit: "с",
+      unit: "s",
       calc: (i) => i.t / (1 / Math.sqrt(1 - i.v_fraction * i.v_fraction)),
     },
     {
       id: "length_contraction",
       name: "L' = L/γ",
       inputs: ["L", "v_fraction"],
-      unit: "м",
+      unit: "m",
       calc: (i) => i.L * Math.sqrt(1 - i.v_fraction * i.v_fraction),
     },
     {
       id: "mass_energy",
       name: "E = mc²",
       inputs: ["m"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => i.m * 8.98755179e16,
     },
     {
       id: "relativistic_mass",
       name: "m' = γm₀",
       inputs: ["m0", "v_fraction"],
-      unit: "кг",
+      unit: "kg",
       calc: (i) => i.m0 / Math.sqrt(1 - i.v_fraction * i.v_fraction),
     },
     {
       id: "relativistic_ke",
       name: "Eₖ = (γ-1)mc²",
       inputs: ["m", "v_fraction"],
-      unit: "Дж",
+      unit: "J",
       calc: (i) => (1 / Math.sqrt(1 - i.v_fraction * i.v_fraction) - 1) * i.m * 8.98755179e16,
     },
   ],
 }
 
-const INPUT_LABELS: Record<string, string> = {
-  m: "Масса m (кг)",
-  v: "Скорость v (м/с)",
-  g: "Ускорение g (м/с²)",
-  h: "Высота h (м)",
-  a: "Ускорение a (м/с²)",
-  F: "Сила F (Н)",
-  s: "Расстояние s (м)",
-  theta: "Угол θ (°)",
-  W: "Работа W (Дж)",
-  t: "Время t (с)",
-  S: "Площадь S (м²)",
-  I: "Сила тока I (А)",
-  R: "Сопротивление R (Ом)",
-  U: "Напряжение U (В)",
-  P: "Мощность P (Вт)",
-  rho: "Уд. сопротивление ρ (Ом·м)",
-  L: "Длина L (м)",
-  q1: "Заряд q₁ (Кл)",
-  q2: "Заряд q₂ (Кл)",
-  r: "Расстояние r (м)",
-  epsilon: "Диэл. проницаемость ε",
-  d: "Расстояние d (м)",
-  C: "Ёмкость C (Ф)",
-  B: "Индукция B (Тл)",
-  f: "Частота f (Гц)",
-  p: "Импульс p (кг·м/с)",
-  lambda: "Длина волны λ (м)",
-  delta_x: "Неопр. позиции Δx (м)",
-  n: "Квантовое число n",
-  A: "Работа выхода A (Дж)",
-  v_fraction: "Скорость v/c (0-0.999)",
-  m0: "Масса покоя m₀ (кг)",
-}
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  mechanics: "⚙️ Механика",
-  electromagnetism: "⚡ Электричество",
-  quantum: "⚛️ Квантовая физика",
-  relativity: "🚀 Относительность",
-}
-
 export function FormulaCalculator() {
+  const t = useI18n()
   const [category, setCategory] = useState<Category>("mechanics")
   const [formula, setFormula] = useState("kinetic_energy")
   const [inputs, setInputs] = useState<Record<string, string>>({})
@@ -248,27 +210,31 @@ export function FormulaCalculator() {
       for (const key of currentFormula.inputs) {
         const val = parseFloat(inputs[key] || "0")
         if (isNaN(val)) {
-          setResult("Ошибка: введите корректные числа")
+          setResult(t("formulaCalculator.errorInput"))
           return
         }
         values[key] = val
       }
       const res = currentFormula.calc(values)
       if (isNaN(res) || !isFinite(res)) {
-        setResult("Ошибка: неверный результат")
+        setResult(t("formulaCalculator.errorResult"))
         return
       }
       setResult(res.toExponential(6))
       setResultUnit(currentFormula.unit)
     } catch {
-      setResult("Ошибка вычисления")
+      setResult(t("formulaCalculator.errorCalc"))
     }
   }
+
+  const unitLabel = resultUnit ? t(`formulaCalculator.units.${resultUnit}`) : ""
+
+  const categories: Category[] = ["mechanics", "electromagnetism", "quantum", "relativity"]
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        {(Object.keys(FORMULAS) as Category[]).map((cat) => (
+        {categories.map((cat) => (
           <Button
             key={cat}
             onClick={() => {
@@ -278,13 +244,13 @@ export function FormulaCalculator() {
             size="sm"
             className={`text-xs ${category === cat ? "bg-purple-600" : ""}`}
           >
-            {CATEGORY_LABELS[cat]}
+            {t(`formulaCalculator.${cat}`)}
           </Button>
         ))}
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs text-purple-400">Выберите формулу:</label>
+        <label className="text-xs text-purple-400">{t("formulaCalculator.selectFormula")}</label>
         <div className="flex flex-wrap gap-2">
           {FORMULAS[category].map((f) => (
             <Button
@@ -307,7 +273,7 @@ export function FormulaCalculator() {
       <div className="grid grid-cols-2 gap-3">
         {currentFormula.inputs.map((input) => (
           <div key={input} className="space-y-1">
-            <label className="text-xs text-gray-400">{INPUT_LABELS[input] || input}</label>
+            <label className="text-xs text-gray-400">{t(`formulaCalculator.inputs.${input}`) || input}</label>
             <input
               type="number"
               step="any"
@@ -326,20 +292,20 @@ export function FormulaCalculator() {
         onClick={calculate}
         className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500"
       >
-        🧮 Вычислить
+        {t("formulaCalculator.calculate")}
       </Button>
 
       {result && (
         <div className="rounded-lg border border-purple-500/30 bg-gradient-to-r from-purple-900/30 to-cyan-900/30 p-4">
-          <div className="mb-1 text-xs text-purple-400">Результат:</div>
+          <div className="mb-1 text-xs text-purple-400">{t("formulaCalculator.result")}</div>
           <div className="font-mono text-2xl text-white">
-            {result} {resultUnit && <span className="text-lg text-cyan-400">{resultUnit}</span>}
+            {result} {unitLabel && <span className="text-lg text-cyan-400">{unitLabel}</span>}
           </div>
         </div>
       )}
 
       <div className="rounded-lg bg-gray-800/30 p-3 text-xs">
-        <div className="mb-2 text-gray-400">📋 Константы:</div>
+        <div className="mb-2 text-gray-400">{t("formulaCalculator.constants")}</div>
         <div className="grid grid-cols-2 gap-2 text-gray-500">
           <div>c = 2.998×10⁸ м/с</div>
           <div>h = 6.626×10⁻³⁴ Дж·с</div>

@@ -127,3 +127,204 @@ export function useClassPerformanceReport() {
     staleTime: 5 * 60 * 1000,
   })
 }
+
+// At-Risk Report Types & Hook
+export interface AtRiskStudent {
+  userId: string
+  name: string | null
+  email: string | null
+  avgScore: number
+  trendDirection: TrendDirection
+  masteryLevel: MasteryLevel
+  daysSinceLastActivity: number
+  riskFactors: string[]
+  riskScore: number
+  lastGradeDate: string | null
+  totalAssessments: number
+  weakestTopic: string | null
+}
+
+export interface AtRiskReport {
+  atRiskStudents: AtRiskStudent[]
+  summary: {
+    totalAtRisk: number
+    criticalCount: number
+    warningCount: number
+    infoCount: number
+    mostCommonRiskFactor: string
+  }
+}
+
+export function useAtRiskReport() {
+  return useQuery<AtRiskReport>({
+    queryKey: ["adminReports", "at-risk"],
+    queryFn: async () => {
+      const res = await fetchWithTimeout("/api/admin/reports/at-risk", {
+        timeoutMs: 15000,
+      })
+      return parseQueryResponse<AtRiskReport>(res)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// Topic Mastery Report Types & Hook
+export interface TopicMasteryData {
+  topic: string
+  masteryDistribution: Record<MasteryLevel, number>
+  avgScore: number
+  totalStudents: number
+  passRate: number
+  trend: Array<{ date: string; avgScore: number }>
+  weakestAssessments: Array<{ title: string; avgScore: number }>
+}
+
+export interface TopicMasteryReport {
+  topics: TopicMasteryData[]
+  overallMasteryDistribution: Record<MasteryLevel, number>
+}
+
+export function useTopicMasteryReport() {
+  return useQuery<TopicMasteryReport>({
+    queryKey: ["adminReports", "topic-mastery"],
+    queryFn: async () => {
+      const res = await fetchWithTimeout("/api/admin/reports/topic-mastery", {
+        timeoutMs: 15000,
+      })
+      return parseQueryResponse<TopicMasteryReport>(res)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// Group Comparison Report Types & Hook
+export interface GroupByTopic {
+  topic: string
+  avgScore: number
+  passRate: number
+}
+
+export interface GroupTrendPoint {
+  date: string
+  avgScore: number
+}
+
+export interface GroupComparisonData {
+  id: string
+  name: string
+  description: string | null
+  memberCount: number
+  avgScore: number
+  passRate: number
+  totalGrades: number
+  activeStudents: number
+  byTopic: GroupByTopic[]
+  trendsOverTime: GroupTrendPoint[]
+}
+
+export interface GroupComparisonReport {
+  groups: GroupComparisonData[]
+}
+
+export function useGroupComparisonReport() {
+  return useQuery<GroupComparisonReport>({
+    queryKey: ["adminReports", "group-comparison"],
+    queryFn: async () => {
+      const res = await fetchWithTimeout("/api/admin/reports/group-comparison", {
+        timeoutMs: 15000,
+      })
+      return parseQueryResponse<GroupComparisonReport>(res)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// Engagement-Grade Correlation Report Types & Hook
+export interface EngagementGradePoint {
+  userId: string
+  name: string | null
+  activityCount: number
+  totalSessionMinutes: number
+  totalXp: number
+  avgGrade: number
+  assessmentCount: number
+}
+
+export interface QuadrantStudent {
+  userId: string
+  name: string | null
+  avgGrade: number
+  activityCount: number
+}
+
+export interface CorrelationStats {
+  activityGradeCorrelation: number
+  sessionGradeCorrelation: number
+}
+
+export interface EngagementGradeCorrelation {
+  scatterData: EngagementGradePoint[]
+  quadrants: {
+    highEngagementHighGrade: QuadrantStudent[]
+    highEngagementLowGrade: QuadrantStudent[]
+    lowEngagementHighGrade: QuadrantStudent[]
+    lowEngagementLowGrade: QuadrantStudent[]
+  }
+  correlation: CorrelationStats
+  summary: {
+    totalStudents: number
+    avgActivityCount: number
+    avgGrade: number
+  }
+}
+
+export function useEngagementGradeCorrelation() {
+  return useQuery<EngagementGradeCorrelation>({
+    queryKey: ["adminReports", "engagement-grades"],
+    queryFn: async () => {
+      const res = await fetchWithTimeout("/api/admin/reports/engagement-grades", {
+        timeoutMs: 15000,
+      })
+      return parseQueryResponse<EngagementGradeCorrelation>(res)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// Learning Velocity Report Types & Hook
+export interface StudentVelocity {
+  userId: string
+  name: string | null
+  email: string | null
+  daysEnrolled: number
+  topicsCompleted: number
+  velocity: number
+  avgScoreImprovementRate: number
+  activityFrequency: number
+}
+
+export interface VelocitySummary {
+  avgVelocity: number
+  medianVelocity: number
+  fastestStudents: Array<{ userId: string; name: string | null; velocity: number }>
+  slowestStudents: Array<{ userId: string; name: string | null; velocity: number }>
+  cumulativeCompletionCurve: Array<{ day: number; avgTopicsCompleted: number }>
+}
+
+export interface LearningVelocityReport {
+  studentVelocities: StudentVelocity[]
+  summary: VelocitySummary
+}
+
+export function useLearningVelocityReport() {
+  return useQuery<LearningVelocityReport>({
+    queryKey: ["adminReports", "learning-velocity"],
+    queryFn: async () => {
+      const res = await fetchWithTimeout("/api/admin/reports/learning-velocity", {
+        timeoutMs: 15000,
+      })
+      return parseQueryResponse<LearningVelocityReport>(res)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}

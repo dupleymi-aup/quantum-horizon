@@ -7,6 +7,7 @@ import { db } from "@/lib/db"
 import { z } from "zod"
 import { sendWelcomeEmail } from "@/lib/email"
 import { createLogger } from "@/lib/logger"
+import { withRateLimit } from "@/lib/rate-limit"
 
 const logger = createLogger("api:register")
 
@@ -20,7 +21,7 @@ const registerSchema = z.object({
  * POST /api/auth/register
  * Регистрация нового пользователя
  */
-export async function POST(request: NextRequest) {
+async function POSTHandler(request: NextRequest) {
   try {
     const body = await request.json()
     const validation = registerSchema.safeParse(body)
@@ -78,9 +79,11 @@ export async function POST(request: NextRequest) {
     })
 
     // Отправка приветственного письма
-    const welcomeResult = await sendWelcomeEmail(user.email, user.name ?? undefined)
-    if (!welcomeResult.success) {
-      logger.warn("Failed to send welcome email:", welcomeResult.error)
+    if (user.email) {
+      const welcomeResult = await sendWelcomeEmail(user.email, user.name ?? undefined)
+      if (!welcomeResult.success) {
+        logger.warn("Failed to send welcome email:", welcomeResult.error)
+      }
     }
 
     return NextResponse.json(
@@ -100,3 +103,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Ошибка при регистрации" }, { status: 500 })
   }
 }
+
+export const POST = withRateLimit(POSTHandler)

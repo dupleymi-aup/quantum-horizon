@@ -257,20 +257,51 @@ export function getProgressToNextAchievement(
   stats: UserStatistics,
   achievement: Achievement
 ): number {
-  // Упрощённая логика прогресса
+  if (stats.achievements.includes(achievement.id)) return 100
+
   switch (achievement.id) {
+    // Learning
+    case "first-quiz":
+      return Math.min(100, stats.quizzesCompleted * 100)
     case "quiz-master":
       return Math.min(100, (stats.quizzesCompleted / 10) * 100)
+    case "perfect-score":
+      return stats.quizzesPassed > 0 ? 100 : 0
     case "scholar":
       return Math.min(100, (stats.quizzesCompleted / 50) * 100)
     case "phd":
       return Math.min(100, (stats.quizzesCompleted / 100) * 100)
+    // Exploration
+    case "first-visualization":
+      return Object.keys(stats.visualizationsViewed).length >= 1 ? 100 : 0
     case "explorer":
       return Math.min(100, (Object.keys(stats.visualizationsViewed).length / 10) * 100)
+    case "world-explorer":
+      return Math.min(100, (Object.keys(stats.visualizationsViewed).length / 20) * 100)
+    case "comparison-master":
+      return Math.min(100, (stats.comparisonsPerformed / 10) * 100)
+    // Mastery
+    case "preset-creator":
+      return stats.presetsCreated >= 1 ? 100 : 0
+    case "preset-master":
+      return Math.min(100, (stats.presetsCreated / 10) * 100)
     case "time-traveler":
       return Math.min(100, (stats.totalTimeSpent / 3600) * 100)
     case "dedicated-learner":
       return Math.min(100, (stats.totalTimeSpent / 36000) * 100)
+    case "quantum-master":
+      return Math.min(100, (stats.totalTimeSpent / 360000) * 100)
+    // Dedication
+    case "first-session":
+      return stats.totalSessions >= 1 ? 100 : 0
+    case "regular":
+      return Math.min(100, (stats.totalSessions / 10) * 100)
+    case "week-streak":
+      return Math.min(100, (stats.streakDays / 7) * 100)
+    case "month-streak":
+      return Math.min(100, (stats.streakDays / 30) * 100)
+    case "year-streak":
+      return Math.min(100, (stats.streakDays / 365) * 100)
     default:
       return 0
   }

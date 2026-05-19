@@ -1,9 +1,15 @@
 "use client"
 
+import { Metadata } from "next"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+
+export const metadata: Metadata = {
+  title: "Authentication Error — Quantum Horizon",
+  description: "An error occurred during authentication. Please try again.",
+}
 
 const errorMessages: Record<string, { title: string; description: string }> = {
   Configuration: {

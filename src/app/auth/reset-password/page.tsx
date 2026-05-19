@@ -1,5 +1,6 @@
 "use client"
 
+import { Metadata } from "next"
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -9,6 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
+
+export const metadata: Metadata = {
+  title: "Reset Password — Quantum Horizon",
+  description: "Set a new password for your Quantum Horizon account.",
+}
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams()

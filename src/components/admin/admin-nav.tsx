@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { BarChart3, Activity, BookOpen, Users, Trophy, UserCircle, Columns, Bell, FileText, FolderOpen, TrendingUp, UserCheck, Download } from "lucide-react"
+import { BarChart3, Activity, BookOpen, Users, Trophy, UserCircle, Columns, Bell, FileText, FolderOpen, TrendingUp, UserCheck, Download, CalendarClock } from "lucide-react"
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
@@ -12,6 +12,7 @@ const ADMIN_NAV = [
   { href: "/admin/performance", label: "Performance", icon: Trophy },
   { href: "/admin/compare", label: "Compare", icon: Columns },
   { href: "/admin/alerts", label: "Insights", icon: Bell },
+  { href: "/admin/exam-deadlines", label: "Exam Deadlines", icon: CalendarClock },
   { href: "/admin/assessments", label: "Grades", icon: FileText },
   { href: "/admin/grades", label: "Grade Trends", icon: TrendingUp },
   { href: "/admin/grades/student", label: "Student Grades", icon: UserCheck },

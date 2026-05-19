@@ -120,12 +120,19 @@ model Bookmark {
 
 /// User settings
 model UserSettings {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  theme     String   @default("system")
-  language  String   @default("ru")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  theme        String   @default("system")
+  language     String   @default("ru")
+  fontSize     String   @default("normal")
+  reduceMotion Boolean  @default(false)
+  highContrast Boolean  @default(false)
+  showAnimations Boolean @default(true)
+  soundEnabled Boolean  @default(false)
+  volume       Int      @default(50)
+  autoSave     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("user_settings")
 }
@@ -243,4 +250,62 @@ model AdminAlert {
   @@index([read])
   @@index([createdAt])
   @@map("admin_alerts")
+}
+
+/// Reminder type
+enum ReminderType {
+  PERSONAL
+  STUDY
+  EXAM
+}
+
+/// User learning reminders and deadlines
+model LearningReminder {
+  id           String       @id @default(cuid())
+  userId       String
+  type         ReminderType @default(PERSONAL)
+  title        String
+  description  String?
+  topic        String?
+  deadline     DateTime
+  reminded     Boolean      @default(false)
+  reminderSentAt DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([deadline])
+  @@index([reminded])
+  @@map("learning_reminders")
+}
+
+/// Admin-managed exam deadlines
+model ExamDeadline {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  topic       String
+  examDate    DateTime
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([examDate])
+  @@index([isActive])
+  @@index([topic])
+  @@map("exam_deadlines")
+}
+
+/// User dismissal/snooze of exam notifications
+model ReminderDismissal {
+  id             String   @id @default(cuid())
+  userId         String
+  examDeadlineId String
+  dismissedAt    DateTime @default(now())
+  snoozeUntil    DateTime?
+
+  @@unique([userId, examDeadlineId])
+  @@index([userId])
+  @@map("reminder_dismissals")
 }

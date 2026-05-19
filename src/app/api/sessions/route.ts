@@ -40,6 +40,7 @@ async function POSTHandler(request: NextRequest) {
         userId: session.user.id,
         durationSec,
         topic,
+        startedAt: new Date(Date.now() - durationSec * 1000),
         endedAt: new Date(),
       },
     })
@@ -51,4 +52,32 @@ async function POSTHandler(request: NextRequest) {
   }
 }
 
+async function GETHandler() {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const sessions = await db.userSession.findMany({
+      where: { userId: session.user.id },
+      orderBy: { startedAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        topic: true,
+        startedAt: true,
+        endedAt: true,
+        durationSec: true,
+      },
+    })
+
+    return NextResponse.json({ success: true, data: sessions })
+  } catch (error) {
+    logger.error("Error fetching sessions:", error instanceof Error ? error.message : "Unknown error")
+    return NextResponse.json({ error: "Failed to fetch sessions" }, { status: 500 })
+  }
+}
+
+export const GET = withRateLimit(GETHandler)
 export const POST = withCsrf(withRateLimit(POSTHandler))

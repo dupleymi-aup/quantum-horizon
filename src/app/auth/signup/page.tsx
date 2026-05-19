@@ -1,5 +1,6 @@
 "use client"
 
+import { Metadata } from "next"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -10,6 +11,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
+
+export const metadata: Metadata = {
+  title: "Sign Up — Quantum Horizon",
+  description: "Create a free Quantum Horizon account to start learning physics interactively.",
+}
 
 export default function SignUpPage() {
   const router = useRouter()

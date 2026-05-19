@@ -116,7 +116,7 @@ async function POSTHandler(request: NextRequest) {
         })
 
         return NextResponse.json(
-          { success: true, data: updated, unlocked: true, xpReward: 10 },
+          { success: true, data: updated, newlyUnlocked: true, unlocked: true, xpReward: 10 },
           { headers: { "Cache-Control": "private, no-store" } }
         )
       }
@@ -133,7 +133,7 @@ async function POSTHandler(request: NextRequest) {
       })
 
       return NextResponse.json(
-        { success: true, data: achievement, unlocked: true, xpReward: 10 },
+        { success: true, data: achievement, newlyUnlocked: true, unlocked: true, xpReward: 10 },
         { headers: { "Cache-Control": "private, no-store" } }
       )
     }

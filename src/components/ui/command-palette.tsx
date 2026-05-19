@@ -114,15 +114,40 @@ export function CommandPalette({
       // Actions
       {
         type: "action" as const,
-        id: "fullscreen",
-        label: "⛶ Fullscreen Mode",
-        shortcut: "F11",
+        id: "laboratory",
+        label: "🔬 Physics Laboratory",
+      },
+      {
+        type: "action" as const,
+        id: "glossary",
+        label: "📖 Physics Glossary",
+      },
+      {
+        type: "action" as const,
+        id: "periodic-table",
+        label: "⚗️ Periodic Table",
+      },
+      {
+        type: "action" as const,
+        id: "flashcards",
+        label: "🃏 Physics Flashcards",
+      },
+      {
+        type: "action" as const,
+        id: "practice",
+        label: "✏️ Practice Problems",
       },
       {
         type: "action" as const,
         id: "help",
         label: "❓ Help & Shortcuts",
         shortcut: "?",
+      },
+      {
+        type: "action" as const,
+        id: "fullscreen",
+        label: "⛶ Fullscreen Mode",
+        shortcut: "F11",
       },
     ],
     []
@@ -146,6 +171,18 @@ export function CommandPalette({
         case "action":
           if (command.id === "fullscreen") {
             document.documentElement.requestFullscreen().catch(() => {})
+          } else if (command.id === "laboratory") {
+            window.location.href = "/laboratory"
+          } else if (command.id === "glossary") {
+            window.location.href = "/glossary"
+          } else if (command.id === "periodic-table") {
+            window.location.href = "/periodic-table"
+          } else if (command.id === "flashcards") {
+            window.location.href = "/flashcards"
+          } else if (command.id === "practice") {
+            window.location.href = "/practice"
+          } else if (command.id === "help") {
+            window.location.href = "/help"
           }
           setOpen(false)
           break

@@ -24,7 +24,6 @@ import { useAdminUsersList, type AdminUser } from "@/hooks/api/use-admin-analyti
 import { useStudentPerformanceReport, type MasteryLevel } from "@/hooks/api/use-admin-reports"
 import { escapeCSV, buildCSV, downloadCSV } from "@/lib/csv"
 import { Search, X, TrendingUp, Award, AlertTriangle, FileText, Download, Target, ArrowUp, ArrowDown, Minus } from "lucide-react"
-import { escapeCSV, buildCSV, downloadCSV } from "@/lib/csv"
 
 const MASTERY_COLORS: Record<MasteryLevel, string> = {
   advanced: "text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400",
@@ -38,13 +37,6 @@ const MASTERY_LABELS: Record<MasteryLevel, string> = {
   proficient: "Proficient",
   developing: "Developing",
   beginner: "Beginner",
-}
-
-function escapeCSV(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
 }
 
 export default function AdminStudentPerformanceReportPage() {

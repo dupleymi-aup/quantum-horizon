@@ -7,6 +7,8 @@ import { db } from "@/lib/db"
 import { z } from "zod"
 import { sendPasswordResetEmail } from "@/lib/email"
 import { createLogger } from "@/lib/logger"
+import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 
 const logger = createLogger("api:reset-password")
 
@@ -23,7 +25,7 @@ const requestResetSchema = z.object({
  * POST /api/auth/reset-password
  * Сброс пароля по токену
  */
-export async function POST(request: NextRequest) {
+export async function POSTHandler(request: NextRequest) {
   try {
     const body = await request.json()
     const validation = resetPasswordSchema.safeParse(body)
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
  * GET /api/auth/reset-password
  * Проверка токена сброса пароля
  */
-export async function GET(request: NextRequest) {
+export async function GETHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get("token")
@@ -118,7 +120,7 @@ export async function GET(request: NextRequest) {
  * POST /api/auth/request-reset
  * Запрос на сброс пароля (отправка email)
  */
-export async function PATCH(request: NextRequest) {
+export async function PATCHHandler(request: NextRequest) {
   try {
     const body = await request.json()
     const validation = requestResetSchema.safeParse(body)
@@ -179,3 +181,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Ошибка при запросе сброса пароля" }, { status: 500 })
   }
 }
+
+export const POST = withCsrf(withRateLimit(POSTHandler))
+export const GET = withRateLimit(GETHandler)
+export const PATCH = withCsrf(withRateLimit(PATCHHandler))

@@ -5,6 +5,7 @@ type Locale = "ru" | "en" | "zh" | "he"
 
 interface Texts {
   about: string
+  aboutDescription: string
   sections: string
   visualizations: string
   formulas: string
@@ -14,6 +15,13 @@ interface Texts {
   footer: string
   keyboard: string
   menu: string
+  tools: string
+  laboratory: string
+  glossary: string
+  periodicTable: string
+  help: string
+  flashcards: string
+  practiceProblems: string
 }
 
 interface VisualizationLabels {
@@ -36,6 +44,7 @@ interface FormulaExamples {
 const TEXTS: Record<Locale, Texts> = {
   ru: {
     about: "📚 О проекте",
+    aboutDescription: "Интерактивные визуализации физических явлений: от квантовой механики до космологии.",
     sections: "📖 Разделы",
     visualizations: "🔬 Визуализации",
     formulas: "📐 Формулы",
@@ -45,9 +54,17 @@ const TEXTS: Record<Locale, Texts> = {
     footer: "Создано с ❤️ для любителей физики",
     keyboard: "Клавиши: 1-4 разделы, M меню, Esc закрыть",
     menu: "Меню",
+    tools: "🧪 Инструменты",
+    laboratory: "Лаборатория",
+    glossary: "Глоссарий",
+    periodicTable: "Периодическая таблица",
+    help: "Помощь",
+    flashcards: "Карточки",
+    practiceProblems: "Задачи",
   },
   en: {
     about: "📚 About",
+    aboutDescription: "Interactive visualizations of physical phenomena: from quantum mechanics to cosmology.",
     sections: "📖 Sections",
     visualizations: "🔬 Visualizations",
     formulas: "📐 Formulas",
@@ -57,9 +74,17 @@ const TEXTS: Record<Locale, Texts> = {
     footer: "Made with ❤️ for physics enthusiasts",
     keyboard: "Keys: 1-4 sections, M menu, Esc close",
     menu: "Menu",
+    tools: "🧪 Tools",
+    laboratory: "Laboratory",
+    glossary: "Glossary",
+    periodicTable: "Periodic Table",
+    help: "Help",
+    flashcards: "Flashcards",
+    practiceProblems: "Practice Problems",
   },
   zh: {
     about: "📚 关于项目",
+    aboutDescription: "物理现象的交互式可视化：从量子力学到宇宙学。",
     sections: "📖 章节",
     visualizations: "🔬 可视化",
     formulas: "📐 公式",
@@ -69,9 +94,17 @@ const TEXTS: Record<Locale, Texts> = {
     footer: "为物理爱好者用❤️制作",
     keyboard: "快捷键：1-4 章节，M 菜单，Esc 关闭",
     menu: "菜单",
+    tools: "🧪 工具",
+    laboratory: "实验室",
+    glossary: "术语表",
+    periodicTable: "元素周期表",
+    help: "帮助",
+    flashcards: "抽认卡",
+    practiceProblems: "练习题",
   },
   he: {
     about: "📚 אודות",
+    aboutDescription: "הדמיות אינטראקטיביות של תופעות פיזיקליות: ממכניקת הקוונטים ועד קוסמולוגיה.",
     sections: "📖 סעיפים",
     visualizations: "🔬 ויזואליזציות",
     formulas: "📐 נוסחאות",
@@ -81,6 +114,13 @@ const TEXTS: Record<Locale, Texts> = {
     footer: "נבנה ב❤️ לחובבי פיזיקה",
     keyboard: "מקשים: 1-4 סעיפים, M תפריט, Esc סגור",
     menu: "תפריט",
+    tools: "🧪 כלים",
+    laboratory: "מעבדה",
+    glossary: "מילון מונחים",
+    periodicTable: "טבלה מחזורית",
+    help: "עזרה",
+    flashcards: "כרטיסי לימוד",
+    practiceProblems: "תרגילים",
   },
 }
 

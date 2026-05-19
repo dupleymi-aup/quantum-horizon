@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { NAV_ITEMS, type Section } from "@/lib/constants-ui"
 
@@ -10,6 +11,17 @@ interface NavigationProps {
 }
 
 export function Navigation({ activeSection, onSectionChange, isDark }: NavigationProps) {
+  const t = useTranslations("nav")
+  const locale = useLocale()
+
+  const sectionNames: Record<Section, string> = {
+    quantum: t("quantumSection"),
+    relativity: t("relativitySection"),
+    cosmos: t("cosmosSection"),
+    thermodynamics: t("thermodynamicsSection"),
+    advanced: t("advancedSection"),
+  }
+
   const handleClick = (section: Section) => {
     onSectionChange(section)
   }
@@ -76,11 +88,7 @@ export function Navigation({ activeSection, onSectionChange, isDark }: Navigatio
           >
             <div className="h-px w-8 bg-gradient-to-r from-transparent to-purple-500/50" />
             <span>
-              {activeSection === "quantum" && "Квантовая механика"}
-              {activeSection === "relativity" && "Теория относительности"}
-              {activeSection === "cosmos" && "Космология"}
-              {activeSection === "thermodynamics" && "Термодинамика"}
-              {activeSection === "advanced" && "Продвинутые темы"}
+              {sectionNames[activeSection]}
             </span>
             <div className="h-px w-8 bg-gradient-to-l from-transparent to-purple-500/50" />
           </div>

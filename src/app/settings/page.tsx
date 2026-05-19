@@ -1,7 +1,13 @@
+import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/app/api/auth/authOptions"
 import { UserSettings } from "@/components/ui/user-settings"
+
+export const metadata: Metadata = {
+  title: "Settings — Quantum Horizon",
+  description: "Customize your theme, language, accessibility, and notification preferences.",
+}
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions)

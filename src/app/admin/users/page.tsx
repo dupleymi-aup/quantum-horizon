@@ -34,10 +34,11 @@ function formatShortDate(iso: string | null): string {
 export default function AdminUsersPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
-  const [roleFilter, setRoleFilter] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
   const [inputValue, setInputValue] = useState("")
 
-  const { data, isLoading, error, refetch } = useAdminUsersList(page, search, roleFilter)
+  const effectiveRole = roleFilter === "all" ? "" : roleFilter
+  const { data, isLoading, error, refetch } = useAdminUsersList(page, search, effectiveRole)
 
   const handleSearch = () => {
     setSearch(inputValue)
@@ -82,7 +83,7 @@ export default function AdminUsersPage() {
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All roles</SelectItem>
+            <SelectItem value="all">All roles</SelectItem>
             <SelectItem value="USER">User</SelectItem>
             <SelectItem value="MODERATOR">Moderator</SelectItem>
             <SelectItem value="ADMIN">Admin</SelectItem>

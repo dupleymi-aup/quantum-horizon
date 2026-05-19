@@ -161,8 +161,8 @@ export function useRemoveBookmark() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/visualizations/bookmarks?id=${id}`, {
+    mutationFn: async (topic: string) => {
+      const response = await fetch(`/api/visualizations/bookmarks?topic=${encodeURIComponent(topic)}`, {
         method: "DELETE",
       })
       if (!response.ok) {
@@ -204,12 +204,11 @@ export function useVisualizationState(topic: string) {
     return void updateProgress.mutateAsync({ topic, completedCount: 1 })
   }
 
-  const toggleBookmark = async (_title: string) => {
+  const toggleBookmark = async (title: string) => {
     if (isBookmarked) {
-      // Need bookmark ID to remove - requires additional implementation
-      return null
+      return removeBookmark.mutateAsync(topic)
     } else {
-      return addBookmark.mutateAsync({ topic, title: _title })
+      return addBookmark.mutateAsync({ topic, title })
     }
   }
 

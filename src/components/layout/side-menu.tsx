@@ -106,7 +106,7 @@ export function SideMenu({
                 <span>📖</span> {texts.about}
               </h2>
               <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                Интерактивные визуализации физических явлений: от квантовой механики до космологии.
+                {texts.aboutDescription}
               </p>
             </div>
 
@@ -147,6 +147,85 @@ export function SideMenu({
                     )}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Tools */}
+            <div>
+              <h3
+                className={`mb-3 flex items-center gap-2 text-sm font-semibold ${
+                  isDark ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                <span>🧪</span> {texts.tools || "Tools"}
+              </h3>
+              <div className="space-y-1.5">
+                <a
+                  href="/laboratory"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">🔬</span>
+                  <span className="font-medium">{texts.laboratory || "Laboratory"}</span>
+                </a>
+                <a
+                  href="/glossary"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">📖</span>
+                  <span className="font-medium">{texts.glossary || "Glossary"}</span>
+                </a>
+                <a
+                  href="/periodic-table"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">⚗️</span>
+                  <span className="font-medium">{texts.periodicTable || "Periodic Table"}</span>
+                </a>
+                <a
+                  href="/help"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">❓</span>
+                  <span className="font-medium">{texts.help || "Help"}</span>
+                </a>
+                <a
+                  href="/flashcards"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">🃏</span>
+                  <span className="font-medium">{texts.flashcards || "Flashcards"}</span>
+                </a>
+                <a
+                  href="/practice"
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                    isDark
+                      ? "text-gray-300 hover:bg-white/5 hover:text-white"
+                      : "text-gray-700 hover:bg-gray-100/50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className="text-lg">✏️</span>
+                  <span className="font-medium">{texts.practiceProblems || "Practice Problems"}</span>
+                </a>
               </div>
             </div>
 

@@ -5,6 +5,8 @@ import { ReactQueryProvider } from "@/components/providers/react-query-provider"
 import { ServiceWorkerRegistration } from "@/components/pwa/service-worker-registration"
 import { PWAInstallPrompt } from "@/components/pwa/pwa-install-prompt"
 import { WebVitalsDev } from "@/components/pwa/web-vitals-dev-only"
+import { ReminderNotifications } from "@/components/reminder-notifications"
+import { AchievementNotifications } from "@/components/achievement-notifications"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { metadata } from "./metadata"
@@ -59,6 +61,8 @@ export default async function RootLayout({
           <ReactQueryProvider>
             {children}
             <Toaster />
+            <ReminderNotifications />
+            <AchievementNotifications />
             <ServiceWorkerRegistration />
             <PWAInstallPrompt />
             <WebVitalsDev />

@@ -1,7 +1,13 @@
+import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/app/api/auth/authOptions"
-import { UserProfile } from "@/components/user/user-profile"
+import { DashboardContent } from "./dashboard-content"
+
+export const metadata: Metadata = {
+  title: "Dashboard — Quantum Horizon",
+  description: "Track your physics learning progress, XP, achievements, and study activity.",
+}
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -12,7 +18,7 @@ export default async function DashboardPage() {
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Dashboard</h1>
-      <UserProfile />
+      <DashboardContent userName={session.user.name ?? "Explorer"} />
     </div>
   )
 }

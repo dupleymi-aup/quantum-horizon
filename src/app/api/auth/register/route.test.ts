@@ -35,6 +35,15 @@ vi.mock("@/lib/email", () => ({
   sendWelcomeEmail: vi.fn(() => Promise.resolve({ success: true, messageId: "mock-123" })),
 }))
 
+// Pass-through mocks for rate limiting and CSRF
+vi.mock("@/lib/rate-limit", () => ({
+  withRateLimit: vi.fn((handler: unknown) => handler),
+}))
+
+vi.mock("@/lib/csrf", () => ({
+  withCsrf: vi.fn((handler: unknown) => handler),
+}))
+
 import { hash } from "bcryptjs"
 import { db } from "@/lib/db"
 import { sendWelcomeEmail } from "@/lib/email"

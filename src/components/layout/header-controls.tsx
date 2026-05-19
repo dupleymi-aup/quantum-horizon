@@ -166,7 +166,7 @@ export function HeaderControls({
           variant="outline"
           size="icon"
           className={iconButtonClass}
-          title={isDark ? "Светлая тема" : "Тёмная тема"}
+          title={isDark ? "Switch to light theme" : "Switch to dark theme"}
         >
           <span className="text-base">{isDark ? "☀️" : "🌙"}</span>
         </Button>
