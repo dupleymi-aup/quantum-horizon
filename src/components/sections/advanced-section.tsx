@@ -5,6 +5,13 @@ import { useTranslations } from "next-intl"
 import { VisualizationCard } from "@/components/visualizations/base/visualization-card"
 import {
   GravitationalWavesVisualization,
+  DoubleSlitVisualization,
+  DarkMatterVisualization,
+  QuantumEntanglementVisualization,
+  AtomicModelVisualization,
+  RadioactiveDecayVisualization,
+  SuperconductivityVisualization,
+  StandardModelVisualization,
   FormulaCalculator,
   PhysicsTimeline,
   PhysicsQuiz,
@@ -19,7 +26,26 @@ export const AdvancedSection = memo(function AdvancedSection({ isDark }: Advance
   const t = useTranslations()
 
   return (
-    <>
+    <section aria-labelledby="advanced-heading" className="space-y-6">
+      <h2 id="advanced-heading" className="sr-only">
+        {t("advancedSection")}
+      </h2>
+      <VisualizationCard
+        title={t("doubleSlit")}
+        description={t("doubleSlitDesc")}
+        color="pink"
+        isDark={isDark}
+      >
+        <DoubleSlitVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("darkMatter")}
+        description={t("darkMatterDesc")}
+        color="purple"
+        isDark={isDark}
+      >
+        <DarkMatterVisualization isDark={isDark} />
+      </VisualizationCard>
       <VisualizationCard
         title={t("gravitationalWaves")}
         description={t("gravitationalWavesDesc")}
@@ -27,6 +53,46 @@ export const AdvancedSection = memo(function AdvancedSection({ isDark }: Advance
         isDark={isDark}
       >
         <GravitationalWavesVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("quantumEntanglement")}
+        description={t("quantumEntanglementDesc")}
+        color="pink"
+        isDark={isDark}
+      >
+        <QuantumEntanglementVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("atomicModel")}
+        description={t("atomicModelDesc")}
+        color="cyan"
+        isDark={isDark}
+      >
+        <AtomicModelVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("radioactiveDecay")}
+        description={t("radioactiveDecayDesc")}
+        color="green"
+        isDark={isDark}
+      >
+        <RadioactiveDecayVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("superconductivity")}
+        description={t("superconductivityDesc")}
+        color="cyan"
+        isDark={isDark}
+      >
+        <SuperconductivityVisualization isDark={isDark} />
+      </VisualizationCard>
+      <VisualizationCard
+        title={t("standardModel")}
+        description={t("standardModelDesc")}
+        color="yellow"
+        isDark={isDark}
+      >
+        <StandardModelVisualization isDark={isDark} />
       </VisualizationCard>
       <VisualizationCard
         title={t("calculator")}
@@ -60,6 +126,6 @@ export const AdvancedSection = memo(function AdvancedSection({ isDark }: Advance
       >
         <ScientistsBiographies />
       </VisualizationCard>
-    </>
+    </section>
   )
 })

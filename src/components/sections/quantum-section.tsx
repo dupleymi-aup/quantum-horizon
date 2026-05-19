@@ -25,7 +25,10 @@ export const QuantumSection = memo(function QuantumSection({ isDark }: QuantumSe
   const t = useTranslations()
 
   return (
-    <>
+    <section aria-labelledby="quantum-heading" className="space-y-6">
+      <h2 id="quantum-heading" className="sr-only">
+        {t("quantumSection")}
+      </h2>
       <VisualizationCard
         title={t("waveFunction")}
         description={t("waveFunctionDesc")}
@@ -114,6 +117,6 @@ export const QuantumSection = memo(function QuantumSection({ isDark }: QuantumSe
       >
         <SuperconductivityVisualization isDark={isDark} />
       </VisualizationCard>
-    </>
+    </section>
   )
 })

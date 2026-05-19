@@ -40,8 +40,8 @@ export function AnimatedBackground({ isDark, className }: AnimatedBackgroundProp
     resizeCanvas()
     window.addEventListener("resize", resizeCanvas)
 
-    // Initialize particles
-    const particleCount = Math.min(50, Math.floor(window.innerWidth / 20))
+    // Initialize particles - оптимизировано: меньше частиц для лучшей производительности
+    const particleCount = Math.min(30, Math.floor(window.innerWidth / 40)) // Было: 50, /20
     const colors = ["#a855f7", "#3b82f6", "#ec4899", "#6366f1"] // purple, blue, pink, indigo
 
     particlesRef.current = Array.from({ length: particleCount }, () => ({

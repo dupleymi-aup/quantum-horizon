@@ -3,52 +3,16 @@
 import { useState, useEffect, useCallback } from "react"
 import { useLocale } from "next-intl"
 import dynamic from "next/dynamic"
-import { SideMenu } from "@/components/layout/side-menu"
-import { HeaderControls } from "@/components/layout/header-controls"
-import { Navigation } from "@/components/layout/navigation"
-import { HeroSection } from "@/components/layout/hero-section"
-import { SiteFooter } from "@/components/layout/site-footer"
 import { useOnboarding } from "@/components/ui/onboarding-tour"
 import { useCommandPalette } from "@/components/ui/enhanced-command-palette"
 import { useHomeKeyboard } from "@/hooks/use-home-keyboard"
 import { type Section, type Language } from "@/lib/constants-ui"
 import type { Theme } from "@/types"
 
-const QuantumSection = dynamic(
-  () => import("@/components/sections/quantum-section").then((m) => m.QuantumSection),
-  { loading: () => <SectionSkeleton /> }
-)
-const RelativitySection = dynamic(
-  () => import("@/components/sections/relativity-section").then((m) => m.RelativitySection),
-  { loading: () => <SectionSkeleton /> }
-)
-const CosmosSection = dynamic(
-  () => import("@/components/sections/cosmos-section").then((m) => m.CosmosSection),
-  { loading: () => <SectionSkeleton /> }
-)
-const ThermodynamicsSection = dynamic(
-  () => import("@/components/sections/thermodynamics-section").then((m) => m.ThermodynamicsSection),
-  { loading: () => <SectionSkeleton /> }
-)
-const AdvancedSection = dynamic(
-  () => import("@/components/sections/advanced-section").then((m) => m.AdvancedSection),
-  { loading: () => <SectionSkeleton /> }
-)
-import { VisualizationCardSkeleton } from "@/components/ui/loading-skeleton"
-
-function SectionSkeleton() {
-  return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <VisualizationCardSkeleton />
-      <VisualizationCardSkeleton />
-      <VisualizationCardSkeleton />
-    </div>
-  )
-}
-
+// Lazy load heavy UI components to reduce initial bundle
 const OnboardingTour = dynamic(
   () => import("@/components/ui/onboarding-tour").then((m) => m.OnboardingTour),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 )
 
 const EnhancedCommandPalette = dynamic(
@@ -56,13 +20,63 @@ const EnhancedCommandPalette = dynamic(
   { ssr: false }
 )
 
+// Lazy load QuickActions to defer framer-motion bundle
 const QuickActions = dynamic(
   () => import("@/components/ui/quick-actions").then((m) => m.QuickActions),
+  { ssr: false, loading: () => null }
+)
+
+// Lazy load AnimatedBackground to defer canvas/animation bundle
+const AnimatedBackground = dynamic(
+  () => import("@/components/layout/animated-background").then((m) => m.AnimatedBackground),
+  { ssr: false, loading: () => null }
+)
+
+// Lazy load layout components to improve FCP
+const SideMenu = dynamic(() => import("@/components/layout/side-menu").then((m) => m.SideMenu), {
+  ssr: false,
+  loading: () => null,
+})
+const HeaderControls = dynamic(
+  () => import("@/components/layout/header-controls").then((m) => m.HeaderControls),
+  { ssr: false, loading: () => null }
+)
+const Navigation = dynamic(
+  () => import("@/components/layout/navigation").then((m) => m.Navigation),
+  { ssr: false, loading: () => null }
+)
+const HeroSection = dynamic(
+  () => import("@/components/layout/hero-section").then((m) => m.HeroSection),
+  { ssr: false, loading: () => null }
+)
+const SiteFooter = dynamic(
+  () => import("@/components/layout/site-footer").then((m) => m.SiteFooter),
+  { ssr: false, loading: () => null }
+)
+
+// Lazy load sections to reduce initial bundle size
+const QuantumSection = dynamic(
+  () => import("@/components/sections/quantum-section").then((m) => m.QuantumSection),
   { ssr: false }
 )
 
-const AnimatedBackground = dynamic(
-  () => import("@/components/layout/animated-background").then((m) => m.AnimatedBackground),
+const RelativitySection = dynamic(
+  () => import("@/components/sections/relativity-section").then((m) => m.RelativitySection),
+  { ssr: false }
+)
+
+const CosmosSection = dynamic(
+  () => import("@/components/sections/cosmos-section").then((m) => m.CosmosSection),
+  { ssr: false }
+)
+
+const ThermodynamicsSection = dynamic(
+  () => import("@/components/sections/thermodynamics-section").then((m) => m.ThermodynamicsSection),
+  { ssr: false }
+)
+
+const AdvancedSection = dynamic(
+  () => import("@/components/sections/advanced-section").then((m) => m.AdvancedSection),
   { ssr: false }
 )
 
