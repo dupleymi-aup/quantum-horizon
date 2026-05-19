@@ -1171,7 +1171,7 @@ describe("api/admin/reports/student-performance", () => {
   it("should return student performance report", async () => {
     vi.mocked(getServerSession).mockResolvedValue(mockAdminUser)
     vi.mocked(db.user.findUnique).mockResolvedValue(mockStudent)
-    vi.mocked(db.grade.findMany).mockResolvedValue(mockGrades as never[])
+    vi.mocked(db.grade.findMany).mockResolvedValue(mockGrades)
     vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
     vi.mocked(db.userActivity.aggregate).mockResolvedValue({ _sum: { xpGained: 500 }, _count: 20 } as never)
 

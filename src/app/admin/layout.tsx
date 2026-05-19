@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/app/api/auth/authOptions"
 import { ReactQueryProvider } from "@/components/providers/react-query-provider"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { AdminNav } from "@/components/admin/admin-nav"

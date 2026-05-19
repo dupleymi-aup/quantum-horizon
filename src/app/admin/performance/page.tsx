@@ -21,7 +21,7 @@ export default function AdminPerformancePage() {
   const { data, isLoading, error, refetch } = useAdminPerformanceAnalytics()
 
   const handleExportCSV = () => {
-    if (!data?.rankings?.length) return
+    if (!data?.rankings.length) return
     const headers = ["Rank", "Name", "Email", "Total XP", "Activities", "Last Active"]
     const rows = data.rankings.map((r, i) => [
       String(i + 1),
