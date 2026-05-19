@@ -6,6 +6,7 @@ import dynamic from "next/dynamic"
 import { useOnboarding } from "@/components/ui/onboarding-tour"
 import { useCommandPalette } from "@/components/ui/enhanced-command-palette"
 import { useHomeKeyboard } from "@/hooks/use-home-keyboard"
+import { useStudyTimer } from "@/hooks/use-study-timer"
 import { type Section, type Language } from "@/lib/constants-ui"
 import type { Theme } from "@/types"
 
@@ -122,6 +123,22 @@ export default function Home() {
     onMenuToggle: handleMenuToggle,
     onMenuClose: handleMenuClose,
   })
+
+  const sectionTopics: Record<Section, string> = {
+    quantum: "quantum_mechanics",
+    relativity: "relativity",
+    cosmos: "cosmology",
+    thermodynamics: "thermodynamics",
+    advanced: "advanced_physics",
+  }
+
+  const { start: startStudy, stop: stopStudy } = useStudyTimer(sectionTopics[activeSection])
+
+  // Start timer when section changes
+  useEffect(() => {
+    stopStudy()
+    startStudy()
+  }, [activeSection])
 
   const isRTL = locale === "he"
   const isDark = theme === "dark"

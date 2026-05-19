@@ -29,9 +29,9 @@ export default function OfflinePage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-900">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-900" role="main">
       <div className="max-w-md p-8 text-center">
-        <div className="mb-4 text-6xl">📡</div>
+        <div className="mb-4 text-6xl" aria-hidden="true">📡</div>
         <h1 className="mb-4 text-3xl font-bold text-white">Нет соединения</h1>
         <p className="mb-6 text-gray-300">
           Похоже, вы потеряли соединение с интернетом. Не волнуйтесь — некоторые страницы доступны
@@ -42,10 +42,11 @@ export default function OfflinePage() {
             window.location.reload()
           }}
           className="rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
+          aria-label="Попробовать снова подключиться к интернету"
         >
-          Попробовать снова
+          <span aria-hidden="true">🔄</span> Попробовать снова
         </button>
-        <div className="mt-8 rounded-lg bg-gray-800/50 p-4">
+        <div className="mt-8 rounded-lg bg-gray-800/50 p-4" role="status" aria-live="polite">
           <p className="text-sm text-gray-400">
             💡 Совет: Включите PWA для доступа к офлайн режиму
           </p>
