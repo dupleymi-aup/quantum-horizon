@@ -40,10 +40,10 @@ export default function RemindersPage() {
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
     if (diffHours < 0) return t("reminders.overdue")
-    if (diffHours === 0) return `${Math.floor(diffMs / (1000 * 60))} min left`
-    if (diffHours < 24) return `${diffHours}h left`
+    if (diffHours === 0) return `${String(Math.floor(diffMs / (1000 * 60)))} min left`
+    if (diffHours < 24) return `${String(diffHours)}h left`
     if (diffDays === 1) return t("reminders.dueToday")
-    return `${diffDays}d left`
+    return `${String(diffDays)}d left`
   }
 
   const getTypeColor = (type: string) => {
@@ -122,7 +122,7 @@ export default function RemindersPage() {
                 variant="ghost"
                 size="icon"
                 className="size-8 shrink-0 text-muted-foreground hover:text-red-500"
-                onClick={() => handleDeleteReminder(r.id)}
+                onClick={() => void handleDeleteReminder(r.id)}
                 disabled={isDeleting}
               >
                 <Trash2 className="size-4" />
