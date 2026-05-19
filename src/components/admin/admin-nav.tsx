@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { BarChart3, Activity, BookOpen, Users, Trophy, UserCircle, Columns, Bell, FileText, FolderOpen, TrendingUp, UserCheck } from "lucide-react"
+import { BarChart3, Activity, BookOpen, Users, Trophy, UserCircle, Columns, Bell, FileText, FolderOpen, TrendingUp, UserCheck, Download } from "lucide-react"
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
@@ -16,6 +16,7 @@ const ADMIN_NAV = [
   { href: "/admin/grades", label: "Grade Trends", icon: TrendingUp },
   { href: "/admin/grades/student", label: "Student Grades", icon: UserCheck },
   { href: "/admin/groups", label: "Groups", icon: FolderOpen },
+  { href: "/admin/reports", label: "Reports", icon: Download },
   { href: "/admin/users", label: "Users", icon: UserCircle },
 ]
 
