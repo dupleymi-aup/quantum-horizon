@@ -26,6 +26,16 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  progress      UserProgress[]
+  bookmarks     Bookmark[]
+  settings      UserSettings[]
+  achievements  UserAchievement[]
+  activity      UserActivity[]
+  userSessions  UserSession[]
+  grades        Grade[]
+  reminders     LearningReminder[]
+  createdExamDeadlines ExamDeadline[]
+  dismissals    ReminderDismissal[]
 
   @@map("users")
 }
@@ -103,6 +113,7 @@ model UserProgress {
   lastCompleted  DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, topic])
   @@map("user_progress")
@@ -115,6 +126,7 @@ model Bookmark {
   topic     String
   title     String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("bookmarks")
 }
@@ -134,6 +146,7 @@ model UserSettings {
   autoSave     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
 }
@@ -146,6 +159,7 @@ model UserAchievement {
   unlockedAt   DateTime @default(now())
   progress     Int      @default(0)
   target       Int      @default(1)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@unique([userId, achievementId])
   @@map("user_achievements")
@@ -159,6 +173,7 @@ model UserActivity {
   topic     String?
   xpGained Int      @default(0)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
@@ -168,12 +183,13 @@ model UserActivity {
 
 /// User session tracking
 model UserSession {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  startedAt   DateTime @default(now())
+  startedAt   DateTime  @default(now())
   endedAt     DateTime?
-  durationSec Int      @default(0)
+  durationSec Int       @default(0)
   topic       String?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([startedAt])
@@ -198,13 +214,14 @@ model Assessment {
 
 /// Student grades on assessments
 model Grade {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   assessmentId String
   userId       String
   score        Int
   maxScore     Int
-  completedAt  DateTime @default(now())
+  completedAt  DateTime   @default(now())
   assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([assessmentId, userId])
   @@index([userId])
@@ -273,6 +290,7 @@ model LearningReminder {
   reminderSentAt DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([deadline])
@@ -291,6 +309,7 @@ model ExamDeadline {
   createdBy   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  creator     User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@index([examDate])
   @@index([isActive])
@@ -305,6 +324,7 @@ model ReminderDismissal {
   examDeadlineId String
   dismissedAt    DateTime @default(now())
   snoozeUntil    DateTime?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, examDeadlineId])
   @@index([userId])

@@ -49,7 +49,7 @@ export async function requireAnyRole(session: Session | null): Promise<AuthGuard
   if (!session?.user.id) {
     return { error: "Unauthorized", status: 401 }
   }
-  return { userId: session.user.id, role: session.user.role }
+  return { userId: session.user.id, role: session.user.role ?? "USER" }
 }
 
 export function isAdmin(role: string): boolean {

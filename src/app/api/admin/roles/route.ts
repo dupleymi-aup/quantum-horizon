@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { authOptions } from "@/app/api/auth/authOptions"
 import { db } from "@/lib/db"
 import { z } from "zod"
 import { requireAdminRole } from "@/lib/auth-helpers"
@@ -93,7 +93,7 @@ async function GETHandler(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const roleFilter = searchParams.get("role")
+    const roleFilter = searchParams.get("role") as "USER" | "TEACHER" | "MODERATOR" | "ADMIN" | null
 
     const where = roleFilter ? { role: roleFilter } : {}
 
