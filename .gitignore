@@ -1,4 +1,3 @@
-```
 # Dependencies
 node_modules/
 
@@ -6,10 +5,19 @@ node_modules/
 dist/
 build/
 target/
+.next/standalone/
+.next/cache/
 
 # Logs and temp files
 *.log
 *.tmp
+*.tar.gz
+
+# Coverage and reports
+coverage/
+.nyc_output/
+playwright-report/
+lighthouse-report/
 
 # Environment
 .env
@@ -112,10 +120,6 @@ next-env.d.ts
 .umirc.*
 .un~lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-.nyc_output/
-
 # Temporary folders
 tmp/
 temp/
@@ -129,4 +133,3 @@ temp/
 ehthumbs.db
 Thumbs.db
 Icon?
-```
