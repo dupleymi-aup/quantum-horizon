@@ -3,24 +3,26 @@ import { getToken } from "next-auth/jwt"
 import type { NextRequest } from "next/server"
 
 const ADMIN_ROUTES = ["/api/admin"]
-const PROTECTED_ROUTES = ["/admin"]
+const TEACHER_ROUTES = ["/api/teacher"]
+const PROTECTED_ROUTES = ["/admin", "/teacher"]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check if request is for admin routes
   const isAdminRoute = ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  )
+  const isTeacherRoute = TEACHER_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   )
   const isProtectedPage = PROTECTED_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   )
 
-  if (isAdminRoute || isProtectedPage) {
+  if (isAdminRoute || isTeacherRoute || isProtectedPage) {
     const token = await getToken({ req: request })
 
     if (!token) {
-      // Redirect to sign-in if not authenticated
       if (isProtectedPage) {
         const signInUrl = new URL("/auth/signin", request.url)
         signInUrl.searchParams.set("callbackUrl", pathname)
@@ -29,7 +31,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check admin role for admin routes
     if (isAdminRoute) {
       const role = token.role
       const isAdmin = role === "ADMIN" || role === "MODERATOR"
@@ -38,9 +39,17 @@ export async function middleware(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
       }
     }
+
+    if (isTeacherRoute) {
+      const role = token.role
+      const isTeacher = role === "TEACHER" || role === "ADMIN" || role === "MODERATOR"
+
+      if (!isTeacher) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      }
+    }
   }
 
-  // Add security headers to API responses
   const response = NextResponse.next()
 
   if (pathname.startsWith("/api/")) {
@@ -53,5 +62,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/admin/:path*"],
+  matcher: ["/api/admin/:path*", "/api/teacher/:path*", "/admin/:path*", "/teacher/:path*"],
 }
