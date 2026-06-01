@@ -14,7 +14,11 @@ const logger = createLogger("api:register")
 const registerSchema = z.object({
   email: z.string().email("Некорректный email"),
   password: z.string().min(8, "Пароль должен содержать минимум 8 символов"),
-  name: z.string().min(2, "Имя должно содержать минимум 2 символа").optional(),
+  name: z
+    .string()
+    .min(2, "Имя должно содержать минимум 2 символа")
+    .max(50, "Имя должно содержать не более 50 символов")
+    .optional(),
 })
 
 /**

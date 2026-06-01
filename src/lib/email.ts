@@ -3,6 +3,15 @@ import { createLogger } from "./logger"
 
 const logger = createLogger("email")
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+}
+
 interface SendEmailOptions {
   to: string
   subject: string
@@ -75,7 +84,7 @@ export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
 }
 
 export async function sendWelcomeEmail(email: string, name?: string) {
-  const displayName = name ?? email.split("@")[0]
+  const displayName = escapeHtml(name ?? email.split("@")[0])
   const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
   const html = `
