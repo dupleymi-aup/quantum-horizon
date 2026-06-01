@@ -76,7 +76,7 @@ describe("api/achievements/route", () => {
       const findManyMock = vi.mocked(db.userAchievement.findMany)
       findManyMock.mockResolvedValue(mockAchievements)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/achievements"))
 
       expect(response.status).toBe(200)
       const data = await response.json()
@@ -101,7 +101,7 @@ describe("api/achievements/route", () => {
     it("should return 401 for unauthenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/achievements"))
 
       expect(response.status).toBe(401)
       const data = await response.json()
@@ -112,7 +112,7 @@ describe("api/achievements/route", () => {
       const findManyMock = vi.mocked(db.userAchievement.findMany)
       findManyMock.mockRejectedValue(new Error("Database error"))
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/achievements"))
 
       expect(response.status).toBe(500)
       const data = await response.json()
@@ -132,7 +132,7 @@ describe("api/achievements/route", () => {
         id: "1",
         userId: mockUserId,
         ...mockBody,
-        unlockedAt: null,
+        unlockedAt: new Date(),
       }
 
       const findUniqueMock = vi.mocked(db.userAchievement.findUnique)
@@ -169,7 +169,7 @@ describe("api/achievements/route", () => {
         achievementId: "explorer",
         progress: 20,
         target: 100,
-        unlockedAt: null,
+        unlockedAt: new Date(),
       }
 
       const updated = {
@@ -210,7 +210,7 @@ describe("api/achievements/route", () => {
         achievementId: "explorer",
         progress: 20,
         target: 100,
-        unlockedAt: null,
+        unlockedAt: new Date(),
       }
 
       const updated = {

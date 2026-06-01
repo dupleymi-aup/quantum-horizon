@@ -62,6 +62,7 @@ describe("api/activity/route", () => {
       const mockActivities = [
         {
           id: "1",
+          userId: mockUserId,
           action: "completed_visualization",
           topic: "quantum",
           xpGained: 50,
@@ -148,7 +149,10 @@ describe("api/activity/route", () => {
 
       const created = {
         id: "1",
-        ...mockBody,
+        userId: mockUserId,
+        action: "completed_visualization",
+        topic: "quantum",
+        xpGained: 50,
         createdAt: new Date(),
       }
 
@@ -190,6 +194,7 @@ describe("api/activity/route", () => {
 
       const created = {
         id: "1",
+        userId: mockUserId,
         action: "viewed_page",
         topic: null,
         xpGained: 0,

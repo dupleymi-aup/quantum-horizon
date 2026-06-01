@@ -6,17 +6,38 @@ import type { ActivityData } from "@/hooks/api/use-admin-analytics"
 const mockUseAdminActivityAnalytics = vi.fn()
 
 vi.mock("@/hooks/api/use-admin-analytics", () => ({
-  useAdminActivityAnalytics: (...args: unknown[]) => mockUseAdminActivityAnalytics(...args) as never,
+  useAdminActivityAnalytics: (...args: unknown[]) =>
+    mockUseAdminActivityAnalytics(...args) as never,
 }))
 
 vi.mock("@/components/analytics", () => ({
-  ActivityLineChart: ({ title }: { title: string }) => <div data-testid="activity-line-chart" data-title={title} />,
+  ActivityLineChart: ({ title }: { title: string }) => (
+    <div data-testid="activity-line-chart" data-title={title} />
+  ),
 }))
 
 const mockData: ActivityData = {
   dailyData: [
-    { date: "2026-05-18", count: 25 },
-    { date: "2026-05-19", count: 32 },
+    {
+      date: "2026-05-18",
+      visualizationViews: 25,
+      lessonsCompleted: 10,
+      quizzesPassed: 8,
+      quizzesFailed: 2,
+      achievementUnlocks: 5,
+      presetsCreated: 3,
+      comparisonsPerformed: 7,
+    },
+    {
+      date: "2026-05-19",
+      visualizationViews: 32,
+      lessonsCompleted: 15,
+      quizzesPassed: 12,
+      quizzesFailed: 3,
+      achievementUnlocks: 7,
+      presetsCreated: 4,
+      comparisonsPerformed: 10,
+    },
   ],
   topicBreakdown: [
     { topic: "quantum", count: 45 },
@@ -64,7 +85,10 @@ describe("AdminActivityPage", () => {
 
   it("shows loading state", () => {
     mockUseAdminActivityAnalytics.mockReturnValue({
-      data: null, isLoading: true, error: null, refetch: vi.fn(),
+      data: null,
+      isLoading: true,
+      error: null,
+      refetch: vi.fn(),
     })
     const { container } = render(<AdminActivityPage />)
     const skeletons = container.querySelectorAll('[data-slot="skeleton"]')
@@ -74,7 +98,10 @@ describe("AdminActivityPage", () => {
   it("shows error state with retry", () => {
     const refetch = vi.fn()
     mockUseAdminActivityAnalytics.mockReturnValue({
-      data: null, isLoading: false, error: new Error("Failed"), refetch,
+      data: null,
+      isLoading: false,
+      error: new Error("Failed"),
+      refetch,
     })
     render(<AdminActivityPage />)
     expect(screen.getByText("Failed to load activity data")).toBeInTheDocument()

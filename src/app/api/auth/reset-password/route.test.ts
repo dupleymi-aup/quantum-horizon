@@ -24,7 +24,7 @@ vi.mock("@/lib/db", () => ({
 }))
 
 vi.mock("@/lib/email", () => ({
-  sendPasswordResetEmail: vi.fn(),
+  sendPasswordResetEmail: vi.fn(() => Promise.resolve({ success: true, messageId: "mock-123" })),
 }))
 
 vi.mock("@/lib/logger", () => ({
@@ -63,13 +63,31 @@ describe("api/auth/reset-password/route", () => {
     it("should reset password with valid token", async () => {
       const futureDate = new Date(Date.now() + 3600000)
       vi.mocked(db.passwordResetToken.findUnique).mockResolvedValue({
+        id: "token-123",
         token: "valid-token",
         email: "test@example.com",
         expires: futureDate,
+        createdAt: new Date(),
       })
-      vi.mocked(hash).mockResolvedValue("hashedPassword")
-      vi.mocked(db.user.update).mockResolvedValue({ id: "user-123" })
-      vi.mocked(db.passwordResetToken.delete).mockResolvedValue({})
+      vi.mocked(hash).mockResolvedValueOnce("hashedPassword")
+      vi.mocked(db.user.update).mockResolvedValueOnce({
+        id: "user-123",
+        email: "test@example.com",
+        password: "hashedPassword",
+        name: "Test User",
+        role: "USER",
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      vi.mocked(db.passwordResetToken.delete).mockResolvedValueOnce({
+        id: "token-123",
+        token: "valid-token",
+        email: "test@example.com",
+        expires: new Date(),
+        createdAt: new Date(),
+      })
 
       const request = new NextRequest("http://localhost/api/auth/reset-password", {
         method: "POST",
@@ -105,11 +123,19 @@ describe("api/auth/reset-password/route", () => {
     it("should return 400 for expired token", async () => {
       const pastDate = new Date(Date.now() - 3600000)
       vi.mocked(db.passwordResetToken.findUnique).mockResolvedValue({
+        id: "token-456",
         token: "expired-token",
         email: "test@example.com",
         expires: pastDate,
+        createdAt: new Date(),
       })
-      vi.mocked(db.passwordResetToken.delete).mockResolvedValue({})
+      vi.mocked(db.passwordResetToken.delete).mockResolvedValue({
+        id: "token-123",
+        token: "valid-token",
+        email: "test@example.com",
+        expires: new Date(),
+        createdAt: new Date(),
+      })
 
       const request = new NextRequest("http://localhost/api/auth/reset-password", {
         method: "POST",
@@ -159,9 +185,11 @@ describe("api/auth/reset-password/route", () => {
     it("should return valid for non-expired token", async () => {
       const futureDate = new Date(Date.now() + 3600000)
       vi.mocked(db.passwordResetToken.findUnique).mockResolvedValue({
+        id: "token-123",
         token: "valid-token",
         email: "test@example.com",
         expires: futureDate,
+        createdAt: new Date(),
       })
 
       const request = new NextRequest("http://localhost/api/auth/reset-password?token=valid-token")
@@ -188,11 +216,19 @@ describe("api/auth/reset-password/route", () => {
     it("should return invalid for expired token and delete it", async () => {
       const pastDate = new Date(Date.now() - 3600000)
       vi.mocked(db.passwordResetToken.findUnique).mockResolvedValue({
+        id: "token-456",
         token: "expired-token",
         email: "test@example.com",
         expires: pastDate,
+        createdAt: new Date(),
       })
-      vi.mocked(db.passwordResetToken.delete).mockResolvedValue({})
+      vi.mocked(db.passwordResetToken.delete).mockResolvedValue({
+        id: "token-123",
+        token: "valid-token",
+        email: "test@example.com",
+        expires: new Date(),
+        createdAt: new Date(),
+      })
 
       const request = new NextRequest(
         "http://localhost/api/auth/reset-password?token=expired-token"
@@ -222,10 +258,21 @@ describe("api/auth/reset-password/route", () => {
         email: "test@example.com",
         name: "Test User",
         role: "USER",
+        password: null,
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
       vi.mocked(db.passwordResetToken.deleteMany).mockResolvedValue({ count: 0 })
-      vi.mocked(db.passwordResetToken.create).mockResolvedValue({})
-      vi.mocked(sendPasswordResetEmail).mockResolvedValue({ success: true })
+      vi.mocked(db.passwordResetToken.create).mockResolvedValue({
+        id: "token-789",
+        token: "reset-token-abc",
+        email: "test@example.com",
+        expires: new Date(Date.now() + 3600000),
+        createdAt: new Date(),
+      })
+      vi.mocked(sendPasswordResetEmail).mockResolvedValue({ success: true, messageId: "mock-123" })
 
       const request = new NextRequest("http://localhost/api/auth/reset-password", {
         method: "PATCH",

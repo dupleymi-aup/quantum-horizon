@@ -80,7 +80,7 @@ describe("api/visualizations/bookmarks/route", () => {
       const findManyMock = vi.mocked(db.bookmark.findMany)
       findManyMock.mockResolvedValue(mockBookmarks)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/bookmarks"))
 
       expect(response.status).toBe(200)
       const data = await response.json()
@@ -97,7 +97,7 @@ describe("api/visualizations/bookmarks/route", () => {
     it("should return empty array when no bookmarks", async () => {
       vi.mocked(db.bookmark.findMany).mockResolvedValue([])
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/bookmarks"))
 
       expect(response.status).toBe(200)
       const data = await response.json()
@@ -108,7 +108,7 @@ describe("api/visualizations/bookmarks/route", () => {
     it("should return 401 for unauthenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/bookmarks"))
 
       expect(response.status).toBe(401)
       const data = await response.json()
@@ -118,7 +118,7 @@ describe("api/visualizations/bookmarks/route", () => {
     it("should handle database errors", async () => {
       vi.mocked(db.bookmark.findMany).mockRejectedValue(new Error("Database error"))
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/bookmarks"))
 
       expect(response.status).toBe(500)
       const data = await response.json()

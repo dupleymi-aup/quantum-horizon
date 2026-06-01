@@ -70,24 +70,40 @@ describe("api/auth/register/route", () => {
       id: "user-123",
       email: mockBody.email,
       name: mockBody.name,
-      role: "USER",
+      password: "hashedPassword",
+      role: "USER" as const,
+      emailVerified: null,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
 
-    vi.mocked(hash).mockResolvedValue("hashedPassword")
-    vi.mocked(db.user.findUnique).mockResolvedValue(null)
-    vi.mocked(db.user.create).mockResolvedValue(mockUser)
-    vi.mocked(db.userProgress.create).mockResolvedValue({
+    vi.mocked(hash).mockResolvedValueOnce("hashedPassword")
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
+    vi.mocked(db.user.create).mockResolvedValueOnce(mockUser)
+    vi.mocked(db.userProgress.create).mockResolvedValueOnce({
       id: "progress-1",
       userId: mockUser.id,
       topic: "general",
       completedCount: 0,
-      lastCompleted: null,
+      lastCompleted: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
-    vi.mocked(db.userSettings.create).mockResolvedValue({
+    vi.mocked(db.userSettings.create).mockResolvedValueOnce({
       id: "settings-1",
       userId: mockUser.id,
       theme: "system",
       language: "ru",
+      fontSize: "normal",
+      reduceMotion: false,
+      highContrast: false,
+      showAnimations: true,
+      soundEnabled: false,
+      volume: 50,
+      autoSave: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
 
     const request = new NextRequest("http://localhost/api/auth/register", {
@@ -117,23 +133,44 @@ describe("api/auth/register/route", () => {
   it("should register user with default name", async () => {
     const mockBody = { email: "test@example.com", password: "password123" }
 
-    const mockUser = { id: "user-123", email: mockBody.email, name: null, role: "USER" }
+    const mockUser = {
+      id: "user-123",
+      email: mockBody.email,
+      name: null,
+      password: "hashedPassword",
+      role: "USER" as const,
+      emailVerified: null,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
 
-    vi.mocked(hash).mockResolvedValue("hashedPassword")
-    vi.mocked(db.user.findUnique).mockResolvedValue(null)
-    vi.mocked(db.user.create).mockResolvedValue(mockUser)
-    vi.mocked(db.userProgress.create).mockResolvedValue({
+    vi.mocked(hash).mockResolvedValueOnce("hashedPassword")
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
+    vi.mocked(db.user.create).mockResolvedValueOnce(mockUser)
+    vi.mocked(db.userProgress.create).mockResolvedValueOnce({
       id: "progress-1",
       userId: mockUser.id,
       topic: "general",
       completedCount: 0,
-      lastCompleted: null,
+      lastCompleted: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
-    vi.mocked(db.userSettings.create).mockResolvedValue({
+    vi.mocked(db.userSettings.create).mockResolvedValueOnce({
       id: "settings-1",
       userId: mockUser.id,
       theme: "system",
       language: "ru",
+      fontSize: "normal",
+      reduceMotion: false,
+      highContrast: false,
+      showAnimations: true,
+      soundEnabled: false,
+      volume: 50,
+      autoSave: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
 
     const request = new NextRequest("http://localhost/api/auth/register", {
@@ -152,11 +189,16 @@ describe("api/auth/register/route", () => {
   it("should return 409 if user already exists", async () => {
     const mockBody = { email: "test@example.com", password: "password123", name: "Test User" }
 
-    vi.mocked(db.user.findUnique).mockResolvedValue({
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce({
       id: "existing-user",
       email: "test@example.com",
       name: "Existing User",
+      password: "hashedPassword",
       role: "USER",
+      emailVerified: null,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
 
     const request = new NextRequest("http://localhost/api/auth/register", {
@@ -215,7 +257,7 @@ describe("api/auth/register/route", () => {
   })
 
   it("should handle database errors", async () => {
-    vi.mocked(db.user.findUnique).mockRejectedValue(new Error("Database error"))
+    vi.mocked(db.user.findUnique).mockRejectedValueOnce(new Error("Database error"))
 
     const request = new NextRequest("http://localhost/api/auth/register", {
       method: "POST",
@@ -235,8 +277,8 @@ describe("api/auth/register/route", () => {
   })
 
   it("should handle hash errors", async () => {
-    vi.mocked(db.user.findUnique).mockResolvedValue(null)
-    vi.mocked(hash).mockRejectedValue(new Error("Hash error"))
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
+    vi.mocked(hash).mockRejectedValueOnce(new Error("Hash error"))
 
     const request = new NextRequest("http://localhost/api/auth/register", {
       method: "POST",
@@ -266,24 +308,40 @@ describe("api/auth/register/route", () => {
       id: "user-123",
       email: mockBody.email,
       name: mockBody.name,
-      role: "USER",
+      password: "hashedPassword",
+      role: "USER" as const,
+      emailVerified: null,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
 
-    vi.mocked(hash).mockResolvedValue("hashedPassword")
-    vi.mocked(db.user.findUnique).mockResolvedValue(null)
-    vi.mocked(db.user.create).mockResolvedValue(mockUser)
-    vi.mocked(db.userProgress.create).mockResolvedValue({
+    vi.mocked(hash).mockResolvedValueOnce("hashedPassword")
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
+    vi.mocked(db.user.create).mockResolvedValueOnce(mockUser)
+    vi.mocked(db.userProgress.create).mockResolvedValueOnce({
       id: "progress-1",
       userId: mockUser.id,
       topic: "general",
       completedCount: 0,
-      lastCompleted: null,
+      lastCompleted: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
-    vi.mocked(db.userSettings.create).mockResolvedValue({
+    vi.mocked(db.userSettings.create).mockResolvedValueOnce({
       id: "settings-1",
       userId: mockUser.id,
       theme: "system",
       language: "ru",
+      fontSize: "normal",
+      reduceMotion: false,
+      highContrast: false,
+      showAnimations: true,
+      soundEnabled: false,
+      volume: 50,
+      autoSave: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
 
     const request = new NextRequest("http://localhost/api/auth/register", {

@@ -552,7 +552,7 @@ describe("api/admin/analytics/grades", () => {
     vi.mocked(db.grade.findMany).mockResolvedValue([mockGrade] as never[])
     vi.mocked(db.assessment.count).mockResolvedValue(5)
 
-    const response = await GradesGET()
+    const response = await GradesGET(new NextRequest("http://localhost/api/admin/analytics/grades"))
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -567,7 +567,7 @@ describe("api/admin/analytics/grades", () => {
     vi.mocked(db.grade.findMany).mockResolvedValue([] as never[])
     vi.mocked(db.assessment.count).mockResolvedValue(0)
 
-    const response = await GradesGET()
+    const response = await GradesGET(new NextRequest("http://localhost/api/admin/analytics/grades"))
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -577,7 +577,7 @@ describe("api/admin/analytics/grades", () => {
 
   it("should return 401 for unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
-    const response = await GradesGET()
+    const response = await GradesGET(new NextRequest("http://localhost/api/admin/analytics/grades"))
     expect(response.status).toBe(401)
   })
 })
@@ -650,7 +650,9 @@ describe("api/admin/analytics/performance", () => {
       { id: "u1", name: "Alice", email: "alice@test.com", createdAt: new Date("2026-01-01") },
     ] as never[])
 
-    const response = await PerformanceGET()
+    const response = await PerformanceGET(
+      new NextRequest("http://localhost/api/admin/analytics/performance")
+    )
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -661,7 +663,9 @@ describe("api/admin/analytics/performance", () => {
 
   it("should return 401 for unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
-    const response = await PerformanceGET()
+    const response = await PerformanceGET(
+      new NextRequest("http://localhost/api/admin/analytics/performance")
+    )
     expect(response.status).toBe(401)
   })
 })
@@ -684,7 +688,9 @@ describe("api/admin/analytics/progress", () => {
       { topic: "quantum", _count: { id: 5 } },
     ] as never[])
 
-    const response = await ProgressGET()
+    const response = await ProgressGET(
+      new NextRequest("http://localhost/api/admin/analytics/progress")
+    )
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -695,7 +701,9 @@ describe("api/admin/analytics/progress", () => {
 
   it("should return 401 for unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
-    const response = await ProgressGET()
+    const response = await ProgressGET(
+      new NextRequest("http://localhost/api/admin/analytics/progress")
+    )
     expect(response.status).toBe(401)
   })
 })
@@ -710,7 +718,7 @@ describe("api/admin/live", () => {
     vi.mocked(db.userActivity.count).mockResolvedValue(0)
     vi.mocked(db.user.findMany).mockResolvedValue([] as never[])
 
-    const response = await LiveGET()
+    const response = await LiveGET(new NextRequest("http://localhost/api/admin/live"))
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -720,7 +728,7 @@ describe("api/admin/live", () => {
 
   it("should return 401 for unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
-    const response = await LiveGET()
+    const response = await LiveGET(new NextRequest("http://localhost/api/admin/live"))
     expect(response.status).toBe(401)
   })
 })
@@ -1103,7 +1111,9 @@ describe("api/admin/alerts/scan", () => {
     vi.mocked(db.adminAlert.findMany).mockResolvedValue([] as never[])
     vi.mocked(db.adminAlert.createMany).mockResolvedValue({ count: 2 })
 
-    const response = await AlertsScanPOST()
+    const response = await AlertsScanPOST(
+      new NextRequest("http://localhost/api/admin/alerts/scan", { method: "POST" })
+    )
     const data = await response.json()
 
     expect(response.status).toBe(200)
@@ -1113,7 +1123,9 @@ describe("api/admin/alerts/scan", () => {
 
   it("should return 401 for unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null)
-    const response = await AlertsScanPOST()
+    const response = await AlertsScanPOST(
+      new NextRequest("http://localhost/api/admin/alerts/scan", { method: "POST" })
+    )
     expect(response.status).toBe(401)
   })
 })
@@ -1161,11 +1173,37 @@ describe("auth-helpers (admin)", () => {
 // ==================== STUDENT PERFORMANCE REPORT ====================
 
 describe("api/admin/reports/student-performance", () => {
-  const mockStudent = { id: "student-1", name: "Test Student", email: "test@test.com", createdAt: new Date("2026-01-01") }
+  const mockStudent = {
+    id: "student-1",
+    name: "Test Student",
+    email: "test@test.com",
+    password: null,
+    role: "USER" as const,
+    emailVerified: null,
+    image: null,
+    createdAt: new Date("2026-01-01"),
+    updatedAt: new Date("2026-01-01"),
+  }
   const mockAssessment = { title: "Test Assessment", topic: "quantum", maxScore: 100 }
   const mockGrades = [
-    { id: "g1", assessmentId: "a1", userId: "student-1", score: 85, maxScore: 100, completedAt: new Date("2026-03-01"), assessment: mockAssessment },
-    { id: "g2", assessmentId: "a2", userId: "student-1", score: 70, maxScore: 100, completedAt: new Date("2026-04-01"), assessment: { ...mockAssessment, title: "Assessment 2" } },
+    {
+      id: "g1",
+      assessmentId: "a1",
+      userId: "student-1",
+      score: 85,
+      maxScore: 100,
+      completedAt: new Date("2026-03-01"),
+      assessment: mockAssessment,
+    },
+    {
+      id: "g2",
+      assessmentId: "a2",
+      userId: "student-1",
+      score: 70,
+      maxScore: 100,
+      completedAt: new Date("2026-04-01"),
+      assessment: { ...mockAssessment, title: "Assessment 2" },
+    },
   ]
 
   it("should return student performance report", async () => {
@@ -1173,7 +1211,10 @@ describe("api/admin/reports/student-performance", () => {
     vi.mocked(db.user.findUnique).mockResolvedValue(mockStudent)
     vi.mocked(db.grade.findMany).mockResolvedValue(mockGrades)
     vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
-    vi.mocked(db.userActivity.aggregate).mockResolvedValue({ _sum: { xpGained: 500 }, _count: 20 } as never)
+    vi.mocked(db.userActivity.aggregate).mockResolvedValue({
+      _sum: { xpGained: 500 },
+      _count: 20,
+    } as never)
 
     const response = await StudentPerformanceGET(
       new NextRequest("http://localhost/api/admin/reports/student-performance?userId=student-1")
@@ -1212,7 +1253,10 @@ describe("api/admin/reports/student-performance", () => {
     vi.mocked(db.user.findUnique).mockResolvedValue(mockStudent)
     vi.mocked(db.grade.findMany).mockResolvedValue([])
     vi.mocked(db.grade.groupBy).mockResolvedValue([] as never[])
-    vi.mocked(db.userActivity.aggregate).mockResolvedValue({ _sum: { xpGained: 0 }, _count: 0 } as never)
+    vi.mocked(db.userActivity.aggregate).mockResolvedValue({
+      _sum: { xpGained: 0 },
+      _count: 0,
+    } as never)
 
     const response = await StudentPerformanceGET(
       new NextRequest("http://localhost/api/admin/reports/student-performance?userId=student-1")
@@ -1240,8 +1284,24 @@ describe("api/admin/reports/class-performance", () => {
     vi.mocked(db.user.count).mockResolvedValue(30)
     vi.mocked(db.grade.groupBy).mockResolvedValue([{ userId: "u1" }] as never[])
     vi.mocked(db.grade.findMany).mockResolvedValue([
-      { id: "g1", assessmentId: "a1", userId: "u1", score: 85, maxScore: 100, completedAt: new Date(), assessment: { title: "Test", topic: "quantum", maxScore: 100 } },
-      { id: "g2", assessmentId: "a2", userId: "u2", score: 45, maxScore: 100, completedAt: new Date(), assessment: { title: "Test 2", topic: "quantum", maxScore: 100 } },
+      {
+        id: "g1",
+        assessmentId: "a1",
+        userId: "u1",
+        score: 85,
+        maxScore: 100,
+        completedAt: new Date(),
+        assessment: { title: "Test", topic: "quantum", maxScore: 100 },
+      },
+      {
+        id: "g2",
+        assessmentId: "a2",
+        userId: "u2",
+        score: 45,
+        maxScore: 100,
+        completedAt: new Date(),
+        assessment: { title: "Test 2", topic: "quantum", maxScore: 100 },
+      },
     ] as never[])
     vi.mocked(db.user.findMany).mockResolvedValue([
       { id: "u1", name: "Alice", email: "alice@test.com" },

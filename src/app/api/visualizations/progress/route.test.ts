@@ -65,6 +65,8 @@ describe("api/visualizations/progress/route", () => {
           topic: "quantum",
           completedCount: 5,
           lastCompleted: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           id: "2",
@@ -72,13 +74,15 @@ describe("api/visualizations/progress/route", () => {
           topic: "cosmos",
           completedCount: 3,
           lastCompleted: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ]
 
       const findManyMock = vi.mocked(db.userProgress.findMany)
       findManyMock.mockResolvedValue(mockProgress)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/progress"))
 
       expect(response.status).toBe(200)
       const data = await response.json()
@@ -96,7 +100,7 @@ describe("api/visualizations/progress/route", () => {
     it("should return empty array when no progress", async () => {
       vi.mocked(db.userProgress.findMany).mockResolvedValue([])
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/progress"))
 
       expect(response.status).toBe(200)
       const data = await response.json()
@@ -107,7 +111,7 @@ describe("api/visualizations/progress/route", () => {
     it("should return 401 for unauthenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null)
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/progress"))
 
       expect(response.status).toBe(401)
       const data = await response.json()
@@ -117,7 +121,7 @@ describe("api/visualizations/progress/route", () => {
     it("should handle database errors", async () => {
       vi.mocked(db.userProgress.findMany).mockRejectedValue(new Error("Database error"))
 
-      const response = await GET()
+      const response = await GET(new NextRequest("http://localhost/api/visualizations/progress"))
 
       expect(response.status).toBe(500)
       const data = await response.json()
@@ -134,6 +138,8 @@ describe("api/visualizations/progress/route", () => {
         userId: mockUserId,
         ...mockBody,
         lastCompleted: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       const upsertMock = vi.mocked(db.userProgress.upsert)
@@ -165,11 +171,14 @@ describe("api/visualizations/progress/route", () => {
         topic: "quantum",
         completedCount: 5,
         lastCompleted: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       const updated = {
         ...existing,
         completedCount: 7,
+        updatedAt: new Date(),
       }
 
       const upsertMock = vi.mocked(db.userProgress.upsert)
@@ -198,6 +207,8 @@ describe("api/visualizations/progress/route", () => {
         topic: "quantum",
         completedCount: 1,
         lastCompleted: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       const upsertMock = vi.mocked(db.userProgress.upsert)

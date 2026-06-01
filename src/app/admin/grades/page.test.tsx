@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest"
 import { render, screen, cleanup } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import AdminGradesPage from "@/app/admin/grades/page"
+import { type GradesOverviewData } from "@/hooks/api/use-admin-analytics"
 
 const mockUseAdminGradesOverview = vi.fn()
 
@@ -132,7 +133,10 @@ describe("AdminGradesPage", () => {
 
   it("shows loading state", () => {
     mockUseAdminGradesOverview.mockReturnValue({
-      data: null, isLoading: true, error: null, refetch: vi.fn(),
+      data: null,
+      isLoading: true,
+      error: null,
+      refetch: vi.fn(),
     })
     const { container } = render(<AdminGradesPage />)
     const skeletons = container.querySelectorAll('[data-slot="skeleton"]')
@@ -142,7 +146,10 @@ describe("AdminGradesPage", () => {
   it("shows error state with retry", () => {
     const refetch = vi.fn()
     mockUseAdminGradesOverview.mockReturnValue({
-      data: null, isLoading: false, error: new Error("Failed"), refetch,
+      data: null,
+      isLoading: false,
+      error: new Error("Failed"),
+      refetch,
     })
     render(<AdminGradesPage />)
     expect(screen.getByText("Failed to load grade analytics")).toBeInTheDocument()
