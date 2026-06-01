@@ -1,6 +1,5 @@
 "use client"
 
-import { Metadata } from "next"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,11 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
-
-export const metadata: Metadata = {
-  title: "Forgot Password — Quantum Horizon",
-  description: "Reset your Quantum Horizon account password.",
-}
 
 export default function ForgotPasswordPage() {
   const router = useRouter()

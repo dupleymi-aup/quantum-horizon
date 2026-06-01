@@ -1,15 +1,9 @@
 "use client"
 
-import { Metadata } from "next"
 import { useState } from "react"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Sign Out — Quantum Horizon",
-  description: "You have been signed out of Quantum Horizon.",
-}
 
 export default function SignOutPage() {
   const [isLoading, setIsLoading] = useState(false)

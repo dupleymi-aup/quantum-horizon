@@ -1,6 +1,5 @@
 "use client"
 
-import { Metadata } from "next"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -10,11 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-
-export const metadata: Metadata = {
-  title: "Sign In — Quantum Horizon",
-  description: "Sign in to your Quantum Horizon account to continue learning physics.",
-}
 
 export default function SignInPage() {
   const router = useRouter()

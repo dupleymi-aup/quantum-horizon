@@ -8,6 +8,7 @@ import { z } from "zod"
 import { sendWelcomeEmail } from "@/lib/email"
 import { createLogger } from "@/lib/logger"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 
 const logger = createLogger("api:register")
 
@@ -108,4 +109,4 @@ async function POSTHandler(request: NextRequest) {
   }
 }
 
-export const POST = withRateLimit(POSTHandler)
+export const POST = withCsrf(withRateLimit(POSTHandler))

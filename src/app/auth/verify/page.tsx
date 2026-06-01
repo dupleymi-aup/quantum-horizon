@@ -1,15 +1,9 @@
 "use client"
 
-import { Metadata } from "next"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-
-export const metadata: Metadata = {
-  title: "Verify Email — Quantum Horizon",
-  description: "Verify your email address to activate your Quantum Horizon account.",
-}
 
 export default function VerifyRequestPage() {
   const router = useRouter()

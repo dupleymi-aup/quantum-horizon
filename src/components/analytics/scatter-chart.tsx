@@ -1,6 +1,5 @@
 "use client"
 
-import type { TooltipProps } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ScatterChart,
@@ -47,18 +46,17 @@ function computeRegressionLine(data: ScatterDataPoint[]) {
   return { slope, intercept }
 }
 
-function CustomTooltip({
-  active,
-  payload,
-  xLabel,
-  yLabel,
-}: TooltipProps & { xLabel: string; yLabel: string }) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+function CustomTooltip(props: {
+  active?: boolean
+  payload?: Array<{ payload: ScatterDataPoint }>
+  xLabel: string
+  yLabel: string
+}) {
+  const { active, payload, xLabel, yLabel } = props
   if (active && payload && payload.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const point = payload[0].payload as ScatterDataPoint
+    const point = payload[0].payload
     return (
-      <div className="bg-background border rounded-md shadow-sm p-2 text-xs">
+      <div className="bg-background rounded-md border p-2 text-xs shadow-sm">
         {point.label && <p className="font-medium">{point.label}</p>}
         <p>
           {xLabel}: {point.x}
@@ -89,7 +87,7 @@ export function ScatterChartComponent({
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm text-center py-8">No data available</p>
+          <p className="text-muted-foreground py-8 text-center text-sm">No data available</p>
         </CardContent>
       </Card>
     )

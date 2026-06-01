@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
 import { withCsrf } from "@/lib/csrf"
 import { withRateLimit } from "@/lib/rate-limit"
-import { z, treeifyError } from "zod"
+import { z } from "zod"
 
 const logger = createLogger("api:sessions")
 
@@ -28,7 +28,7 @@ async function POSTHandler(request: NextRequest) {
     const validationResult = sessionSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }
@@ -55,7 +55,7 @@ async function POSTHandler(request: NextRequest) {
 async function GETHandler() {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!session?.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -74,7 +74,10 @@ async function GETHandler() {
 
     return NextResponse.json({ success: true, data: sessions })
   } catch (error) {
-    logger.error("Error fetching sessions:", error instanceof Error ? error.message : "Unknown error")
+    logger.error(
+      "Error fetching sessions:",
+      error instanceof Error ? error.message : "Unknown error"
+    )
     return NextResponse.json({ error: "Failed to fetch sessions" }, { status: 500 })
   }
 }

@@ -1,6 +1,5 @@
 "use client"
 
-import { Metadata } from "next"
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,11 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
-
-export const metadata: Metadata = {
-  title: "Reset Password — Quantum Horizon",
-  description: "Set a new password for your Quantum Horizon account.",
-}
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
@@ -52,7 +46,11 @@ export default function ResetPasswordPage() {
           const response = await fetchWithTimeout(`/api/auth/reset-password?token=${token}`, {
             timeoutMs: 10000,
           })
-          const data = (await response.json()) as { valid?: boolean; email?: string; error?: string }
+          const data = (await response.json()) as {
+            valid?: boolean
+            email?: string
+            error?: string
+          }
 
           if (response.ok && data.valid) {
             setTokenValid(true)

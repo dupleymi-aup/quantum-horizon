@@ -7,22 +7,37 @@ import { createLogger } from "@/lib/logger"
 import { adminJson } from "@/lib/admin-response"
 import { withCsrf } from "@/lib/csrf"
 import { withRateLimit } from "@/lib/rate-limit"
-import { z, treeifyError } from "zod"
+import { z } from "zod"
 
 const logger = createLogger("api:admin:exam-deadlines")
+
+/**
+ * Sanitize a string value by stripping HTML tags and dangerous characters
+ * to prevent stored XSS attacks.
+ */
+function sanitizeInput(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;")
+}
 
 const examSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(500).optional(),
   topic: z.string().min(1).max(200),
-  examDate: z.string().iso.datetime(),
+  examDate: z.coerce.date(),
   isActive: z.boolean().optional(),
 })
 
 async function GETHandler() {
   try {
     const session = await getServerSession(authOptions)
-    if (session?.user?.id == null) {
+    if (!session?.user.id) {
       return adminJson({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -55,7 +70,7 @@ async function POSTHandler(request: NextRequest) {
     const validationResult = examSchema.safeParse(body)
     if (!validationResult.success) {
       return adminJson(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }
@@ -64,9 +79,9 @@ async function POSTHandler(request: NextRequest) {
 
     const exam = await db.examDeadline.create({
       data: {
-        title,
-        description,
-        topic,
+        title: sanitizeInput(title),
+        description: description !== undefined ? sanitizeInput(description) : undefined,
+        topic: sanitizeInput(topic),
         examDate: new Date(examDate),
         createdBy: authResult.userId,
         isActive: isActive ?? true,
@@ -99,7 +114,7 @@ async function PATCHHandler(request: NextRequest) {
     const validationResult = examSchema.partial().safeParse(body)
     if (!validationResult.success) {
       return adminJson(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }
@@ -114,9 +129,9 @@ async function PATCHHandler(request: NextRequest) {
     const updated = await db.examDeadline.update({
       where: { id },
       data: {
-        ...(title !== undefined && { title }),
-        ...(description !== undefined && { description }),
-        ...(topic !== undefined && { topic }),
+        ...(title !== undefined && { title: sanitizeInput(title) }),
+        ...(description !== undefined && { description: sanitizeInput(description) }),
+        ...(topic !== undefined && { topic: sanitizeInput(topic) }),
         ...(examDate !== undefined && { examDate: new Date(examDate) }),
         ...(isActive !== undefined && { isActive }),
       },

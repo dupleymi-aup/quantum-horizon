@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/authOptions"
@@ -5,7 +6,7 @@ import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
 import { withCsrf } from "@/lib/csrf"
 import { withRateLimit } from "@/lib/rate-limit"
-import { z, treeifyError } from "zod"
+import { z } from "zod"
 
 const logger = createLogger("api:reminders")
 
@@ -64,7 +65,7 @@ async function POSTHandler(request: NextRequest) {
     const validationResult = reminderSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }

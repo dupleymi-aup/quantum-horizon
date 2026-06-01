@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 import { createLogger } from "@/lib/logger"
 import { withCsrf } from "@/lib/csrf"
 import { withRateLimit } from "@/lib/rate-limit"
-import { z, treeifyError } from "zod"
+import { z } from "zod"
 
 const logger = createLogger("api:bookmarks")
 
@@ -63,7 +63,7 @@ async function POSTHandler(request: NextRequest) {
     const validationResult = bookmarkSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }

@@ -6,7 +6,7 @@ import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { withRateLimit } from "@/lib/rate-limit"
 import { withCsrf } from "@/lib/csrf"
-import { z, treeifyError } from "zod"
+import { z } from "zod"
 
 const logger = createLogger("api:admin:assessments")
 
@@ -87,7 +87,7 @@ async function POSTHandler(request: NextRequest) {
     const validationResult = assessmentSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: treeifyError(validationResult.error) },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       )
     }
@@ -97,7 +97,7 @@ async function POSTHandler(request: NextRequest) {
       const gradeResult = gradeSchema.extend({ maxScore: z.number().optional() }).safeParse(body)
       if (!gradeResult.success) {
         return NextResponse.json(
-          { error: "Invalid grade input", details: treeifyError(gradeResult.error) },
+          { error: "Invalid grade input", details: gradeResult.error.issues },
           { status: 400 }
         )
       }

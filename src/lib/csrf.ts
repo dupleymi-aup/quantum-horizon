@@ -33,18 +33,15 @@ function isValidOrigin(request: NextRequest): boolean {
     }
   }
 
-  // No origin or referer — allow for same-site (server-to-server) requests
-  // but deny for browser requests that should have these headers
+  // No origin or referer — this is suspicious for browser requests
+  // Only allow if sec-fetch-site indicates same-origin (browsers always send these headers)
   const secFetchSite = request.headers.get("sec-fetch-site")
-  if (secFetchSite === "same-origin" || secFetchSite === "same-site") {
+  if (secFetchSite === "same-origin") {
     return true
   }
 
-  // Non-browser requests (no sec-fetch-site) are allowed
-  if (!secFetchSite) {
-    return true
-  }
-
+  // Deny requests without proper origin/referer headers
+  // This prevents bypass by stripping headers in cross-site requests
   return false
 }
 
