@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select"
 import { AdminError } from "@/components/admin/admin-error"
 import { AdminTableSkeleton } from "@/components/admin/admin-skeleton"
+import { CreateUserDialog } from "@/components/admin/create-user-dialog"
 import { useAdminUsersList, type AdminUser } from "@/hooks/api/use-admin-analytics"
 import { Search } from "lucide-react"
 import { formatDate } from "@/lib/utils"
@@ -46,7 +47,9 @@ export default function AdminUsersPage() {
   }
 
   if (error) {
-    return <AdminError message="Failed to load users" onRetry={() => void refetch()} />
+    return (
+      <AdminError message="Не удалось загрузить пользователей" onRetry={() => void refetch()} />
+    )
   }
 
   if (isLoading) {
@@ -58,7 +61,7 @@ export default function AdminUsersPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex flex-1 gap-2">
           <Input
-            placeholder="Search by name or email..."
+            placeholder="Поиск по имени или email..."
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value)
@@ -80,33 +83,34 @@ export default function AdminUsersPage() {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All roles" />
+            <SelectValue placeholder="Все роли" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All roles</SelectItem>
-            <SelectItem value="USER">Student</SelectItem>
-            <SelectItem value="TEACHER">Teacher</SelectItem>
-            <SelectItem value="MODERATOR">Moderator</SelectItem>
-            <SelectItem value="ADMIN">Admin</SelectItem>
+            <SelectItem value="all">Все роли</SelectItem>
+            <SelectItem value="USER">Студент</SelectItem>
+            <SelectItem value="TEACHER">Преподаватель</SelectItem>
+            <SelectItem value="MODERATOR">Модератор</SelectItem>
+            <SelectItem value="ADMIN">Администратор</SelectItem>
           </SelectContent>
         </Select>
+        <CreateUserDialog />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Users ({data?.total ?? 0})</CardTitle>
+          <CardTitle>Пользователи ({data?.total ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>Имя</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>Роль</TableHead>
                 <TableHead className="text-right">XP</TableHead>
-                <TableHead className="text-right">Activities</TableHead>
-                <TableHead>Last Active</TableHead>
-                <TableHead>Registered</TableHead>
+                <TableHead className="text-right">Активности</TableHead>
+                <TableHead>Последняя активность</TableHead>
+                <TableHead>Дата регистрации</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -123,17 +127,23 @@ export default function AdminUsersPage() {
                   <TableCell>{user.email ?? "—"}</TableCell>
                   <TableCell>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                         user.role === "ADMIN"
-                          ? "bg-red-100 text-red-700"
+                          ? "bg-red-500/10 text-red-400 ring-1 ring-red-500/20 ring-inset"
                           : user.role === "MODERATOR"
-                            ? "bg-blue-100 text-blue-700"
+                            ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20 ring-inset"
                             : user.role === "TEACHER"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-700"
+                              ? "bg-green-500/10 text-green-400 ring-1 ring-green-500/20 ring-inset"
+                              : "bg-slate-500/10 text-slate-400 ring-1 ring-slate-500/20 ring-inset"
                       }`}
                     >
-                      {user.role === "USER" ? "Student" : user.role}
+                      {user.role === "USER"
+                        ? "Студент"
+                        : user.role === "ADMIN"
+                          ? "Администратор"
+                          : user.role === "MODERATOR"
+                            ? "Модератор"
+                            : "Преподаватель"}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">{user.totalXp.toLocaleString()}</TableCell>
@@ -148,7 +158,7 @@ export default function AdminUsersPage() {
           {data && data.totalPages > 1 && (
             <div className="mt-4 flex items-center justify-between">
               <p className="text-muted-foreground text-sm">
-                Page {data.page} of {data.totalPages}
+                Страница {data.page} из {data.totalPages}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -159,7 +169,7 @@ export default function AdminUsersPage() {
                     setPage((p) => p - 1)
                   }}
                 >
-                  Previous
+                  Назад
                 </Button>
                 <Button
                   variant="outline"
@@ -169,7 +179,7 @@ export default function AdminUsersPage() {
                     setPage((p) => p + 1)
                   }}
                 >
-                  Next
+                  Вперед
                 </Button>
               </div>
             </div>
