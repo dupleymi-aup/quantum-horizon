@@ -145,6 +145,11 @@ export function CommandPalette({
       },
       {
         type: "action" as const,
+        id: "achievements",
+        label: "🏆 Achievements",
+      },
+      {
+        type: "action" as const,
         id: "fullscreen",
         label: "⛶ Fullscreen Mode",
         shortcut: "F11",
@@ -183,6 +188,8 @@ export function CommandPalette({
             window.location.href = "/practice"
           } else if (command.id === "help") {
             window.location.href = "/help"
+          } else if (command.id === "achievements") {
+            window.location.href = "/achievements"
           }
           setOpen(false)
           break
