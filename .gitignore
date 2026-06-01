@@ -133,3 +133,7 @@ temp/
 ehthumbs.db
 Thumbs.db
 Icon?
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
