@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithTimeout } from "@/lib/fetch-with-timeout"
 
@@ -19,6 +20,7 @@ export default function SignUpPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [role, setRole] = useState<"USER" | "TEACHER">("USER")
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -31,7 +33,7 @@ export default function SignUpPage() {
         timeoutMs: 10000,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       })
 
       const data = (await response.json()) as { error?: string }
@@ -82,6 +84,40 @@ export default function SignUpPage() {
         <CardContent className="space-y-4">
           {/* Форма регистрации */}
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Тип аккаунта</Label>
+              <RadioGroup
+                value={role}
+                onValueChange={(value) => {
+                  setRole(value as "USER" | "TEACHER")
+                }}
+                className="grid grid-cols-2 gap-2"
+              >
+                <div className="flex items-start space-x-2 rounded-lg border border-slate-600 bg-slate-800 p-3">
+                  <RadioGroupItem value="USER" id="student" className="mt-1" />
+                  <div className="flex-1">
+                    <Label htmlFor="student" className="cursor-pointer font-medium">
+                      Студент
+                    </Label>
+                    <p className="text-xs text-slate-400">
+                      Изучение материалов и прохождение тестов
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2 rounded-lg border border-slate-600 bg-slate-800 p-3">
+                  <RadioGroupItem value="TEACHER" id="teacher" className="mt-1" />
+                  <div className="flex-1">
+                    <Label htmlFor="teacher" className="cursor-pointer font-medium">
+                      Преподаватель
+                    </Label>
+                    <p className="text-xs text-slate-400">
+                      Создание тестов и управление студентами
+                    </p>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Имя (необязательно)</Label>
               <Input

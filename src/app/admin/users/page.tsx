@@ -84,7 +84,8 @@ export default function AdminUsersPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All roles</SelectItem>
-            <SelectItem value="USER">User</SelectItem>
+            <SelectItem value="USER">Student</SelectItem>
+            <SelectItem value="TEACHER">Teacher</SelectItem>
             <SelectItem value="MODERATOR">Moderator</SelectItem>
             <SelectItem value="ADMIN">Admin</SelectItem>
           </SelectContent>
@@ -127,10 +128,12 @@ export default function AdminUsersPage() {
                           ? "bg-red-100 text-red-700"
                           : user.role === "MODERATOR"
                             ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
+                            : user.role === "TEACHER"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-700"
                       }`}
                     >
-                      {user.role}
+                      {user.role === "USER" ? "Student" : user.role}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">{user.totalXp.toLocaleString()}</TableCell>

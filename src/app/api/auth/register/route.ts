@@ -20,11 +20,12 @@ const registerSchema = z.object({
     .min(2, "Имя должно содержать минимум 2 символа")
     .max(50, "Имя должно содержать не более 50 символов")
     .optional(),
+  role: z.enum(["USER", "TEACHER"]).default("USER"),
 })
 
 /**
  * POST /api/auth/register
- * Регистрация нового пользователя
+ * Регистрация нового пользователя с выбором роли (STUDENT или TEACHER)
  */
 async function POSTHandler(request: NextRequest) {
   try {
@@ -38,7 +39,7 @@ async function POSTHandler(request: NextRequest) {
       )
     }
 
-    const { email, password, name } = validation.data
+    const { email, password, name, role } = validation.data
 
     // Проверка существования пользователя
     const existingUser = await db.user.findUnique({
@@ -55,13 +56,13 @@ async function POSTHandler(request: NextRequest) {
     // Хэширование пароля
     const hashedPassword = await hash(password, 12)
 
-    // Создание пользователя
+    // Создание пользователя с выбранной ролью
     const user = await db.user.create({
       data: {
         email,
         password: hashedPassword,
         name: name ?? null,
-        role: "USER",
+        role: role,
       },
     })
 
