@@ -153,6 +153,6 @@ async function DELETEHandler(request: NextRequest) {
   }
 }
 
-export const GET = withRateLimit(GETHandler)
+export const GET = withCsrf(withRateLimit(GETHandler))
 export const POST = withCsrf(withRateLimit(POSTHandler))
 export const DELETE = withCsrf(withRateLimit(DELETEHandler))

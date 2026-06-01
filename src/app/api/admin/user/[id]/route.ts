@@ -6,6 +6,7 @@ import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 
 const logger = createLogger("api:admin:user-detail")
 
@@ -105,6 +106,6 @@ async function GETHandler(_request: NextRequest, { params }: { params: Promise<{
   }
 }
 
-export const GET = withRateLimit(
+export const GET = withCsrf(withRateLimit(
   GETHandler as (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>
-)
+))

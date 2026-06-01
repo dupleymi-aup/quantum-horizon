@@ -5,6 +5,7 @@ import { requireAdminRole, isAuthError } from "@/lib/auth-helpers"
 import { createLogger } from "@/lib/logger"
 import { adminJson } from "@/lib/admin-response"
 import { withRateLimit } from "@/lib/rate-limit"
+import { withCsrf } from "@/lib/csrf"
 
 const logger = createLogger("api:admin:analytics:grades")
 
@@ -150,4 +151,4 @@ async function GETHandler() {
   }
 }
 
-export const GET = withRateLimit(GETHandler)
+export const GET = withCsrf(withRateLimit(GETHandler))

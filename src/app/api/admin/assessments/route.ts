@@ -145,5 +145,5 @@ async function POSTHandler(request: NextRequest) {
   }
 }
 
-export const GET = withRateLimit(GETHandler)
+export const GET = withCsrf(withRateLimit(GETHandler))
 export const POST = withCsrf(withRateLimit(POSTHandler))
