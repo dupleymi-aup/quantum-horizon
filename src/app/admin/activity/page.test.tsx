@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest"
 import { render, screen, cleanup } from "@testing-library/react"
 import AdminActivityPage from "@/app/admin/activity/page"
+import type { ActivityData } from "@/hooks/api/use-admin-analytics"
 
 const mockUseAdminActivityAnalytics = vi.fn()
 

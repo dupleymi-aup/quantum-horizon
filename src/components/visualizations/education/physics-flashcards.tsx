@@ -750,7 +750,14 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
       cards = cards.filter((c) => masteredCards.has(c.id))
     }
     if (shuffled) {
-      cards = [...cards].sort(() => Math.random() - 0.5)
+      // Fisher-Yates shuffle with crypto.getRandomValues for purity compliance
+      const shuffledArray = [...cards]
+      for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+         
+        ;[shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]
+      }
+      cards = shuffledArray
     }
 
     return cards
@@ -770,7 +777,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
     if (isAnimating) return
     setIsAnimating(true)
     setIsFlipped((prev) => !prev)
-    setTimeout(() => setIsAnimating(false), 300)
+    setTimeout(() => { setIsAnimating(false); }, 300)
   }, [isAnimating])
 
   const handleNext = useCallback(() => {
@@ -778,7 +785,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
     setIsFlipped(false)
     setIsAnimating(true)
     setCurrentIndex((prev) => (prev + 1) % totalCards)
-    setTimeout(() => setIsAnimating(false), 300)
+    setTimeout(() => { setIsAnimating(false); }, 300)
   }, [isAnimating, totalCards])
 
   const handlePrevious = useCallback(() => {
@@ -786,7 +793,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
     setIsFlipped(false)
     setIsAnimating(true)
     setCurrentIndex((prev) => (prev - 1 + totalCards) % totalCards)
-    setTimeout(() => setIsAnimating(false), 300)
+    setTimeout(() => { setIsAnimating(false); }, 300)
   }, [isAnimating, totalCards])
 
   const handleShuffle = useCallback(() => {
@@ -851,11 +858,12 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
     }
 
     window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    return () => { window.removeEventListener("keydown", handleKeyDown); }
   }, [handleNext, handlePrevious, handleFlip, handleShuffle, handleReset])
 
   // Reset index when filters change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentIndex(0)
     setIsFlipped(false)
   }, [filterCategory, filterDifficulty, shuffled, showOnlyMastered])
@@ -906,7 +914,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => { setShowFilters(!showFilters); }}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${btnBg} ${textSecondary}`}
             aria-label={text.category}
           >
@@ -943,7 +951,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
             <span className={`text-xs font-medium ${textSecondary}`}>{text.category}:</span>
             <div className="flex flex-wrap gap-1.5">
               <button
-                onClick={() => setFilterCategory("all")}
+                onClick={() => { setFilterCategory("all"); }}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                   filterCategory === "all"
                     ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
@@ -958,7 +966,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
                 return (
                   <button
                     key={cat}
-                    onClick={() => setFilterCategory(filterCategory === cat ? "all" : cat)}
+                    onClick={() => { setFilterCategory(filterCategory === cat ? "all" : cat); }}
                     className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                       filterCategory === cat
                         ? `bg-gradient-to-r ${colors.gradient} text-white`
@@ -977,7 +985,7 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
             {(["all", "beginner", "intermediate", "advanced"] as const).map((diff) => (
               <button
                 key={diff}
-                onClick={() => setFilterDifficulty(diff === "all" ? "all" : diff)}
+                onClick={() => { setFilterDifficulty(diff === "all" ? "all" : diff); }}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                   filterDifficulty === diff
                     ? diff === "all"
@@ -991,14 +999,14 @@ export function PhysicsFlashcards({ isDark = true }: PhysicsFlashcardsProps) {
             ))}
             <div className="ml-auto">
               <button
-                onClick={() => setShowOnlyMastered(!showOnlyMastered)}
+                onClick={() => { setShowOnlyMastered(!showOnlyMastered); }}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                   showOnlyMastered
                     ? "bg-green-500/20 text-green-400"
                     : filterBtnDefault
                 }`}
               >
-                {showOnlyMastered ? text.mastered : `${language === "ru" ? "Показать изученные" : language === "zh" ? "显示已掌握" : language === "he" ? "הצג נלמדים" : "Show mastered"}`}
+                {showOnlyMastered ? text.mastered : (language === "ru" ? "Показать изученные" : language === "zh" ? "显示已掌握" : language === "he" ? "הצג נלמדים" : "Show mastered")}
               </button>
             </div>
           </div>

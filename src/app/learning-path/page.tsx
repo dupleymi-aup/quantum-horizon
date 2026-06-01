@@ -1,17 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
 import { LearningPath } from "@/components/ui/learning-path"
 import { useUserProgress } from "@/hooks/api/use-user-progress"
 
 export default function LearningPathPage() {
   const { progress, loading } = useUserProgress()
-  const [completedTopics, setCompletedTopics] = useState<string[]>([])
 
-  useEffect(() => {
-    if (progress && progress.length > 0) {
-      setCompletedTopics(progress.filter((p) => p.completedCount > 0).map((p) => p.topic))
-    }
+  const completedTopics = useMemo(() => {
+    if (progress === undefined) return []
+    return progress.filter((p) => p.completedCount > 0).map((p) => p.topic)
   }, [progress])
 
   return (

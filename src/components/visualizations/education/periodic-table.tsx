@@ -162,11 +162,11 @@ const PERIODIC_LABELS: Record<Language, Record<string, string>> = {
   },
 }
 
-function getOrbitalDiagram(config: string): { orbital: string; electrons: number }[] {
-  const orbitals: { orbital: string; electrons: number }[] = []
+function getOrbitalDiagram(config: string): Array<{ orbital: string; electrons: number }> {
+  const orbitals: Array<{ orbital: string; electrons: number }> = []
   const parts = config.replace(/\[|\]/g, "").split(/(?=[0-9][spdf])/)
   for (const part of parts) {
-    const match = part.match(/^(\d[spdf])(\d?)/)
+    const match = /^(\d[spdf])(\d?)/.exec(part)
     if (match) {
       orbitals.push({ orbital: match[1], electrons: parseInt(match[2] || "1") })
     }
@@ -194,7 +194,7 @@ export function PeriodicTable() {
       {/* Filter */}
       <div className="flex gap-2 flex-wrap">
         <button
-          onClick={() => setFilterBlock("")}
+          onClick={() => { setFilterBlock(""); }}
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             filterBlock === "" ? "bg-purple-600 text-white" : "border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
           }`}
@@ -204,7 +204,7 @@ export function PeriodicTable() {
         {["s", "p", "d", "f"].map((b) => (
           <button
             key={b}
-            onClick={() => setFilterBlock(filterBlock === b ? "" : b)}
+            onClick={() => { setFilterBlock(filterBlock === b ? "" : b); }}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               filterBlock === b ? "bg-purple-600 text-white" : "border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
             }`}
@@ -222,7 +222,7 @@ export function PeriodicTable() {
           return (
             <button
               key={el.z}
-              onClick={() => setSelectedZ(isSelected ? null : el.z)}
+              onClick={() => { setSelectedZ(isSelected ? null : el.z); }}
               className={`relative rounded-lg border p-2 text-center transition-all hover:scale-105 ${
                 isSelected
                   ? "border-purple-400 ring-2 ring-purple-500 bg-gray-700"

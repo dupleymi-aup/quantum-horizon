@@ -54,7 +54,7 @@ export default function RemindersPage() {
     }
   }
 
-  const tabs: { type: ReminderType; label: string }[] = [
+  const tabs: Array<{ type: ReminderType; label: string }> = [
     { type: null, label: "All" },
     { type: "PERSONAL", label: t("reminders.type.PERSONAL") },
     { type: "STUDY", label: t("reminders.type.STUDY") },
@@ -68,7 +68,7 @@ export default function RemindersPage() {
           <Bell className="size-7 text-yellow-500" />
           <h1 className="text-2xl font-bold">{t("reminders.title")}</h1>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={() => { setDialogOpen(true); }}>
           <Plus className="mr-1 size-4" />
           {t("reminders.createReminder")}
         </Button>
@@ -79,7 +79,7 @@ export default function RemindersPage() {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            onClick={() => setFilterType(tab.type)}
+            onClick={() => { setFilterType(tab.type); }}
             className={cn(
               "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               filterType === tab.type
@@ -104,7 +104,7 @@ export default function RemindersPage() {
             >
               <div className="flex items-start gap-3">
                 <div className={cn("mt-0.5 rounded-full px-2.5 py-1 text-xs font-medium", getTypeColor(r.type))}>
-                  {t(`reminders.type.${r.type}` as Parameters<typeof t>[0])}
+                  {t(`reminders.type.${r.type}`)}
                 </div>
                 <div>
                   <div className="text-base font-semibold">{r.title}</div>

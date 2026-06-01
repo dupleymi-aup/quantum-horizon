@@ -93,7 +93,7 @@ export function ReminderDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("reminders.typeLabel")}</label>
-            <Select value={type} onValueChange={(v) => setType(v as "PERSONAL" | "STUDY" | "EXAM")}>
+            <Select value={type} onValueChange={(v) => { setType(v as "PERSONAL" | "STUDY" | "EXAM"); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -108,7 +108,7 @@ export function ReminderDialog({
             <label className="text-sm font-medium">{t("reminders.titlePlaceholder")}</label>
             <Input
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => { setTitle(e.target.value); }}
               placeholder={t("reminders.titlePlaceholder")}
               required
             />
@@ -117,7 +117,7 @@ export function ReminderDialog({
             <label className="text-sm font-medium">{t("reminders.descriptionPlaceholder")}</label>
             <Textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => { setDescription(e.target.value); }}
               placeholder={t("reminders.descriptionPlaceholder")}
               rows={2}
             />
@@ -126,7 +126,7 @@ export function ReminderDialog({
             <label className="text-sm font-medium">{t("reminders.topicPlaceholder")}</label>
             <Input
               value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              onChange={(e) => { setTopic(e.target.value); }}
               placeholder={t("reminders.topicPlaceholder")}
             />
           </div>
@@ -135,7 +135,7 @@ export function ReminderDialog({
             <Input
               type="datetime-local"
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              onChange={(e) => { setDeadline(e.target.value); }}
               required
             />
           </div>
@@ -143,7 +143,7 @@ export function ReminderDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => { onOpenChange(false); }}
               disabled={isSubmitting}
             >
               {t("reminders.cancel")}

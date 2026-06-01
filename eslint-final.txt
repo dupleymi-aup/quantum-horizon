@@ -1,0 +1,311 @@
+
+> nextjs_tailwind_shadcn_ts@0.4.10 lint
+> eslint .
+
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\exam-deadlines\page.tsx
+   86:10  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+   89:10  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  121:29  error  Promise-returning function provided to attribute where a void return was expected                   @typescript-eslint/no-misused-promises
+  174:33  error  Promise-returning function provided to attribute where a void return was expected                   @typescript-eslint/no-misused-promises
+  187:33  error  Promise-returning function provided to attribute where a void return was expected                   @typescript-eslint/no-misused-promises
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\grades\page.test.tsx
+  56:7  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\reports\at-risk\page.tsx
+   62:24  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   63:25  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   70:32  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  172:68  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\reports\engagement-grades\page.tsx
+    5:3   warning  'Table' is defined but never used. Allowed unused vars must match /^_/u                                    @typescript-eslint/no-unused-vars
+    6:3   warning  'TableBody' is defined but never used. Allowed unused vars must match /^_/u                                @typescript-eslint/no-unused-vars
+    7:3   warning  'TableCell' is defined but never used. Allowed unused vars must match /^_/u                                @typescript-eslint/no-unused-vars
+    8:3   warning  'TableHead' is defined but never used. Allowed unused vars must match /^_/u                                @typescript-eslint/no-unused-vars
+    9:3   warning  'TableHeader' is defined but never used. Allowed unused vars must match /^_/u                              @typescript-eslint/no-unused-vars
+   10:3   warning  'TableRow' is defined but never used. Allowed unused vars must match /^_/u                                 @typescript-eslint/no-unused-vars
+   52:28  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   76:28  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  125:19  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  142:65  error    Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
+  177:39  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\reports\group-comparison\page.tsx
+    6:20  warning  'ProgressBarChart' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   36:25  warning  'setSelectedGroup' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  113:9   warning  'bestGroup' is assigned a value but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  132:73  error    Invalid type "number" of template literal expression                                         @typescript-eslint/restrict-template-expressions
+  133:73  error    Invalid type "number" of template literal expression                                         @typescript-eslint/restrict-template-expressions
+  222:48  error    Invalid type "number" of template literal expression                                         @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\reports\learning-velocity\page.tsx
+   48:28  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   49:29  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  109:19  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  113:9   warning  'velocityHistogram' is assigned a value but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  114:18  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  132:21  error    Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
+  137:21  error    Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
+  142:56  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  173:41  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  195:41  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  221:34  error    Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
+  256:66  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\admin\reports\topic-mastery\page.tsx
+    5:55  warning  'GradeDistributionChart' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  115:63  error    Invalid type "number" of template literal expression                                      @typescript-eslint/restrict-template-expressions
+  116:67  error    Invalid type "number" of template literal expression                                      @typescript-eslint/restrict-template-expressions
+  119:8   error    Unnecessary conditional, value is always truthy                                           @typescript-eslint/no-unnecessary-condition
+  171:42  error    Invalid type "number" of template literal expression                                      @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\exam-deadlines\route.ts
+  18:24  error  `datetime` is deprecated. Use `z.iso.datetime()` instead  @typescript-eslint/no-deprecated
+  25:23  error  Unnecessary optional chain on a non-nullish value         @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\reports\at-risk\route.ts
+  32:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  85:29  error    Unnecessary conditional, value is always truthy                            @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\reports\engagement-grades\route.ts
+  32:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\reports\group-comparison\route.ts
+  12:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u           @typescript-eslint/no-unused-vars
+  36:11  warning  'userMap' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  81:9   error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+  96:9   error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\reports\learning-velocity\route.ts
+  12:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\admin\reports\topic-mastery\route.ts
+   21:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u           @typescript-eslint/no-unused-vars
+   46:11  warning  'userIds' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   59:26  error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+   63:7   error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+   69:23  error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+   73:7   error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+   90:7   error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+  121:25  error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+  136:11  error    Forbidden non-null assertion                                                        @typescript-eslint/no-non-null-assertion
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\recommendations\route.ts
+  11:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u                           @typescript-eslint/no-unused-vars
+  14:23  error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  56:21  error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  57:11  error    Unnecessary conditional, value is always falsy                                                      @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\reminders\check\dismiss\route.ts
+  14:27  error  `datetime` is deprecated. Use `z.iso.datetime()` instead  @typescript-eslint/no-deprecated
+  20:23  error  Unnecessary optional chain on a non-nullish value         @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\reminders\check\route.ts
+  12:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  15:23  error    Unnecessary optional chain on a non-nullish value                          @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\reminders\route.ts
+  16:24  error  `datetime` is deprecated. Use `z.iso.datetime()` instead  @typescript-eslint/no-deprecated
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\sessions\route.ts
+  58:23  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\api\settings\route.ts
+  12:27  warning  'request' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  15:23  error    Unnecessary optional chain on a non-nullish value                          @typescript-eslint/no-unnecessary-condition
+  33:23  error    Unnecessary optional chain on a non-nullish value                          @typescript-eslint/no-unnecessary-condition
+  37:11  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  38:11  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  44:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  45:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  46:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  47:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  48:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  49:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  50:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  51:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  52:9   error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  55:38  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  56:41  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  57:41  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  58:45  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  59:45  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  60:47  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  61:45  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  62:39  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+  63:41  error    Unsafe assignment of an `any` value                                        @typescript-eslint/no-unsafe-assignment
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\error\page.tsx
+  9:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\forgot-password\page.tsx
+  14:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\reset-password\page.tsx
+  14:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\signin\page.tsx
+  14:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\signout\page.tsx
+  9:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\signup\page.tsx
+  15:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\auth\verify\page.tsx
+  9:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\dashboard\page.tsx
+  7:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\flashcards\page.tsx
+  4:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\glossary\page.tsx
+  4:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\help\page.tsx
+  3:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\laboratory\page.tsx
+  4:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\learning-path\page.tsx
+  11:9  error  Unnecessary conditional, the types have no overlap  @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\page.tsx
+  139:5   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-confusing-void-expression')
+  140:29  error    Unexpected empty arrow function                                                                                     @typescript-eslint/no-empty-function
+  141:5   error    Unsafe call of a type that could not be resolved                                                                    @typescript-eslint/no-unsafe-call
+  141:5   error    Placing a void expression inside another expression is forbidden. Move it to its own statement instead              @typescript-eslint/no-confusing-void-expression
+  141:30  error    Unexpected empty arrow function                                                                                     @typescript-eslint/no-empty-function
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\periodic-table\page.tsx
+  4:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\practice\page.tsx
+  4:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\profile\page.tsx
+  7:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\app\settings\page.tsx
+  7:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\layout\navigation.tsx
+  15:9  warning  'locale' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\reminders\reminder-dialog.tsx
+   65:40  error  `FormEvent` is deprecated. FormEvent doesn't actually exist.
+You probably meant to use {@link ChangeEvent}, {@link InputEvent}, {@link SubmitEvent}, or just {@link SyntheticEvent} instead
+depending on the event type  @typescript-eslint/no-deprecated
+   93:24  error  Promise-returning function provided to attribute where a void return was expected                                                                                                                                        @typescript-eslint/no-misused-promises
+  151:58  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                                                                                                                @typescript-eslint/prefer-nullish-coalescing
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\periodic-table.tsx
+  220:23   error  Unnecessary conditional, value is always truthy               @typescript-eslint/no-unnecessary-condition
+  255:126  error  Unnecessary optional chain on a non-nullish value             @typescript-eslint/no-unnecessary-condition
+  255:193  error  Unnecessary optional chain on a non-nullish value             @typescript-eslint/no-unnecessary-condition
+  259:89   error  Unnecessary optional chain on a non-nullish value             @typescript-eslint/no-unnecessary-condition
+  341:54   error  Invalid type "number" of template literal expression          @typescript-eslint/restrict-template-expressions
+  357:56   error  Invalid type "number" of template literal expression          @typescript-eslint/restrict-template-expressions
+  358:125  error  Invalid type "number | "N/A"" of template literal expression  @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-flashcards.tsx
+   753:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-flashcards.tsx:753:37
+  751 |     }
+  752 |     if (shuffled) {
+> 753 |       cards = [...cards].sort(() => Math.random() - 0.5)
+      |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  754 |     }
+  755 |
+  756 |     return cards                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/purity
+   859:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-flashcards.tsx:859:5
+  857 |   // Reset index when filters change
+  858 |   useEffect(() => {
+> 859 |     setCurrentIndex(0)
+      |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  860 |     setIsFlipped(false)
+  861 |   }, [filterCategory, filterDifficulty, shuffled, showOnlyMastered])
+  862 |  react-hooks/set-state-in-effect
+  1021:32  error  Invalid type "number" of template literal expression                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/restrict-template-expressions
+  1031:25  error  Invalid type "number" of template literal expression                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/restrict-template-expressions
+  1031:36  error  Invalid type "number" of template literal expression                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/restrict-template-expressions
+  1045:37  error  Invalid type "number" of template literal expression                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-glossary.tsx
+  553:31  warning  'idx' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-laboratory.tsx
+    5:29  warning  'XCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  180:30  error    Invalid type "number" of template literal expression                       @typescript-eslint/restrict-template-expressions
+  180:44  error    Invalid type "300" of template literal expression                          @typescript-eslint/restrict-template-expressions
+  341:30  error    Invalid type "number" of template literal expression                       @typescript-eslint/restrict-template-expressions
+  341:44  error    Invalid type "300" of template literal expression                          @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\physics-quiz.tsx
+     6:31  warning  'Award' is defined but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+    60:7   warning  'TOPIC_COLORS' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   771:10  warning  'answers' is assigned a value but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   785:21  error    Unnecessary conditional, value is always truthy                                          @typescript-eslint/no-unnecessary-condition
+   984:14  error    Unnecessary conditional, value is always truthy                                          @typescript-eslint/no-unnecessary-condition
+  1000:8   error    Unnecessary conditional, value is always truthy                                          @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\components\visualizations\education\practice-problems.tsx
+  291:8   error  Unnecessary conditional, value is always truthy                                                     @typescript-eslint/no-unnecessary-condition
+  334:18  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\hooks\api\use-achievement-notifications.ts
+  40:45  error  Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  58:30  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  60:22  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\hooks\api\use-reminders.ts
+   56:27  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+   75:71  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+   92:71  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+  107:71  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+  139:14  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  167:72  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+  188:23  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  207:67  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+  222:67  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+  239:67  error  Invalid type "number" of template literal expression                                                @typescript-eslint/restrict-template-expressions
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\hooks\use-reminder-notifications.ts
+  38:29  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  39:30  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  40:11  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  63:18  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  81:20  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  83:20  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  85:20  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  90:18  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  94:18  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\hooks\use-study-timer.ts
+   11:7   warning  'AUTOSAVE_INTERVAL_MS' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  100:26  error    Unexpected empty arrow function                                                                  @typescript-eslint/no-empty-function
+
+C:\Users\dupleymi\Documents\GitHub\quantum-horizon\src\lib\recommendations.ts
+  85:10  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  92:10  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+
+✖ 175 problems (130 errors, 45 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

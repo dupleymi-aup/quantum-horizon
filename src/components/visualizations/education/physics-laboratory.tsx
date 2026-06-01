@@ -601,7 +601,7 @@ export function PhysicsLaboratory() {
     setSliderValues({})
   }
 
-  const allComplete = experiment && completedSteps.size === experiment.steps.length
+  const allComplete = completedSteps.size === experiment?.steps.length
 
   return (
     <div className="space-y-6">
@@ -617,7 +617,7 @@ export function PhysicsLaboratory() {
           return (
             <button
               key={exp.id}
-              onClick={() => handleSelect(exp.id)}
+              onClick={() => { handleSelect(exp.id); }}
               className={`rounded-xl border p-4 text-left transition-all hover:scale-[1.02] ${
                 selectedId === exp.id
                   ? "border-purple-500 bg-purple-500/10"
@@ -744,27 +744,27 @@ export function PhysicsLaboratory() {
                   </div>
                   <div>
                     <label className="text-xs text-gray-400">
-                      {experiment.steps[currentStep].interactive!.label}:{" "}
+                      {experiment.steps[currentStep].interactive.label}:{" "}
                       <span className="font-mono text-cyan-300">
-                        {(sliderValues[currentStep] ?? experiment.steps[currentStep].interactive!.default).toFixed(1)}{" "}
-                        {experiment.steps[currentStep].interactive!.unit}
+                        {(sliderValues[currentStep] ?? experiment.steps[currentStep].interactive.default).toFixed(1)}{" "}
+                        {experiment.steps[currentStep].interactive.unit}
                       </span>
                     </label>
                     <input
                       type="range"
-                      min={experiment.steps[currentStep].interactive!.min}
-                      max={experiment.steps[currentStep].interactive!.max}
-                      step={experiment.steps[currentStep].interactive!.step}
-                      value={sliderValues[currentStep] ?? experiment.steps[currentStep].interactive!.default}
+                      min={experiment.steps[currentStep].interactive.min}
+                      max={experiment.steps[currentStep].interactive.max}
+                      step={experiment.steps[currentStep].interactive.step}
+                      value={sliderValues[currentStep] ?? experiment.steps[currentStep].interactive.default}
                       onChange={(e) =>
-                        setSliderValues((prev) => ({ ...prev, [currentStep]: parseFloat(e.target.value) }))
+                        { setSliderValues((prev) => ({ ...prev, [currentStep]: parseFloat(e.target.value) })); }
                       }
                       className="mt-1 w-full accent-cyan-500"
                     />
                   </div>
                   <div className="rounded bg-gray-900/50 p-3 font-mono text-sm text-green-400">
-                    {experiment.steps[currentStep].interactive!.result(
-                      sliderValues[currentStep] ?? experiment.steps[currentStep].interactive!.default
+                    {experiment.steps[currentStep].interactive.result(
+                      sliderValues[currentStep] ?? experiment.steps[currentStep].interactive.default
                     )}
                   </div>
                 </div>
@@ -774,7 +774,7 @@ export function PhysicsLaboratory() {
               <div className="flex justify-between">
                 {currentStep > 0 ? (
                   <button
-                    onClick={() => setCurrentStep((prev) => prev - 1)}
+                    onClick={() => { setCurrentStep((prev) => prev - 1); }}
                     className="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                   >
                     {labels.prevStep}

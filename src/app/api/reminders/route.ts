@@ -100,7 +100,7 @@ async function PATCHHandler(request: NextRequest) {
     const { reminded } = z.object({ reminded: z.boolean().optional() }).safeParse(body).data ?? {}
 
     const existing = await db.learningReminder.findUnique({ where: { id } })
-    if (!existing || existing.userId !== userId) {
+    if (existing?.userId !== userId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 })
     }
 
@@ -132,7 +132,7 @@ async function DELETEHandler(request: NextRequest) {
     }
 
     const existing = await db.learningReminder.findUnique({ where: { id } })
-    if (!existing || existing.userId !== userId) {
+    if (existing?.userId !== userId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 })
     }
 

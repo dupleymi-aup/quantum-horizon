@@ -82,12 +82,12 @@ export function getRecommendations(input: RecommendationInput): RecommendationSc
  * Получить заголовок рекомендации для UI
  */
 export function getRecommendationTitle(viz: VisualizationMeta, locale: string): string {
-  return viz.title[locale as keyof typeof viz.title] ?? viz.title["en"] ?? viz.id
+  return viz.title[locale] ?? viz.title.en ?? viz.id
 }
 
 /**
  * Получить описание рекомендации для UI
  */
 export function getRecommendationDescription(viz: VisualizationMeta, locale: string): string {
-  return viz.description[locale as keyof typeof viz.description] ?? viz.description["en"] ?? ""
+  return viz.description[locale] ?? viz.description.en ?? ""
 }

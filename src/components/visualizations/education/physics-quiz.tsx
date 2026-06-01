@@ -768,7 +768,7 @@ export function PhysicsQuiz() {
   const [showFilters, setShowFilters] = useState(true)
   const [streak, setStreak] = useState(0)
   const [totalPoints, setTotalPoints] = useState(0)
-  const [answers, setAnswers] = useState<{ question: string; correct: boolean }[]>([])
+  const [answers, setAnswers] = useState<Array<{ question: string; correct: boolean }>>([])
 
   const text = RESULT_TEXT[language]
 
@@ -832,7 +832,7 @@ export function PhysicsQuiz() {
             <div className="mb-2 text-xs font-medium text-gray-400">{text.topic}</div>
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setFilterTopic("all")}
+                onClick={() => { setFilterTopic("all"); }}
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium ${filterTopic === "all" ? "bg-purple-600 text-white" : "border border-gray-700 bg-gray-800 text-gray-300"}`}
               >
                 {text.allTopics}
@@ -842,7 +842,7 @@ export function PhysicsQuiz() {
                 return (
                   <button
                     key={topic}
-                    onClick={() => setFilterTopic(filterTopic === topic ? "all" : topic)}
+                    onClick={() => { setFilterTopic(filterTopic === topic ? "all" : topic); }}
                     className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       filterTopic === topic
                         ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
@@ -862,7 +862,7 @@ export function PhysicsQuiz() {
               {(["all", "beginner", "intermediate", "advanced"] as const).map((diff) => (
                 <button
                   key={diff}
-                  onClick={() => setFilterDifficulty(diff)}
+                  onClick={() => { setFilterDifficulty(diff); }}
                   className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                     filterDifficulty === diff
                       ? diff === "all"
@@ -918,7 +918,7 @@ export function PhysicsQuiz() {
       {/* Filter toggle */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => { setShowFilters(!showFilters); }}
           className="flex items-center gap-2 text-xs text-gray-400 hover:text-white"
         >
           <Filter className="h-3 w-3" />
@@ -933,7 +933,7 @@ export function PhysicsQuiz() {
         <div className="space-y-3 rounded-lg border border-gray-700 bg-gray-800/50 p-3">
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setFilterTopic("all")}
+              onClick={() => { setFilterTopic("all"); }}
               className={`rounded-lg px-2 py-1 text-[10px] font-medium ${filterTopic === "all" ? "bg-purple-600 text-white" : "border border-gray-700 bg-gray-800 text-gray-400"}`}
             >
               {text.allTopics}
@@ -943,7 +943,7 @@ export function PhysicsQuiz() {
               return (
                 <button
                   key={topic}
-                  onClick={() => setFilterTopic(filterTopic === topic ? "all" : topic)}
+                  onClick={() => { setFilterTopic(filterTopic === topic ? "all" : topic); }}
                   className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-medium ${
                     filterTopic === topic
                       ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
@@ -960,7 +960,7 @@ export function PhysicsQuiz() {
             {(["all", "beginner", "intermediate", "advanced"] as const).map((diff) => (
               <button
                 key={diff}
-                onClick={() => setFilterDifficulty(diff)}
+                onClick={() => { setFilterDifficulty(diff); }}
                 className={`rounded px-2 py-1 text-[10px] font-medium ${
                   filterDifficulty === diff
                     ? diff === "all"
@@ -1011,7 +1011,7 @@ export function PhysicsQuiz() {
               {q.options.map((option, index) => (
                 <button
                   key={index}
-                  onClick={() => handleAnswer(index)}
+                  onClick={() => { handleAnswer(index); }}
                   disabled={answered}
                   className={`w-full rounded-lg px-4 py-3 text-left text-sm transition-all ${
                     answered

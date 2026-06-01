@@ -15,14 +15,14 @@ const examSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(500).optional(),
   topic: z.string().min(1).max(200),
-  examDate: z.string().datetime(),
+  examDate: z.string().iso.datetime(),
   isActive: z.boolean().optional(),
 })
 
 async function GETHandler() {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (session?.user?.id == null) {
       return adminJson({ error: "Unauthorized" }, { status: 401 })
     }
 

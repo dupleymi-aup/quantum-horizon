@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useI18n } from "@/i18n/use-i18n"
 import { CalendarClock, Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { useExamDeadlines } from "@/hooks/api/use-reminders"
 import { AdminError } from "@/components/admin/admin-error"
 import { AdminNav } from "@/components/admin/admin-nav"
@@ -26,6 +25,10 @@ function toLocalDateTime(date: Date): string {
   return local.toISOString().slice(0, 16)
 }
 
+function getDefaultExamDate(): string {
+  return toLocalDateTime(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+}
+
 export default function AdminExamDeadlinesPage() {
   const t = useI18n()
   const { exams, isLoading, error, createExam, deleteExam, isCreating, isDeleting } = useExamDeadlines()
@@ -35,7 +38,8 @@ export default function AdminExamDeadlinesPage() {
   const [title, setTitle] = useState("")
   const [topic, setTopic] = useState("")
   const [description, setDescription] = useState("")
-  const [examDate, setExamDate] = useState(toLocalDateTime(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)))
+  const defaultExamDate = useMemo(() => getDefaultExamDate(), [])
+  const [examDate, setExamDate] = useState(defaultExamDate)
 
   const handleCreate = async () => {
     if (!title.trim() || !topic.trim() || !examDate) return
@@ -49,7 +53,7 @@ export default function AdminExamDeadlinesPage() {
     setTitle("")
     setTopic("")
     setDescription("")
-    setExamDate(toLocalDateTime(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)))
+    setExamDate(getDefaultExamDate())
     setShowCreate(false)
   }
 
@@ -72,7 +76,7 @@ export default function AdminExamDeadlinesPage() {
   }
 
   if (error) {
-    return <AdminError message={error} onRetry={() => window.location.reload()} />
+    return <AdminError message={error} onRetry={() => { window.location.reload(); }} />
   }
 
   return (
@@ -93,31 +97,31 @@ export default function AdminExamDeadlinesPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">{t("reminders.titlePlaceholder")}</label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Final Exam" />
+              <Input value={title} onChange={(e) => { setTitle(e.target.value); }} placeholder="Final Exam" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">{t("reminders.topicPlaceholder")}</label>
-              <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Quantum Mechanics" />
+              <Input value={topic} onChange={(e) => { setTopic(e.target.value); }} placeholder="Quantum Mechanics" />
             </div>
             <div className="space-y-2 sm:col-span-2">
               <label className="text-sm font-medium">{t("reminders.descriptionPlaceholder")}</label>
               <Textarea
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => { setDescription(e.target.value); }}
                 placeholder="Optional description"
                 rows={2}
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">{t("reminders.deadlineLabel")}</label>
-              <Input type="datetime-local" value={examDate} onChange={(e) => setExamDate(e.target.value)} />
+              <Input type="datetime-local" value={examDate} onChange={(e) => { setExamDate(e.target.value); }} />
             </div>
           </div>
           <div className="mt-4 flex gap-2">
             <Button onClick={handleCreate} disabled={isCreating || !title.trim() || !topic.trim() || !examDate}>
               {t("reminders.save")}
             </Button>
-            <Button variant="outline" onClick={() => setShowCreate(false)} disabled={isCreating}>
+            <Button variant="outline" onClick={() => { setShowCreate(false); }} disabled={isCreating}>
               {t("reminders.cancel")}
             </Button>
           </div>
@@ -128,7 +132,7 @@ export default function AdminExamDeadlinesPage() {
       <div className="rounded-xl border">
         <div className="flex items-center justify-between border-b p-4">
           <h2 className="text-lg font-semibold">{t("reminders.upcomingExams")}</h2>
-          <Button size="sm" onClick={() => setShowCreate(!showCreate)}>
+          <Button size="sm" onClick={() => { setShowCreate(!showCreate); }}>
             <Plus className="mr-1 size-4" />
             Add Exam
           </Button>

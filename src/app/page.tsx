@@ -136,9 +136,15 @@ export default function Home() {
 
   // Start timer when section changes
   useEffect(() => {
-    stopStudy()
-    startStudy()
-  }, [activeSection])
+    const handleStop = async () => {
+      await stopStudy()
+    }
+    const handleStart = async () => {
+      await startStudy()
+    }
+    void handleStop()
+    void handleStart()
+  }, [activeSection, startStudy, stopStudy])
 
   const isRTL = locale === "he"
   const isDark = theme === "dark"

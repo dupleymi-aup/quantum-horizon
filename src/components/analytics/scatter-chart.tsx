@@ -1,5 +1,6 @@
 "use client"
 
+import type { TooltipProps } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ScatterChart,
@@ -46,6 +47,31 @@ function computeRegressionLine(data: ScatterDataPoint[]) {
   return { slope, intercept }
 }
 
+function CustomTooltip({
+  active,
+  payload,
+  xLabel,
+  yLabel,
+}: TooltipProps & { xLabel: string; yLabel: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  if (active && payload && payload.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const point = payload[0].payload as ScatterDataPoint
+    return (
+      <div className="bg-background border rounded-md shadow-sm p-2 text-xs">
+        {point.label && <p className="font-medium">{point.label}</p>}
+        <p>
+          {xLabel}: {point.x}
+        </p>
+        <p>
+          {yLabel}: {point.y}
+        </p>
+      </div>
+    )
+  }
+  return null
+}
+
 export function ScatterChartComponent({
   data,
   title = "Scatter Plot",
@@ -79,24 +105,6 @@ export function ScatterChartComponent({
       ]
     : []
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length > 0) {
-      const point = payload[0].payload
-      return (
-        <div className="bg-background border rounded-md shadow-sm p-2 text-xs">
-          {point.label && <p className="font-medium">{point.label}</p>}
-          <p>
-            {xLabel}: {point.x}
-          </p>
-          <p>
-            {yLabel}: {point.y}
-          </p>
-        </div>
-      )
-    }
-    return null
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -113,7 +121,7 @@ export function ScatterChartComponent({
               <Label value={yLabel} angle={-90} position="insideLeft" />
             </YAxis>
             <ZAxis range={[40, 40]} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip xLabel={xLabel} yLabel={yLabel} />} />
             {showMedianLines && (
               <>
                 <ReferenceLine x={medianX} stroke="gray" strokeDasharray="3 3" />

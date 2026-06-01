@@ -144,7 +144,7 @@ export default function AdminAtRiskReportPage() {
           <CardTitle>At-Risk Students</CardTitle>
         </CardHeader>
         <CardContent>
-          {data && data.atRiskStudents.length === 0 && (
+          {data?.atRiskStudents.length === 0 && (
             <p className="text-muted-foreground text-sm text-center py-8">
               No at-risk students identified
             </p>

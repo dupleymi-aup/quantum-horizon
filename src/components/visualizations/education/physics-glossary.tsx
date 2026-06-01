@@ -511,14 +511,14 @@ export function PhysicsGlossary() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); }}
             placeholder={labels.search}
             className="w-full rounded-lg border border-gray-700 bg-gray-800 pl-10 pr-4 py-2 text-sm text-white placeholder:text-gray-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto">
           <button
-            onClick={() => setSelectedCategory("")}
+            onClick={() => { setSelectedCategory(""); }}
             className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
               selectedCategory === ""
                 ? "bg-purple-600 text-white"
@@ -530,7 +530,7 @@ export function PhysicsGlossary() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setSelectedCategory(cat === selectedCategory ? "" : cat)}
+              onClick={() => { setSelectedCategory(cat === selectedCategory ? "" : cat); }}
               className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                 selectedCategory === cat
                   ? "bg-purple-600 text-white"
@@ -558,7 +558,7 @@ export function PhysicsGlossary() {
           return (
             <div key={origIdx} className="rounded-lg border border-gray-700 bg-gray-800/50 overflow-hidden">
               <button
-                onClick={() => toggleTerm(origIdx)}
+                onClick={() => { toggleTerm(origIdx); }}
                 className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-700/50"
               >
                 <div className="flex items-center gap-3">
@@ -605,7 +605,7 @@ export function PhysicsGlossary() {
                         {entry.related.map((r) => (
                           <button
                             key={r}
-                            onClick={() => setSearch(r)}
+                            onClick={() => { setSearch(r); }}
                             className="flex items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/10 px-2.5 py-1 text-xs text-purple-300 hover:bg-purple-500/20"
                           >
                             {r}

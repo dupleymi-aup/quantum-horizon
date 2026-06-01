@@ -61,10 +61,10 @@ export function useReminderNotifications() {
         duration: 15000,
         action: {
           label: t("reminders.dismiss") ?? "Dismiss",
-          onClick: () => markShown(reminder.id),
+          onClick: () => { markShown(reminder.id); },
         },
-        onDismiss: () => markShown(reminder.id),
-        onAutoClose: () => markShown(reminder.id),
+        onDismiss: () => { markShown(reminder.id); },
+        onAutoClose: () => { markShown(reminder.id); },
       })
       markShown(reminder.id)
     }
@@ -98,8 +98,8 @@ export function useReminderNotifications() {
             markShown(exam.id)
           },
         },
-        onDismiss: () => markShown(exam.id),
-        onAutoClose: () => markShown(exam.id),
+        onDismiss: () => { markShown(exam.id); },
+        onAutoClose: () => { markShown(exam.id); },
       })
       markShown(exam.id)
     }

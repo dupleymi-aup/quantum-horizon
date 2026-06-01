@@ -431,7 +431,7 @@ export function DashboardContent({ userName }: DashboardContentProps) {
             <Bell className="size-5 text-yellow-500" />
             <h3 className="text-lg font-semibold">{t("reminders.title")}</h3>
           </div>
-          <Button size="sm" onClick={() => setDialogOpen(true)}>
+          <Button size="sm" onClick={() => { setDialogOpen(true); }}>
             <CalendarClock className="mr-1 size-4" />
             {t("reminders.createReminder")}
           </Button>
@@ -447,7 +447,7 @@ export function DashboardContent({ userName }: DashboardContentProps) {
               >
                 <div className="flex items-start gap-3">
                   <div className={cn("mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium", getTypeColor(r.type))}>
-                    {t(`reminders.type.${r.type}` as Parameters<typeof t>[0])}
+                    {t(`reminders.type.${r.type}`)}
                   </div>
                   <div>
                     <div className="text-sm font-medium">{r.title}</div>

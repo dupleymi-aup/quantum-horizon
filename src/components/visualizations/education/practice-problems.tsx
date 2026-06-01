@@ -320,7 +320,7 @@ export function PracticeProblems() {
                 type="number"
                 step="any"
                 value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
+                onChange={(e) => { setUserAnswer(e.target.value); }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSubmit()
                 }}
@@ -360,7 +360,7 @@ export function PracticeProblems() {
           <div className="flex gap-2">
             {!submitted && (
               <Button
-                onClick={() => setShowHint(!showHint)}
+                onClick={() => { setShowHint(!showHint); }}
                 variant="outline"
                 size="sm"
                 className="text-xs border-yellow-500/50 text-yellow-300"
@@ -370,7 +370,7 @@ export function PracticeProblems() {
             )}
             {submitted && (
               <Button
-                onClick={() => setShowSolution(!showSolution)}
+                onClick={() => { setShowSolution(!showSolution); }}
                 variant="outline"
                 size="sm"
                 className="text-xs border-blue-500/50 text-blue-300"

@@ -55,17 +55,17 @@ export function useAchievementToastNotifications() {
     }
 
     toast.success(
-      `${achievement.icon} ${t(`achievements.${achievement.id}` as Parameters<typeof t>[0]) ?? achievement.name}`,
+      `${achievement.icon} ${t(`achievements.${achievement.id}`) ?? achievement.name}`,
       {
         description: t(
-          `achievements.${achievement.id}Desc` as Parameters<typeof t>[0]
+          `achievements.${achievement.id}Desc`
         ) ?? achievement.description,
         style: {
           borderLeft: `4px solid ${colorMap[achievement.rarity] ?? "#6b7280"}`,
         },
         duration: 5000,
-        onDismiss: () => dismissToast(achievementId),
-        onAutoClose: () => dismissToast(achievementId),
+        onDismiss: () => { dismissToast(achievementId); },
+        onAutoClose: () => { dismissToast(achievementId); },
       }
     )
   }, [mutation.data, t])
